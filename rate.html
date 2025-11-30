@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Analyzer: Top 150 & Binance Volatility</title>
+    <!-- Використовуємо стабільну версію 3.8.0 -->
+    <script src="https://unpkg.com/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
+    
+    <style>
+        /* Базовий розмір шрифту: 85% */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #f4f6f8; 
+            margin: 0; 
+            padding: 20px;
+            font-size: 85%; 
+        }
+        
+        h1 { text-align: center; color: #333; font-size: 1.5em; }
+        
+        /* Controls Header */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .control-group { display: flex; flex-direction: column; }
+        
+        label { font-size: 0.9em; font-weight: bold; margin-bottom: 4px; color: #555; }
+        select, input { padding: 6px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.9em; }
+        input[type="number"] { width: 60px; }
+        button { font-size: 0.9em !important; }
+
+        /* Coin List */
+        .coin-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+        }
+        .coin-card {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-align: center;
+            border: 1px solid transparent;
+        }
+        .coin-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-color: #f0b90b; 
+        }
+        
+        .rank { font-size: 0.8em; color: #888; margin-bottom: 3px; }
+        .symbol { font-size: 1.2em; font-weight: bold; color: #333; } 
+        .name { font-size: 0.9em; color: #666; }
+
+        /* Loading */
+        #loading { text-align: center; font-size: 1.1em; margin-top: 50px; display: none; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 95%;
+            max-width: 800px; 
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            font-size: 1em; 
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-close {
+            position: absolute;
+            top: 10px; right: 15px;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #aaa;
+            z-index: 10;
+        }
+        .modal-close:hover { color: #333; }
+        
+        /* Modal Layout: Split View */
+        .modal-body {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 10px;
+        }
+        .stats-column {
+            flex: 1;
+            min-width: 300px;
+        }
+        .chart-column {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+        #chartContainer {
+            width: 100%;
+            height: 350px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+
+        /* Stats Table in Modal */
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+        .stats-table th, .stats-table td {
+            border: 1px solid #ccc;
+            padding: 6px;
+            text-align: center;
+        }
+        
+        .stats-table th { 
+            background-color: #fff;
+            font-weight: bold;
+        }
+
+        /* Сірий фон для непарних стовпців */
+        .stats-table th:nth-child(odd),
+        .stats-table td:nth-child(odd) {
+            background-color: #e6e6e6; 
+        }
+
+        .green-text { color: #27ae60; font-weight: bold; }
+        .red-text { color: #c0392b; font-weight: bold; }
+        
+        .section-title { 
+            margin-top: 10px; 
+            font-size: 1em; 
+            font-weight: bold; 
+            border-bottom: 2px solid #eee; 
+            padding-bottom: 5px; 
+            color: #444;
+        }
+        .chart-title {
+            font-size: 1em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-align: center;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Crypto Volatility Analyzer</h1>
+
+    <div class="controls">
+        <div class="control-group">
+            <label>Таймфрейм</label>
+            <select id="tfSelect">
+                <option value="4h">4 години</option>
+                <option value="6h">6 годин</option>
+                <option value="12h">12 годин</option>
+                <option value="1d">1 день</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label>Поріг L1 (%)</label>
+            <select id="l1Select">
+                <option value="2">2%</option>
+                <option value="3">3%</option>
+                <option value="4">4%</option>
+                <option value="5" selected>5%</option>
+                <option value="6">6%</option>
+                <option value="7">7%</option>
+                <option value="8">8%</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label>Поріг L2 (%)</label>
+            <select id="l2Select">
+                <option value="2">2%</option>
+                <option value="3">3%</option>
+                <option value="4">4%</option>
+                <option value="5">5%</option>
+                <option value="6">6%</option>
+                <option value="7">7%</option>
+                <option value="8" selected>8%</option>
+            </select>
+        </div>
+        <!-- Нове налаштування кількості свічок -->
+        <div class="control-group">
+            <label>Свічки (графік)</label>
+            <input type="number" id="candleLimit" value="100" min="20" max="1000" step="10">
+        </div>
+
+        <div class="control-group" style="justify-content: flex-end;">
+            <button onclick="initApp()" style="padding: 6px 14px; cursor: pointer; background: #f0b90b; border: none; border-radius: 4px; font-weight: bold;">Оновити список</button>
+        </div>
+    </div>
+
+    <div id="loading">Завантаження даних (Binance + CoinGecko)...</div>
+    <div id="coinList" class="coin-list"></div>
+
+    <!-- Modal -->
+    <div id="statsModal" class="modal-overlay">
+        <div class="modal">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle" style="font-size: 1.3em; margin-bottom: 10px;">Статистика</h2>
+            
+            <div class="modal-body">
+                <!-- Ліва колонка: Таблиці -->
+                <div class="stats-column" id="modalStatsContent">
+                    Завантаження свічок...
+                </div>
+
+                <!-- Права колонка: Графік -->
+                <div class="chart-column">
+                    <div class="chart-title">Технічний аналіз (BB + SMA 8)</div>
+                    <div id="chartContainer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // Config
+    const COINGECKO_API = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=200&page=1&sparkline=false';
+    const BINANCE_INFO = 'https://api.binance.com/api/v3/exchangeInfo';
+    const BINANCE_KLINES = 'https://api.binance.com/api/v3/klines';
+
+    let binancePairs = new Set();
+    let displayCoins = [];
+    let chartInstance = null; // Для зберігання інстансу графіка
+
+    // Initialize logic
+    async function initApp() {
+        const loading = document.getElementById('loading');
+        const listDiv = document.getElementById('coinList');
+        
+        loading.style.display = 'block';
+        listDiv.innerHTML = '';
+
+        try {
+            await fetchBinancePairs();
+            const cgData = await fetch(COINGECKO_API).then(res => res.json());
+            processCoins(cgData);
+        } catch (error) {
+            console.error(error);
+            listDiv.innerHTML = `<p style="color:red; text-align:center;">Помилка завантаження даних.<br>${error.message}</p>`;
+        } finally {
+            loading.style.display = 'none';
+        }
+    }
+
+    async function fetchBinancePairs() {
+        try {
+            const res = await fetch(BINANCE_INFO);
+            const data = await res.json();
+            data.symbols.forEach(s => {
+                if (s.status === 'TRADING' && s.quoteAsset === 'USDT') {
+                    binancePairs.add(s.symbol);
+                }
+            });
+        } catch (e) {
+            alert("Не вдалося отримати список пар з Binance");
+        }
+    }
+
+    function processCoins(cgData) {
+        const listDiv = document.getElementById('coinList');
+        displayCoins = [];
+
+        cgData.forEach((coin, index) => {
+            const binanceSymbol = coin.symbol.toUpperCase() + 'USDT';
+            if (binancePairs.has(binanceSymbol)) {
+                displayCoins.push({ ...coin, binanceSymbol, rank: index + 1 });
+            }
+        });
+
+        const finalList = displayCoins.slice(0, 150);
+
+        finalList.forEach(coin => {
+            const div = document.createElement('div');
+            div.className = 'coin-card';
+            div.onclick = () => openModal(coin.binanceSymbol, coin.name);
+            div.innerHTML = `
+                <div class="rank">#${coin.market_cap_rank}</div>
+                <div class="symbol">${coin.symbol.toUpperCase()}</div>
+                <div class="name">${coin.name}</div>
+            `;
+            listDiv.appendChild(div);
+        });
+    }
+
+    // --- Modal Logic ---
+    const modal = document.getElementById('statsModal');
+    
+    function openModal(symbol, name) {
+        modal.style.display = 'flex';
+        document.getElementById('modalTitle').innerText = `${name} (${symbol}) - Аналіз`;
+        document.getElementById('modalStatsContent').innerHTML = '<div style="text-align:center; padding:20px;">Завантаження свічок...</div>';
+        
+        // Очистити попередній графік
+        if (chartInstance) {
+            chartInstance.remove();
+            chartInstance = null;
+        }
+        document.getElementById('chartContainer').innerHTML = '';
+
+        analyzeCoin(symbol);
+    }
+
+    function closeModal() {
+        modal.style.display = 'none';
+        if (chartInstance) {
+            chartInstance.remove();
+            chartInstance = null;
+        }
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
+
+    async function analyzeCoin(symbol) {
+        const tf = document.getElementById('tfSelect').value;
+        const l1 = parseFloat(document.getElementById('l1Select').value);
+        const l2 = parseFloat(document.getElementById('l2Select').value);
+
+        try {
+            const url = `${BINANCE_KLINES}?symbol=${symbol}&interval=${tf}&limit=1000`;
+            const res = await fetch(url);
+            const klines = await res.json();
+            
+            // 1. Статистика
+            const stats = calculateStats(klines, l1, l2);
+            renderStats(stats, l1, l2, klines.length);
+
+            // 2. Графік (малює з урахуванням налаштування кількості)
+            drawChart(klines);
+
+        } catch (e) {
+            console.error(e);
+            document.getElementById('modalStatsContent').innerText = "Помилка при отриманні даних.";
+        }
+    }
+
+    // --- Math & Stats ---
+    function calculateStats(klines, l1, l2) {
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const prevYear = currentYear - 1;
+        
+        const threeMonthsAgoDate = new Date();
+        threeMonthsAgoDate.setMonth(now.getMonth() - 3);
+        const threeMonthsAgoTs = threeMonthsAgoDate.getTime();
+
+        const createStatObj = () => ({ totalCandles: 0, greenL1: 0, greenL2: 0, redL1: 0, redL2: 0 });
+
+        const data = {
+            all: createStatObj(),
+            last3Months: createStatObj(),
+            currYear: createStatObj(),
+            prevYear: createStatObj()
+        };
+
+        klines.forEach(k => {
+            const time = k[0];
+            const open = parseFloat(k[1]);
+            const high = parseFloat(k[2]);
+            const low = parseFloat(k[3]);
+            const close = parseFloat(k[4]);
+            
+            const year = new Date(time).getFullYear();
+            const volatility = ((high - low) * 100) / close;
+            const isGreen = close > open; 
+            const isRed = close < open;   
+
+            const updateStat = (obj) => {
+                obj.totalCandles++;
+                if (isGreen) {
+                    if (volatility > l1) obj.greenL1++;
+                    if (volatility > l2) obj.greenL2++;
+                } else if (isRed) {
+                    if (volatility > l1) obj.redL1++;
+                    if (volatility > l2) obj.redL2++;
+                }
+            };
+
+            updateStat(data.all);
+            if (time >= threeMonthsAgoTs) updateStat(data.last3Months);
+            if (year === currentYear) updateStat(data.currYear);
+            if (year === prevYear) updateStat(data.prevYear);
+        });
+
+        return data;
+    }
+
+    function renderStats(data, l1, l2, totalFetched) {
+        const container = document.getElementById('modalStatsContent');
+        
+        const generateTable = (title, statObj) => {
+            if (statObj.totalCandles === 0) return '';
+            const getPerc = (val) => ((val / statObj.totalCandles) * 100).toFixed(2) + '%';
+            return `
+                <div class="section-title">${title} (${statObj.totalCandles})</div>
+                <table class="stats-table">
+                    <thead>
+                        <tr>
+                            <th>Тип</th>
+                            <th>> L1</th>
+                            <th>%</th>
+                            <th>> L2</th>
+                            <th>%</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="green-text">Green</td>
+                            <td>${statObj.greenL1}</td>
+                            <td>${getPerc(statObj.greenL1)}</td>
+                            <td>${statObj.greenL2}</td>
+                            <td>${getPerc(statObj.greenL2)}</td>
+                        </tr>
+                        <tr>
+                            <td class="red-text">Red</td>
+                            <td>${statObj.redL1}</td>
+                            <td>${getPerc(statObj.redL1)}</td>
+                            <td>${statObj.redL2}</td>
+                            <td>${getPerc(statObj.redL2)}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+        };
+
+        let html = ``;
+        html += generateTable(`Всі (${totalFetched})`, data.all);
+        html += generateTable(`3 Місяці`, data.last3Months);
+        html += generateTable(`Поточний рік`, data.currYear);
+        html += generateTable(`Минулий рік`, data.prevYear);
+        container.innerHTML = html;
+    }
+
+    // --- Charting ---
+    function drawChart(klines) {
+        const container = document.getElementById('chartContainer');
+        
+        // 1. Prepare Data
+        const candleData = klines.map(k => ({
+            time: k[0] / 1000, 
+            open: parseFloat(k[1]),
+            high: parseFloat(k[2]),
+            low: parseFloat(k[3]),
+            close: parseFloat(k[4])
+        }));
+
+        // 2. Calculate Indicators (Full Dataset)
+        const sma8Data = calculateSMA(candleData, 8);
+        const bbData = calculateBollingerBands(candleData, 20, 2);
+
+        // 3. Slice Logic based on Input
+        const inputVal = parseInt(document.getElementById('candleLimit').value);
+        // Захист від дурня: мінімум 20, максимум 1000
+        const sliceCount = (isNaN(inputVal) || inputVal < 20) ? 100 : Math.min(inputVal, 1000);
+        
+        const total = candleData.length;
+        
+        // Знаходимо індекс початку для свічок
+        const startIndex = total > sliceCount ? total - sliceCount : 0;
+        
+        // Беремо підмножину свічок
+        const lastCandles = candleData.slice(startIndex);
+        
+        // Отримуємо час першої свічки у видимій області
+        const startTime = lastCandles[0].time;
+
+        // Фільтруємо індикатори, щоб вони починалися з цього ж часу
+        const lastSMA = sma8Data.filter(d => d.time >= startTime);
+        const lastBB = bbData.filter(d => d.time >= startTime);
+
+        // 4. Create Chart
+        chartInstance = LightweightCharts.createChart(container, {
+            width: container.clientWidth,
+            height: 350,
+            layout: { backgroundColor: '#ffffff', textColor: '#333' },
+            grid: { vertLines: { color: '#f0f3fa' }, horzLines: { color: '#f0f3fa' } },
+            timeScale: { timeVisible: true, borderColor: '#D1D4DC' },
+            rightPriceScale: { borderColor: '#D1D4DC' },
+        });
+
+        // Add Candle Series
+        const candlestickSeries = chartInstance.addCandlestickSeries({
+            upColor: '#26a69a', downColor: '#ef5350', 
+            borderVisible: false, wickUpColor: '#26a69a', wickDownColor: '#ef5350',
+            lastValueVisible: false, priceLineVisible: false
+        });
+        candlestickSeries.setData(lastCandles);
+
+        // Add Bollinger Bands (Спочатку, щоб були під низом)
+        // Верхня та Нижня
+        const bbUpper = chartInstance.addLineSeries({ 
+            color: 'rgba(128, 0, 128, 0.4)', lineWidth: 1, 
+            lastValueVisible: false, priceLineVisible: false 
+        });
+        const bbLower = chartInstance.addLineSeries({ 
+            color: 'rgba(128, 0, 128, 0.4)', lineWidth: 1, 
+            lastValueVisible: false, priceLineVisible: false 
+        });
+        // Середня (dashed)
+        const bbMiddle = chartInstance.addLineSeries({ 
+            color: 'rgba(128, 0, 128, 0.6)', lineWidth: 1, 
+           // lineStyle: 2, // пунктир
+            lastValueVisible: false, priceLineVisible: false 
+        });
+        
+        bbUpper.setData(lastBB.map(d => ({ time: d.time, value: d.upper })));
+        bbLower.setData(lastBB.map(d => ({ time: d.time, value: d.lower })));
+        bbMiddle.setData(lastBB.map(d => ({ time: d.time, value: d.middle }))); // Середня лінія
+
+        // Add SMA 8 (В кінці, зверху, нейтральний колір)
+        const smaSeries = chartInstance.addLineSeries({
+            color: '#78909c', // Спокійний сіро-блакитний колір
+            lineWidth: 1, 
+            lastValueVisible: false, priceLineVisible: false
+        });
+        smaSeries.setData(lastSMA);
+
+        // Fit content
+        chartInstance.timeScale().fitContent();
+    }
+
+    function calculateSMA(data, period) {
+        const result = [];
+        for (let i = 0; i < data.length; i++) {
+            if (i < period - 1) continue;
+            let sum = 0;
+            for (let j = 0; j < period; j++) {
+                sum += data[i - j].close;
+            }
+            result.push({ time: data[i].time, value: sum / period });
+        }
+        return result;
+    }
+
+    function calculateBollingerBands(data, period, multiplier) {
+        const result = [];
+        for (let i = 0; i < data.length; i++) {
+            if (i < period - 1) continue;
+
+            let sum = 0;
+            for (let j = 0; j < period; j++) {
+                sum += data[i - j].close;
+            }
+            const sma = sum / period;
+
+            let sumSqDiff = 0;
+            for (let j = 0; j < period; j++) {
+                sumSqDiff += Math.pow(data[i - j].close - sma, 2);
+            }
+            const stdDev = Math.sqrt(sumSqDiff / period);
+
+            result.push({
+                time: data[i].time,
+                middle: sma, // Повертаємо середню лінію
+                upper: sma + (multiplier * stdDev),
+                lower: sma - (multiplier * stdDev)
+            });
+        }
+        return result;
+    }
+    
+    window.addEventListener('resize', () => {
+        if (chartInstance && document.getElementById('chartContainer')) {
+            chartInstance.applyOptions({ width: document.getElementById('chartContainer').clientWidth });
+        }
+    });
+
+    window.onload = initApp;
+
+</script>
+
+</body>
+</html>
