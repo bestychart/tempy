@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crypto Analyzer: Top 150 & Binance Volatility</title>
-    <!-- Використовуємо стабільну версію 3.8.0 -->
+    <!-- Stable version 3.8.0 -->
     <script src="https://unpkg.com/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
     
     <style>
-        /* Базовий розмір шрифту: 85% */
+        /* Base font size: 85% */
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             background-color: #f4f6f8; 
@@ -64,8 +64,9 @@
         .symbol { font-size: 1.2em; font-weight: bold; color: #333; } 
         .name { font-size: 0.9em; color: #666; }
 
-        /* Loading */
+        /* Loading & Error */
         #loading { text-align: center; font-size: 1.1em; margin-top: 50px; display: none; }
+        .error-msg { color: #c0392b; text-align: center; font-weight: bold; margin-top: 20px; }
 
         /* Modal */
         .modal-overlay {
@@ -143,7 +144,7 @@
             font-weight: bold;
         }
 
-        /* Сірий фон для непарних стовпців */
+        /* Grey background for odd columns */
         .stats-table th:nth-child(odd),
         .stats-table td:nth-child(odd) {
             background-color: #e6e6e6; 
@@ -167,6 +168,15 @@
             text-align: center;
             color: #555;
         }
+        .data-info {
+            font-size: 1em;         /* Такий же розмір як у основного тексту */
+            color: #333;            /* Стандартний темний колір */
+            font-weight: bold;      /* Жирний шрифт */
+            text-align: center;     /* По центру */
+            margin-bottom: 15px;    /* Відступ знизу */
+            border-bottom: 1px solid #eee; /* Легка лінія знизу (опціонально, для стилю) */
+            padding-bottom: 5px;
+        }
     </style>
 </head>
 <body>
@@ -175,16 +185,16 @@
 
     <div class="controls">
         <div class="control-group">
-            <label>Таймфрейм</label>
+            <label>Timeframe</label>
             <select id="tfSelect">
-                <option value="4h">4 години</option>
-                <option value="6h">6 годин</option>
-                <option value="12h">12 годин</option>
-                <option value="1d">1 день</option>
+                <option value="4h">4 Hours</option>
+                <option value="6h">6 Hours</option>
+                <option value="12h">12 Hours</option>
+                <option value="1d">1 Day</option>
             </select>
         </div>
         <div class="control-group">
-            <label>Поріг L1 (%)</label>
+            <label>Threshold L1 (%)</label>
             <select id="l1Select">
                 <option value="2">2%</option>
                 <option value="3">3%</option>
@@ -196,7 +206,7 @@
             </select>
         </div>
         <div class="control-group">
-            <label>Поріг L2 (%)</label>
+            <label>Threshold L2 (%)</label>
             <select id="l2Select">
                 <option value="2">2%</option>
                 <option value="3">3%</option>
@@ -207,35 +217,35 @@
                 <option value="8" selected>8%</option>
             </select>
         </div>
-        <!-- Нове налаштування кількості свічок -->
+        <!-- Candles limit setting -->
         <div class="control-group">
-            <label>Свічки (графік)</label>
+            <label>Candles (Chart)</label>
             <input type="number" id="candleLimit" value="100" min="20" max="1000" step="10">
         </div>
 
         <div class="control-group" style="justify-content: flex-end;">
-            <button onclick="initApp()" style="padding: 6px 14px; cursor: pointer; background: #f0b90b; border: none; border-radius: 4px; font-weight: bold;">Оновити список</button>
+            <button onclick="initApp()" style="padding: 6px 14px; cursor: pointer; background: #f0b90b; border: none; border-radius: 4px; font-weight: bold;">Refresh List</button>
         </div>
     </div>
 
-    <div id="loading">Завантаження даних (Binance + CoinGecko)...</div>
+    <div id="loading">Loading data (Binance + CoinGecko)...</div>
     <div id="coinList" class="coin-list"></div>
 
     <!-- Modal -->
     <div id="statsModal" class="modal-overlay">
         <div class="modal">
             <span class="modal-close" onclick="closeModal()">&times;</span>
-            <h2 id="modalTitle" style="font-size: 1.3em; margin-bottom: 10px;">Статистика</h2>
+            <h2 id="modalTitle" style="font-size: 1.3em; margin-bottom: 10px;">Statistics</h2>
             
             <div class="modal-body">
-                <!-- Ліва колонка: Таблиці -->
+                <!-- Left Column: Tables -->
                 <div class="stats-column" id="modalStatsContent">
-                    Завантаження свічок...
+                    Loading candles...
                 </div>
 
-                <!-- Права колонка: Графік -->
+                <!-- Right Column: Chart -->
                 <div class="chart-column">
-                    <div class="chart-title">Технічний аналіз (BB + SMA 8)</div>
+                    <div class="chart-title">Technical Analysis (BB + SMA 8)</div>
                     <div id="chartContainer"></div>
                 </div>
             </div>
@@ -243,363 +253,8 @@
     </div>
 
 <script>
-    // Config
-    const COINGECKO_API = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=200&page=1&sparkline=false';
-    const BINANCE_INFO = 'https://api.binance.com/api/v3/exchangeInfo';
-    const BINANCE_KLINES = 'https://api.binance.com/api/v3/klines';
 
-    let binancePairs = new Set();
-    let displayCoins = [];
-    let chartInstance = null; // Для зберігання інстансу графіка
-
-    // Initialize logic
-    async function initApp() {
-        const loading = document.getElementById('loading');
-        const listDiv = document.getElementById('coinList');
-        
-        loading.style.display = 'block';
-        listDiv.innerHTML = '';
-
-        try {
-            await fetchBinancePairs();
-            const cgData = await fetch(COINGECKO_API).then(res => res.json());
-            processCoins(cgData);
-        } catch (error) {
-            console.error(error);
-            listDiv.innerHTML = `<p style="color:red; text-align:center;">Помилка завантаження даних.<br>${error.message}</p>`;
-        } finally {
-            loading.style.display = 'none';
-        }
-    }
-
-    async function fetchBinancePairs() {
-        try {
-            const res = await fetch(BINANCE_INFO);
-            const data = await res.json();
-            data.symbols.forEach(s => {
-                if (s.status === 'TRADING' && s.quoteAsset === 'USDT') {
-                    binancePairs.add(s.symbol);
-                }
-            });
-        } catch (e) {
-            alert("Не вдалося отримати список пар з Binance");
-        }
-    }
-
-    function processCoins(cgData) {
-        const listDiv = document.getElementById('coinList');
-        displayCoins = [];
-
-        cgData.forEach((coin, index) => {
-            const binanceSymbol = coin.symbol.toUpperCase() + 'USDT';
-            if (binancePairs.has(binanceSymbol)) {
-                displayCoins.push({ ...coin, binanceSymbol, rank: index + 1 });
-            }
-        });
-
-        const finalList = displayCoins.slice(0, 150);
-
-        finalList.forEach(coin => {
-            const div = document.createElement('div');
-            div.className = 'coin-card';
-            div.onclick = () => openModal(coin.binanceSymbol, coin.name);
-            div.innerHTML = `
-                <div class="rank">#${coin.market_cap_rank}</div>
-                <div class="symbol">${coin.symbol.toUpperCase()}</div>
-                <div class="name">${coin.name}</div>
-            `;
-            listDiv.appendChild(div);
-        });
-    }
-
-    // --- Modal Logic ---
-    const modal = document.getElementById('statsModal');
-    
-    function openModal(symbol, name) {
-        modal.style.display = 'flex';
-        document.getElementById('modalTitle').innerText = `${name} (${symbol}) - Аналіз`;
-        document.getElementById('modalStatsContent').innerHTML = '<div style="text-align:center; padding:20px;">Завантаження свічок...</div>';
-        
-        // Очистити попередній графік
-        if (chartInstance) {
-            chartInstance.remove();
-            chartInstance = null;
-        }
-        document.getElementById('chartContainer').innerHTML = '';
-
-        analyzeCoin(symbol);
-    }
-
-    function closeModal() {
-        modal.style.display = 'none';
-        if (chartInstance) {
-            chartInstance.remove();
-            chartInstance = null;
-        }
-    }
-
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            closeModal();
-        }
-    }
-
-    async function analyzeCoin(symbol) {
-        const tf = document.getElementById('tfSelect').value;
-        const l1 = parseFloat(document.getElementById('l1Select').value);
-        const l2 = parseFloat(document.getElementById('l2Select').value);
-
-        try {
-            const url = `${BINANCE_KLINES}?symbol=${symbol}&interval=${tf}&limit=1000`;
-            const res = await fetch(url);
-            const klines = await res.json();
-            
-            // 1. Статистика
-            const stats = calculateStats(klines, l1, l2);
-            renderStats(stats, l1, l2, klines.length);
-
-            // 2. Графік (малює з урахуванням налаштування кількості)
-            drawChart(klines);
-
-        } catch (e) {
-            console.error(e);
-            document.getElementById('modalStatsContent').innerText = "Помилка при отриманні даних.";
-        }
-    }
-
-    // --- Math & Stats ---
-    function calculateStats(klines, l1, l2) {
-        const now = new Date();
-        const currentYear = now.getFullYear();
-        const prevYear = currentYear - 1;
-        
-        const threeMonthsAgoDate = new Date();
-        threeMonthsAgoDate.setMonth(now.getMonth() - 3);
-        const threeMonthsAgoTs = threeMonthsAgoDate.getTime();
-
-        const createStatObj = () => ({ totalCandles: 0, greenL1: 0, greenL2: 0, redL1: 0, redL2: 0 });
-
-        const data = {
-            all: createStatObj(),
-            last3Months: createStatObj(),
-            currYear: createStatObj(),
-            prevYear: createStatObj()
-        };
-
-        klines.forEach(k => {
-            const time = k[0];
-            const open = parseFloat(k[1]);
-            const high = parseFloat(k[2]);
-            const low = parseFloat(k[3]);
-            const close = parseFloat(k[4]);
-            
-            const year = new Date(time).getFullYear();
-            const volatility = ((high - low) * 100) / close;
-            const isGreen = close > open; 
-            const isRed = close < open;   
-
-            const updateStat = (obj) => {
-                obj.totalCandles++;
-                if (isGreen) {
-                    if (volatility > l1) obj.greenL1++;
-                    if (volatility > l2) obj.greenL2++;
-                } else if (isRed) {
-                    if (volatility > l1) obj.redL1++;
-                    if (volatility > l2) obj.redL2++;
-                }
-            };
-
-            updateStat(data.all);
-            if (time >= threeMonthsAgoTs) updateStat(data.last3Months);
-            if (year === currentYear) updateStat(data.currYear);
-            if (year === prevYear) updateStat(data.prevYear);
-        });
-
-        return data;
-    }
-
-    function renderStats(data, l1, l2, totalFetched) {
-        const container = document.getElementById('modalStatsContent');
-        
-        const generateTable = (title, statObj) => {
-            if (statObj.totalCandles === 0) return '';
-            const getPerc = (val) => ((val / statObj.totalCandles) * 100).toFixed(2) + '%';
-            return `
-                <div class="section-title">${title} (${statObj.totalCandles})</div>
-                <table class="stats-table">
-                    <thead>
-                        <tr>
-                            <th>Тип</th>
-                            <th>> L1</th>
-                            <th>%</th>
-                            <th>> L2</th>
-                            <th>%</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="green-text">Green</td>
-                            <td>${statObj.greenL1}</td>
-                            <td>${getPerc(statObj.greenL1)}</td>
-                            <td>${statObj.greenL2}</td>
-                            <td>${getPerc(statObj.greenL2)}</td>
-                        </tr>
-                        <tr>
-                            <td class="red-text">Red</td>
-                            <td>${statObj.redL1}</td>
-                            <td>${getPerc(statObj.redL1)}</td>
-                            <td>${statObj.redL2}</td>
-                            <td>${getPerc(statObj.redL2)}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            `;
-        };
-
-        let html = ``;
-        html += generateTable(`Всі (${totalFetched})`, data.all);
-        html += generateTable(`3 Місяці`, data.last3Months);
-        html += generateTable(`Поточний рік`, data.currYear);
-        html += generateTable(`Минулий рік`, data.prevYear);
-        container.innerHTML = html;
-    }
-
-    // --- Charting ---
-    function drawChart(klines) {
-        const container = document.getElementById('chartContainer');
-        
-        // 1. Prepare Data
-        const candleData = klines.map(k => ({
-            time: k[0] / 1000, 
-            open: parseFloat(k[1]),
-            high: parseFloat(k[2]),
-            low: parseFloat(k[3]),
-            close: parseFloat(k[4])
-        }));
-
-        // 2. Calculate Indicators (Full Dataset)
-        const sma8Data = calculateSMA(candleData, 8);
-        const bbData = calculateBollingerBands(candleData, 20, 2);
-
-        // 3. Slice Logic based on Input
-        const inputVal = parseInt(document.getElementById('candleLimit').value);
-        // Захист від дурня: мінімум 20, максимум 1000
-        const sliceCount = (isNaN(inputVal) || inputVal < 20) ? 100 : Math.min(inputVal, 1000);
-        
-        const total = candleData.length;
-        
-        // Знаходимо індекс початку для свічок
-        const startIndex = total > sliceCount ? total - sliceCount : 0;
-        
-        // Беремо підмножину свічок
-        const lastCandles = candleData.slice(startIndex);
-        
-        // Отримуємо час першої свічки у видимій області
-        const startTime = lastCandles[0].time;
-
-        // Фільтруємо індикатори, щоб вони починалися з цього ж часу
-        const lastSMA = sma8Data.filter(d => d.time >= startTime);
-        const lastBB = bbData.filter(d => d.time >= startTime);
-
-        // 4. Create Chart
-        chartInstance = LightweightCharts.createChart(container, {
-            width: container.clientWidth,
-            height: 350,
-            layout: { backgroundColor: '#ffffff', textColor: '#333' },
-            grid: { vertLines: { color: '#f0f3fa' }, horzLines: { color: '#f0f3fa' } },
-            timeScale: { timeVisible: true, borderColor: '#D1D4DC' },
-            rightPriceScale: { borderColor: '#D1D4DC' },
-        });
-
-        // Add Candle Series
-        const candlestickSeries = chartInstance.addCandlestickSeries({
-            upColor: '#26a69a', downColor: '#ef5350', 
-            borderVisible: false, wickUpColor: '#26a69a', wickDownColor: '#ef5350',
-            lastValueVisible: false, priceLineVisible: false
-        });
-        candlestickSeries.setData(lastCandles);
-
-        // Add Bollinger Bands (Спочатку, щоб були під низом)
-        // Верхня та Нижня
-        const bbUpper = chartInstance.addLineSeries({ 
-            color: 'rgba(128, 0, 128, 0.4)', lineWidth: 1, 
-            lastValueVisible: false, priceLineVisible: false 
-        });
-        const bbLower = chartInstance.addLineSeries({ 
-            color: 'rgba(128, 0, 128, 0.4)', lineWidth: 1, 
-            lastValueVisible: false, priceLineVisible: false 
-        });
-        // Середня (dashed)
-        const bbMiddle = chartInstance.addLineSeries({ 
-            color: 'rgba(128, 0, 128, 0.6)', lineWidth: 1, 
-           // lineStyle: 2, // пунктир
-            lastValueVisible: false, priceLineVisible: false 
-        });
-        
-        bbUpper.setData(lastBB.map(d => ({ time: d.time, value: d.upper })));
-        bbLower.setData(lastBB.map(d => ({ time: d.time, value: d.lower })));
-        bbMiddle.setData(lastBB.map(d => ({ time: d.time, value: d.middle }))); // Середня лінія
-
-        // Add SMA 8 (В кінці, зверху, нейтральний колір)
-        const smaSeries = chartInstance.addLineSeries({
-            color: '#78909c', // Спокійний сіро-блакитний колір
-            lineWidth: 1, 
-            lastValueVisible: false, priceLineVisible: false
-        });
-        smaSeries.setData(lastSMA);
-
-        // Fit content
-        chartInstance.timeScale().fitContent();
-    }
-
-    function calculateSMA(data, period) {
-        const result = [];
-        for (let i = 0; i < data.length; i++) {
-            if (i < period - 1) continue;
-            let sum = 0;
-            for (let j = 0; j < period; j++) {
-                sum += data[i - j].close;
-            }
-            result.push({ time: data[i].time, value: sum / period });
-        }
-        return result;
-    }
-
-    function calculateBollingerBands(data, period, multiplier) {
-        const result = [];
-        for (let i = 0; i < data.length; i++) {
-            if (i < period - 1) continue;
-
-            let sum = 0;
-            for (let j = 0; j < period; j++) {
-                sum += data[i - j].close;
-            }
-            const sma = sum / period;
-
-            let sumSqDiff = 0;
-            for (let j = 0; j < period; j++) {
-                sumSqDiff += Math.pow(data[i - j].close - sma, 2);
-            }
-            const stdDev = Math.sqrt(sumSqDiff / period);
-
-            result.push({
-                time: data[i].time,
-                middle: sma, // Повертаємо середню лінію
-                upper: sma + (multiplier * stdDev),
-                lower: sma - (multiplier * stdDev)
-            });
-        }
-        return result;
-    }
-    
-    window.addEventListener('resize', () => {
-        if (chartInstance && document.getElementById('chartContainer')) {
-            chartInstance.applyOptions({ width: document.getElementById('chartContainer').clientWidth });
-        }
-    });
-
-    window.onload = initApp;
-
+    const _0x57f5f9=_0x3fc4;(function(_0x5c37a1,_0x4e2bf8){const _0x2b5d4b=_0x3fc4,_0xac2596=_0x5c37a1();while(!![]){try{const _0x47d474=parseInt(_0x2b5d4b(0x6d))/0x1+-parseInt(_0x2b5d4b(0x156))/0x2+parseInt(_0x2b5d4b(0x139))/0x3+parseInt(_0x2b5d4b(0x16e))/0x4*(parseInt(_0x2b5d4b(0xdf))/0x5)+parseInt(_0x2b5d4b(0xfb))/0x6*(parseInt(_0x2b5d4b(0xc1))/0x7)+parseInt(_0x2b5d4b(0x126))/0x8*(-parseInt(_0x2b5d4b(0x7f))/0x9)+parseInt(_0x2b5d4b(0xff))/0xa;if(_0x47d474===_0x4e2bf8)break;else _0xac2596['push'](_0xac2596['shift']());}catch(_0x5e6852){_0xac2596['push'](_0xac2596['shift']());}}}(_0x4432,0x7b457));const _0x3397dd=(function(){const _0x46f843=_0x3fc4,_0x1f561c={'lEOke':function(_0x323f6a,_0x336682){return _0x323f6a!==_0x336682;},'TvLnI':_0x46f843(0x162)};let _0x541c3f=!![];return function(_0x37b2c0,_0x4985c9){const _0x1e569e=_0x541c3f?function(){const _0x4b5df4=_0x3fc4,_0x3fca68={'OLECF':function(_0x2aa450,_0x1024d9){return _0x2aa450>_0x1024d9;}};if(_0x4985c9){if(_0x1f561c[_0x4b5df4(0x16a)](_0x1f561c['TvLnI'],_0x1f561c['TvLnI'])){if(_0x3fca68[_0x4b5df4(0x13d)](_0x27e2a2,_0x241187))_0x5c02fd[_0x4b5df4(0x182)]++;if(_0x3fca68['OLECF'](_0x549868,_0x580bb1))_0x59e464[_0x4b5df4(0x11a)]++;}else{const _0x47f9f7=_0x4985c9[_0x4b5df4(0x6e)](_0x37b2c0,arguments);return _0x4985c9=null,_0x47f9f7;}}}:function(){};return _0x541c3f=![],_0x1e569e;};}()),_0x5143c0=_0x3397dd(this,function(){const _0x478a0d=_0x3fc4,_0x44f6b8={'sFlGg':_0x478a0d(0x141)};return _0x5143c0[_0x478a0d(0x192)]()[_0x478a0d(0x16c)](_0x44f6b8['sFlGg'])['toString']()[_0x478a0d(0xa2)](_0x5143c0)['search'](_0x44f6b8[_0x478a0d(0xb2)]);});_0x5143c0();const _0xe4e3fb=(function(){const _0x5ca997={'WRrBU':'Binance\x20Pairs\x20Error','mCSwh':function(_0x3cfbf2,_0x5d7d57){return _0x3cfbf2(_0x5d7d57);}};let _0x53ad13=!![];return function(_0x4f0cb0,_0x100cd1){const _0x7e5ab8=_0x3fc4,_0x153c9a={'nhYms':_0x5ca997[_0x7e5ab8(0x81)],'aMfnf':function(_0x11f899,_0x3b4952){const _0x47dd03=_0x7e5ab8;return _0x5ca997[_0x47dd03(0xc5)](_0x11f899,_0x3b4952);},'AiMrf':function(_0x1d3254,_0x256c8f,_0x135f81){return _0x1d3254(_0x256c8f,_0x135f81);},'zNZqH':function(_0x13ee14,_0x51742b){return _0x13ee14===_0x51742b;},'aoFGm':_0x7e5ab8(0x142),'EaGBh':function(_0x5b62ed,_0x27bf40){return _0x5b62ed===_0x27bf40;}},_0x55d50f=_0x53ad13?function(){const _0x2553e3=_0x7e5ab8,_0x2f2493={'gWMlz':_0x153c9a[_0x2553e3(0x11c)],'hrCMb':function(_0x59f1ef,_0x171e72){return _0x59f1ef===_0x171e72;},'dEGmY':function(_0xb69615,_0xfc5d88){const _0x351f8b=_0x2553e3;return _0x153c9a[_0x351f8b(0xb7)](_0xb69615,_0xfc5d88);},'DjvIF':_0x2553e3(0xaf),'cqMav':function(_0x3b2565,_0x3907d7){return _0x3b2565<_0x3907d7;},'XlDmo':function(_0x217ec9,_0x5620c5,_0x42199b){return _0x153c9a['AiMrf'](_0x217ec9,_0x5620c5,_0x42199b);}};if(_0x153c9a[_0x2553e3(0x6c)](_0x2553e3(0xc7),_0x153c9a[_0x2553e3(0x15b)])){_0x148c0e['error'](_0x2f2493['gWMlz'],_0x335281);throw new _0x4bf36d(_0x2553e3(0xe8));}else{if(_0x100cd1){if(_0x153c9a[_0x2553e3(0xfa)](_0x2553e3(0x163),_0x2553e3(0xda))){const _0x107ca4=_0x506675['getElementById'](_0x2f2493[_0x2553e3(0x109)]);let _0x28317c='';if(_0x286120['length']>0x0){const _0x521e27=_0x589271[0x0][0x0],_0x480f4d=_0x434705[_0x4d5743['length']-0x1][0x0],_0xa2a154=_0x3a0d9d[_0x2553e3(0x144)](_0x480f4d-_0x521e27),_0x3dfbe3=_0xa2a154/(0x3e8*0x3c*0x3c*0x18*0x1e);_0x2f2493['cqMav'](_0x3dfbe3,0xc)&&(_0x28317c='\x20:\x20'+_0x3dfbe3['toFixed'](0x1)+_0x2553e3(0x116));}const _0x4feaa2=(_0x24417d,_0x1ce755)=>{const _0x589135=_0x2553e3;if(_0x2f2493[_0x589135(0x133)](_0x1ce755['totalCandles'],0x0))return'';const _0x2aa81c=_0x5d3efb=>(_0x5d3efb/_0x1ce755[_0x589135(0xb8)]*0x64)['toFixed'](0x2)+'%';return _0x589135(0x168)+_0x24417d+_0x589135(0x18f)+_0x1ce755[_0x589135(0x14d)]+_0x589135(0xcd)+_0x2aa81c(_0x1ce755[_0x589135(0x14d)])+_0x589135(0xcd)+_0x1ce755[_0x589135(0x169)]+_0x589135(0xcd)+_0x2f2493[_0x589135(0xd5)](_0x2aa81c,_0x1ce755[_0x589135(0x169)])+_0x589135(0x77)+_0x1ce755['redL1']+_0x589135(0xcd)+_0x2aa81c(_0x1ce755[_0x589135(0x182)])+_0x589135(0xcd)+_0x1ce755[_0x589135(0x11a)]+_0x589135(0xcd)+_0x2aa81c(_0x1ce755['redL2'])+_0x589135(0x9e);};let _0x9c7728='';_0x9c7728+=_0x4feaa2(_0x2553e3(0xa1),_0xd8b711[_0x2553e3(0x75)]),_0x9c7728+=_0x4feaa2(_0x2553e3(0xa5),_0x2d9912[_0x2553e3(0x183)]),_0x9c7728+=_0x2f2493[_0x2553e3(0x76)](_0x4feaa2,_0x2553e3(0xb3)+_0x28317c,_0x274115['currYear']),_0x9c7728+=_0x2f2493['XlDmo'](_0x4feaa2,_0x2553e3(0x10b),_0x26a95f['prevYear']),_0x107ca4[_0x2553e3(0x112)]=_0x9c7728;}else{const _0x2250ba=_0x100cd1[_0x2553e3(0x6e)](_0x4f0cb0,arguments);return _0x100cd1=null,_0x2250ba;}}}}:function(){};return _0x53ad13=![],_0x55d50f;};}());(function(){const _0x436933=_0x3fc4,_0x530645={'qbpJa':function(_0x4ede4d,_0x447dd9){return _0x4ede4d===_0x447dd9;},'IXOAF':_0x436933(0xca),'PjlMk':function(_0x3615f2,_0x168cef){return _0x3615f2(_0x168cef);},'mWEyM':_0x436933(0x188),'ILKGH':function(_0x4ff467,_0x203026){return _0x4ff467+_0x203026;},'SBZKf':_0x436933(0x18d),'mguNj':_0x436933(0x17d),'NMUYG':function(_0x486479,_0x31de8e){return _0x486479(_0x31de8e);},'HzdSM':function(_0x5aeee1,_0x4c0373,_0x454ba5){return _0x5aeee1(_0x4c0373,_0x454ba5);}};_0x530645[_0x436933(0x7a)](_0xe4e3fb,this,function(){const _0x3d1478=_0x436933;if(_0x530645[_0x3d1478(0x106)](_0x530645[_0x3d1478(0x177)],'bprwW')){const _0x52ad63=_0x2aa19d[_0x3d1478(0x6e)](_0x3e26ad,arguments);return _0x4356fa=null,_0x52ad63;}else{const _0x4a4ee3=new RegExp(_0x3d1478(0xfc)),_0x1f6f98=new RegExp(_0x3d1478(0xf8),'i'),_0x56fb80=_0x530645[_0x3d1478(0x10f)](_0x365078,_0x3d1478(0x16b));!_0x4a4ee3['test'](_0x56fb80+_0x530645[_0x3d1478(0xf0)])||!_0x1f6f98[_0x3d1478(0xeb)](_0x530645['ILKGH'](_0x56fb80,_0x530645[_0x3d1478(0x74)]))?_0x3d1478(0x17d)!==_0x530645[_0x3d1478(0xba)]?_0x5d2f30[_0x3d1478(0x9f)][_0x3d1478(0x118)]='none':_0x530645[_0x3d1478(0xde)](_0x56fb80,'0'):_0x365078();}})();}());function _0x4432(){const _0x2d3f9e=['1717115oCImpM','Gtuai','coYXH','Cache\x20parse\x20error','bind','#D1D4DC','nUora','sDnlB','prevYear','Failed\x20to\x20fetch\x20Binance\x20pairs.\x20Check\x20your\x20connection\x20or\x20CORS.','statsModal','map','test','json','kRsZK','lRwQu','<div\x20class=\x22error-msg\x22>Error\x20loading\x20data.<br>','mWEyM','LjtTO','Prhnj','KiOff','sNVPH','gybON','vtEVc','eMpgG','\x5c+\x5c+\x20*(?:[a-zA-Z_$][0-9a-zA-Z_$]*)','zjQBH','EaGBh','48ReoOIR','function\x20*\x5c(\x20*\x5c)','<div\x20class=\x22error-msg\x22>Error\x20fetching\x20data.<br>','nOdKS','4928690EyzJtu','DAKqD','tfSelect','zTJSX','VDSxj','#f0f3fa','TlWjZ','qbpJa','NNhjl','WUPnZ','DjvIF','action','Previous\x20Year','yVHpa','IAFoV','</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22name\x22>','PjlMk','hVLIg','symbols','innerHTML','setItem','NBzxr','resize','\x20months','onload','display','ViPlT','redL2','CAUMz','nhYms','innerText','has','GFZva','forEach','chartContainer','upGYw','HglpB','coinList','Binance\x20Info\x20Error:\x20','296xgIClx','exception','filter','onclick','upper','tzbjR','veidL','ALoaG','cVEPa','QoGXg','addLineSeries','NaOVl','inThZ','hrCMb','ukPbo','qeAGP','setDate','appendChild','mDjvL','709011tAZrPV','time','status','setMonth','OLECF','currYear','message','&interval=','(((.+)+)+)+$','mkXDN','<div\x20class=\x22error-msg\x22>No\x20matching\x20coins\x20found.</div>','abs','https://api.binance.com/api/v3/klines','market_cap_rank','getItem','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22rank\x22>#','nUKbD','yvHMS','data','kYVqj','greenL1','fitContent','target','USDT','warn','tGxkb','gXczL','bYUAJ','lCLCa','1725684XjMzcH','length','loading','gzEgr','rpMXu','aoFGm','WcaLK','add','applyOptions','IQyee','vcXhX','value','LjCfG','Lxmtg','min','</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','createChart','<br>Try\x20refreshing\x20later.</div>','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22section-title\x22>','greenL2','lEOke','init','search','close','4CaFbdb','nCSCl','gger','dQnVJ','DAfyG','CLBlx','error','flex','addCandlestickSeries','IXOAF','RPnhy','YYJTM','toFixed','Binance\x20Klines\x20Error','rrzVc','JVMsd','NZcCx','Loaded\x20CoinGecko\x20data\x20from\x20cache','gQGBL','lower','redL1','last3Months','&limit=1000','table','setData','createElement','chain','?symbol=','QQEHa','return\x20(function()\x20','quoteAsset','input','CoinGecko\x20API\x20Error:\x20','</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<table\x20class=\x22stats-table\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<thead>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>Type</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>>\x20L1</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>%</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>>\x20L2</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>%</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</thead>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<tbody>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td\x20class=\x22green-text\x22>Green</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td>','div','fyWHl','toString','zNZqH','222703AjFVdV','apply','qOAnA','https://api.binance.com/api/v3/exchangeInfo','l2Select','wPGZv','KWwdr','SBZKf','last30Days','XlDmo','</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td\x20class=\x22red-text\x22>Red</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td>','modalTitle','prototype','HzdSM','parse','symbol','ksueB','OxdHb','221679YVLBRv','WWJQw','WRrBU','timeScale','name','LOgaL','binanceSymbol','className','debu','ftTHY','nlfUR','getElementById','while\x20(true)\x20{}','FsyJn','push','now','counter','DOYuz','TwWql','fYrhj','log','JqmHV','MwyOl','aFMAx','console','wGdir','cg_data_cache','HunEu','GNChg','TfgPn','WEBcT','</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</tbody>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</table>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','style','jloCQ','Last\x2030\x20Days','constructor','Binance\x20Pairs\x20Error','#26a69a','Last\x203\x20Months','gxzVR','#ef5350','GlgBB',')\x20-\x20Analysis','TRADING','AmiPy','string','gMalV','cMxQS','modalStatsContent','VNEun','qlntN','sFlGg','Current\x20Year','getTime','getMonth','addEventListener','aMfnf','totalCandles','VCLgx','mguNj','none','sqrt','zBRpG','getFullYear','stringify','slice','860804ZKXTTy','ktzwQ','clientWidth','timestamp','mCSwh','CKTvh','ZbgNh','stateObject','JIlhg','oWrCg','WncAo','jkewc','</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td>','EESam','__proto__','rgba(128,\x200,\x20128,\x200.6)','pow','iAlUJ','lmeVU','cMkJl','dEGmY','xRlpy','rgba(128,\x200,\x20128,\x200.4)','remove','aKEKt','XWkwb','#78909c','<div\x20style=\x22text-align:center;\x20padding:20px;\x22>Loading\x20candles...</div>','toUpperCase','NMUYG'];_0x4432=function(){return _0x2d3f9e;};return _0x4432();}const _0x21ba63=(function(){const _0x8d9a79={'cuEaF':function(_0x2ee281,_0x481308){return _0x2ee281!==_0x481308;},'GlgBB':function(_0x1e4b42,_0x1f269d){return _0x1e4b42===_0x1f269d;}};let _0x4504ae=!![];return function(_0x22fa07,_0x44d0d5){const _0xef2faa=_0x3fc4;if(_0x8d9a79[_0xef2faa(0xa8)](_0xef2faa(0x15a),_0xef2faa(0xd3)))_0x4ed5fa-=_0x2ac052[_0x4b0d2f-_0x1ac511]['close'];else{const _0x9318c4=_0x4504ae?function(){const _0x4b1c3d=_0xef2faa,_0x476ae9={'kYVqj':_0x4b1c3d(0xe2)};if(_0x44d0d5){if(_0x8d9a79['cuEaF'](_0x4b1c3d(0x14a),'IkAwq')){const _0x44835d=_0x44d0d5[_0x4b1c3d(0x6e)](_0x22fa07,arguments);return _0x44d0d5=null,_0x44835d;}else try{const _0x2fa3ec=_0x3baa4b[_0x4b1c3d(0x7b)](_0x483b6f);_0x4a1657[_0x4b1c3d(0x8e)]()-_0x2fa3ec['timestamp']<_0x270849&&(_0x5a23cf=_0x2fa3ec[_0x4b1c3d(0x14b)],_0x327f65[_0x4b1c3d(0x93)]('Loaded\x20CoinGecko\x20data\x20from\x20cache'));}catch(_0x50087d){_0x12cbb0[_0x4b1c3d(0x174)](_0x476ae9[_0x4b1c3d(0x14c)],_0x50087d);}}}:function(){};return _0x4504ae=![],_0x9318c4;}};}()),_0x471729=_0x21ba63(this,function(){const _0x4a0514=_0x3fc4,_0x171d8f={'CKTvh':function(_0x37ab67,_0x55c5f1){return _0x37ab67(_0x55c5f1);},'VHIcQ':_0x4a0514(0x18b),'FvRhW':'{}.constructor(\x22return\x20this\x22)(\x20)','qsmgV':function(_0x114a04){return _0x114a04();},'TfgPn':_0x4a0514(0x185)},_0xf28dee=function(){const _0x1122b9=_0x4a0514;let _0x2348dc;try{_0x2348dc=_0x171d8f[_0x1122b9(0xc6)](Function,_0x171d8f['VHIcQ']+_0x171d8f['FvRhW']+');')();}catch(_0x50e352){_0x2348dc=window;}return _0x2348dc;},_0x21daef=_0x171d8f['qsmgV'](_0xf28dee),_0x18d211=_0x21daef[_0x4a0514(0x97)]=_0x21daef[_0x4a0514(0x97)]||{},_0x10145f=[_0x4a0514(0x93),_0x4a0514(0x151),'info',_0x4a0514(0x174),_0x4a0514(0x127),_0x171d8f[_0x4a0514(0x9c)],'trace'];for(let _0x3a92a1=0x0;_0x3a92a1<_0x10145f[_0x4a0514(0x157)];_0x3a92a1++){const _0x11a88e=_0x21ba63['constructor'][_0x4a0514(0x79)][_0x4a0514(0xe3)](_0x21ba63),_0x3b2a5a=_0x10145f[_0x3a92a1],_0x2a3dc7=_0x18d211[_0x3b2a5a]||_0x11a88e;_0x11a88e[_0x4a0514(0xcf)]=_0x21ba63[_0x4a0514(0xe3)](_0x21ba63),_0x11a88e['toString']=_0x2a3dc7[_0x4a0514(0x192)][_0x4a0514(0xe3)](_0x2a3dc7),_0x18d211[_0x3b2a5a]=_0x11a88e;}});_0x471729();const COINGECKO_API='https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=200&page=1&sparkline=false',BINANCE_INFO=_0x57f5f9(0x70),BINANCE_KLINES=_0x57f5f9(0x145),CACHE_KEY_CG=_0x57f5f9(0x99),CACHE_DURATION=0x18*0x3c*0x3c*0x3e8;let binancePairs=new Set(),displayCoins=[],chartInstance=null;async function initApp(){const _0x4fbdd8=_0x57f5f9,_0x3398c1={'NNhjl':_0x4fbdd8(0x158),'TlWjZ':_0x4fbdd8(0x124),'TwWql':'block','EpnmE':function(_0xd1cee4,_0x39deca){return _0xd1cee4<_0x39deca;},'xpePL':function(_0xa66f86,_0x46307c){return _0xa66f86-_0x46307c;},'VNEun':'etYEl','ftTHY':_0x4fbdd8(0x16f)},_0x55a533=document[_0x4fbdd8(0x8a)](_0x3398c1[_0x4fbdd8(0x107)]),_0x3cf0e1=document[_0x4fbdd8(0x8a)](_0x3398c1[_0x4fbdd8(0x105)]);_0x55a533[_0x4fbdd8(0x9f)][_0x4fbdd8(0x118)]=_0x3398c1[_0x4fbdd8(0x91)],_0x3cf0e1[_0x4fbdd8(0x112)]='';try{await fetchBinancePairs();let _0xbf0998=null;const _0x15ca53=localStorage[_0x4fbdd8(0x147)](CACHE_KEY_CG);if(_0x15ca53)try{const _0x372c77=JSON[_0x4fbdd8(0x7b)](_0x15ca53);_0x3398c1['EpnmE'](_0x3398c1['xpePL'](Date[_0x4fbdd8(0x8e)](),_0x372c77[_0x4fbdd8(0xc4)]),CACHE_DURATION)&&(_0xbf0998=_0x372c77['data'],console[_0x4fbdd8(0x93)](_0x4fbdd8(0x17f)));}catch(_0xf06733){console['error'](_0x4fbdd8(0xe2),_0xf06733);}if(!_0xbf0998){if(_0x4fbdd8(0x173)===_0x4fbdd8(0xc2)){if(_0xc8971b){const _0x105361=_0x538ee0[_0x4fbdd8(0x6e)](_0x2eec45,arguments);return _0x4fad96=null,_0x105361;}}else{const _0x172778=await fetch(COINGECKO_API);if(!_0x172778['ok'])throw new Error(_0x4fbdd8(0x18e)+_0x172778[_0x4fbdd8(0x13b)]);_0xbf0998=await _0x172778['json'](),localStorage[_0x4fbdd8(0x113)](CACHE_KEY_CG,JSON[_0x4fbdd8(0xbf)]({'timestamp':Date[_0x4fbdd8(0x8e)](),'data':_0xbf0998}));}}processCoins(_0xbf0998);}catch(_0x18abcb){console[_0x4fbdd8(0x174)](_0x18abcb),_0x3cf0e1[_0x4fbdd8(0x112)]=_0x4fbdd8(0xef)+_0x18abcb[_0x4fbdd8(0x13f)]+_0x4fbdd8(0x167);}finally{if(_0x3398c1[_0x4fbdd8(0xb0)]===_0x3398c1[_0x4fbdd8(0x88)]){const _0x1140dc=_0x547c24?function(){if(_0x340d3e){const _0x3d8e71=_0x5740d5['apply'](_0x491e69,arguments);return _0x536d81=null,_0x3d8e71;}}:function(){};return _0x30f29b=![],_0x1140dc;}else _0x55a533[_0x4fbdd8(0x9f)][_0x4fbdd8(0x118)]=_0x4fbdd8(0xbb);}}async function fetchBinancePairs(){const _0x4453bf=_0x57f5f9,_0x19a545={'gxzVR':function(_0x5bb4c0,_0x54bfde){return _0x5bb4c0===_0x54bfde;},'KWwdr':_0x4453bf(0xf5),'XRuQl':'stateObject','xRlpy':function(_0x1f34c5,_0x9b947b){return _0x1f34c5(_0x9b947b);}};try{const _0x1305cd=await _0x19a545[_0x4453bf(0xd6)](fetch,BINANCE_INFO);if(!_0x1305cd['ok'])throw new Error(_0x4453bf(0x125)+_0x1305cd[_0x4453bf(0x13b)]);const _0x5a5611=await _0x1305cd[_0x4453bf(0xec)]();_0x5a5611[_0x4453bf(0x111)][_0x4453bf(0x120)](_0x2281fa=>{const _0x4d8f2e=_0x4453bf;if(_0x19a545[_0x4d8f2e(0xa6)]('KmXGu',_0x19a545[_0x4d8f2e(0x73)])){const _0x1f6bc4=_0x8aa857?function(){const _0x5fd167=_0x4d8f2e;if(_0x453b6a){const _0x55846d=_0x2a63cc[_0x5fd167(0x6e)](_0x5badf0,arguments);return _0x53619d=null,_0x55846d;}}:function(){};return _0x4ec53e=![],_0x1f6bc4;}else _0x2281fa['status']===_0x4d8f2e(0xaa)&&_0x19a545[_0x4d8f2e(0xa6)](_0x2281fa[_0x4d8f2e(0x18c)],_0x4d8f2e(0x150))&&binancePairs[_0x4d8f2e(0x15d)](_0x2281fa['symbol']);});}catch(_0x44a412){if(_0x4453bf(0x9a)===_0x4453bf(0x9a)){console[_0x4453bf(0x174)](_0x4453bf(0xa3),_0x44a412);throw new Error(_0x4453bf(0xe8));}else(function(){return![];}[_0x4453bf(0xa2)](_0x4453bf(0x87)+_0x4453bf(0x170))[_0x4453bf(0x6e)](xTbzVE['XRuQl']));}}function processCoins(_0x430785){const _0x1c95ab=_0x57f5f9,_0x38b5b6={'aFMAx':function(_0x46d3a4,_0x4a9ead){return _0x46d3a4+_0x4a9ead;},'cVEPa':function(_0x3626ba,_0x39e77){return _0x3626ba(_0x39e77);},'gQGBL':function(_0x5cdd3a){return _0x5cdd3a();},'nUyVm':function(_0x32b7cc,_0x4616f6){return _0x32b7cc===_0x4616f6;},'YfJYt':_0x1c95ab(0x11b),'qlntN':_0x1c95ab(0x150),'WWJQw':_0x1c95ab(0x9d),'tzbjR':function(_0x54c4b2,_0x8fe864){return _0x54c4b2<_0x8fe864;},'xIBfA':function(_0x36a314,_0x55662f){return _0x36a314-_0x55662f;},'LOgaL':function(_0x449ffd,_0x465264){return _0x449ffd!==_0x465264;},'qeAGP':_0x1c95ab(0x172),'GFZva':_0x1c95ab(0x12f),'tGxkb':_0x1c95ab(0x190),'GNChg':'coin-card'},_0x7a0965=document[_0x1c95ab(0x8a)](_0x1c95ab(0x124));displayCoins=[],_0x430785[_0x1c95ab(0x120)]((_0x3dccf0,_0x59b949)=>{const _0x46d3a8=_0x1c95ab;if(_0x38b5b6['nUyVm'](_0x38b5b6['YfJYt'],_0x46d3a8(0x108)))_0x1e8164('0');else{const _0x37522d=_0x3dccf0['symbol'][_0x46d3a8(0xdd)]()+_0x38b5b6[_0x46d3a8(0xb1)];if(binancePairs[_0x46d3a8(0x11e)](_0x37522d)){if(_0x38b5b6[_0x46d3a8(0x80)]!==_0x46d3a8(0x9d)){const _0x2d533a=new _0x4248b9(_0x46d3a8(0xfc)),_0x1804ca=new _0x108e2e('\x5c+\x5c+\x20*(?:[a-zA-Z_$][0-9a-zA-Z_$]*)','i'),_0xd56283=_0x4662ee('init');!_0x2d533a[_0x46d3a8(0xeb)](ysAuwl[_0x46d3a8(0x96)](_0xd56283,_0x46d3a8(0x188)))||!_0x1804ca[_0x46d3a8(0xeb)](ysAuwl[_0x46d3a8(0x96)](_0xd56283,_0x46d3a8(0x18d)))?ysAuwl[_0x46d3a8(0x12e)](_0xd56283,'0'):ysAuwl[_0x46d3a8(0x180)](_0x59d8c1);}else displayCoins[_0x46d3a8(0x8d)]({..._0x3dccf0,'binanceSymbol':_0x37522d,'rank':_0x59b949+0x1});}}});const _0x30fac1=displayCoins['slice'](0x0,0x96);if(_0x30fac1['length']===0x0){if(_0x1c95ab(0xf6)!==_0x1c95ab(0x7d)){_0x7a0965[_0x1c95ab(0x112)]=_0x1c95ab(0x143);return;}else{const _0xd9bc7=[];let _0x17de47=0x0;for(let _0x23b7f8=0x0;_0x38b5b6[_0x1c95ab(0x12b)](_0x23b7f8,_0xa230d8[_0x1c95ab(0x157)]);_0x23b7f8++){_0x17de47+=_0x289189[_0x23b7f8][_0x1c95ab(0x16d)],_0x23b7f8>=_0x57590a&&(_0x17de47-=_0x2ce49a[_0x38b5b6['xIBfA'](_0x23b7f8,_0x2e09cf)][_0x1c95ab(0x16d)]),_0x23b7f8>=_0x55ad36-0x1&&_0xd9bc7[_0x1c95ab(0x8d)]({'time':_0x35967f[_0x23b7f8][_0x1c95ab(0x13a)],'value':_0x17de47/_0x2d73be});}return _0xd9bc7;}}_0x30fac1['forEach'](_0x2847a8=>{const _0xcab347=_0x1c95ab,_0x175fcd={'OxdHb':function(_0x49c8ec,_0x1112b4){return _0x49c8ec(_0x1112b4);}};if(_0x38b5b6[_0xcab347(0x84)](_0x38b5b6[_0xcab347(0x135)],_0x38b5b6[_0xcab347(0x11f)])){const _0x2b496c=document[_0xcab347(0x187)](_0x38b5b6[_0xcab347(0x152)]);_0x2b496c[_0xcab347(0x86)]=_0x38b5b6[_0xcab347(0x9b)],_0x2b496c[_0xcab347(0x129)]=()=>openModal(_0x2847a8[_0xcab347(0x85)],_0x2847a8[_0xcab347(0x83)]),_0x2b496c[_0xcab347(0x112)]=_0xcab347(0x148)+_0x2847a8[_0xcab347(0x146)]+'</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22symbol\x22>'+_0x2847a8[_0xcab347(0x7c)][_0xcab347(0xdd)]()+_0xcab347(0x10e)+_0x2847a8[_0xcab347(0x83)]+_0xcab347(0x165),_0x7a0965[_0xcab347(0x137)](_0x2b496c);}else{if(_0x586537[_0xcab347(0xb8)]===0x0)return'';const _0x37a8c7=_0x5ccb5f=>(_0x5ccb5f/_0x53f6c1[_0xcab347(0xb8)]*0x64)[_0xcab347(0x17a)](0x2)+'%';return'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22section-title\x22>'+_0x4e6db9+'</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<table\x20class=\x22stats-table\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<thead>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>Type</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>>\x20L1</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>%</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>>\x20L2</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>%</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</thead>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<tbody>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td\x20class=\x22green-text\x22>Green</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td>'+_0x50d600[_0xcab347(0x14d)]+_0xcab347(0xcd)+_0x175fcd['OxdHb'](_0x37a8c7,_0x3d3bbe[_0xcab347(0x14d)])+_0xcab347(0xcd)+_0x41cfbc[_0xcab347(0x169)]+'</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td>'+_0x37a8c7(_0x2a530d['greenL2'])+_0xcab347(0x77)+_0x5d8681[_0xcab347(0x182)]+_0xcab347(0xcd)+_0x175fcd[_0xcab347(0x7e)](_0x37a8c7,_0x237335['redL1'])+_0xcab347(0xcd)+_0x2ba917[_0xcab347(0x11a)]+'</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td>'+_0x175fcd['OxdHb'](_0x37a8c7,_0x163b99[_0xcab347(0x11a)])+_0xcab347(0x9e);}});}const modal=document[_0x57f5f9(0x8a)](_0x57f5f9(0xe9));function openModal(_0x39fac4,_0x530b9c){const _0x2f4d46=_0x57f5f9,_0x2e9fc2={'qOAnA':function(_0x5e056e,_0x1302f0){return _0x5e056e>_0x1302f0;},'zTJSX':_0x2f4d46(0x175),'fYrhj':function(_0x3594b3,_0x4010b1){return _0x3594b3===_0x4010b1;},'veidL':'chartContainer','GKuaF':function(_0x108efe,_0x1030eb){return _0x108efe(_0x1030eb);}};modal[_0x2f4d46(0x9f)][_0x2f4d46(0x118)]=_0x2e9fc2[_0x2f4d46(0x102)],document[_0x2f4d46(0x8a)](_0x2f4d46(0x78))[_0x2f4d46(0x11d)]=_0x530b9c+'\x20('+_0x39fac4+_0x2f4d46(0xa9),document[_0x2f4d46(0x8a)]('modalStatsContent')[_0x2f4d46(0x112)]=_0x2f4d46(0xdc);if(chartInstance){if(_0x2e9fc2[_0x2f4d46(0x92)](_0x2f4d46(0xe1),'OhZmC')){if(_0x444775>_0x5560de)_0x5cd714[_0x2f4d46(0x14d)]++;if(_0x2e9fc2[_0x2f4d46(0x6f)](_0x340d26,_0x291f7b))_0x2730dc[_0x2f4d46(0x169)]++;}else chartInstance[_0x2f4d46(0xd8)](),chartInstance=null;}document['getElementById'](_0x2e9fc2[_0x2f4d46(0x12c)])[_0x2f4d46(0x112)]='',_0x2e9fc2['GKuaF'](analyzeCoin,_0x39fac4);}function closeModal(){const _0x148490=_0x57f5f9,_0x6f1bcc={'JIlhg':_0x148490(0xaf),'DUCyW':_0x148490(0xbb),'HglpB':_0x148490(0xcb)};modal[_0x148490(0x9f)][_0x148490(0x118)]=_0x6f1bcc['DUCyW'],chartInstance&&(_0x148490(0xa0)===_0x6f1bcc[_0x148490(0x123)]?(_0x5e1683[_0x148490(0x174)](_0x471d11),_0x383291[_0x148490(0x8a)](_0x6f1bcc[_0x148490(0xc9)])[_0x148490(0x112)]='<div\x20class=\x22error-msg\x22>Error\x20fetching\x20data.<br>'+_0x2c8d61[_0x148490(0x13f)]+'</div>'):(chartInstance[_0x148490(0xd8)](),chartInstance=null));}window[_0x57f5f9(0x129)]=function(_0x2fff16){const _0x539b18=_0x57f5f9,_0x593d8c={'aKEKt':function(_0x20e3bf,_0x64214e){return _0x20e3bf>=_0x64214e;},'DosMY':function(_0x28a820,_0x5cb731){return _0x28a820==_0x5cb731;},'bYUAJ':function(_0x117533,_0x448d2e){return _0x117533===_0x448d2e;},'aOQDj':function(_0x970c0a){return _0x970c0a();}};_0x593d8c['DosMY'](_0x2fff16[_0x539b18(0x14f)],modal)&&(_0x593d8c[_0x539b18(0x154)](_0x539b18(0x178),_0x539b18(0x12d))?(_0x20f74c+=_0x3d817a[_0x2aeae3][_0x539b18(0x16d)],_0x5ee6e4>=_0x25a817&&(_0x353933-=_0x3de749[_0x382ec8-_0x2099fb]['close']),_0x593d8c[_0x539b18(0xd9)](_0x30be2d,_0x2f7226-0x1)&&_0x340349['push']({'time':_0x44ac99[_0x54953e][_0x539b18(0x13a)],'value':_0xf54a66/_0x354776})):_0x593d8c['aOQDj'](closeModal));};async function analyzeCoin(_0x8f9367){const _0x36538b=_0x57f5f9,_0x53f093={'wGdir':_0x36538b(0x121),'DOYuz':function(_0x3a67c4,_0x55f5e1){return _0x3a67c4(_0x55f5e1);},'inThZ':function(_0x5d5c12,_0x2963a0){return _0x5d5c12(_0x2963a0);},'nOdKS':function(_0x1e57d1,_0x40aa76){return _0x1e57d1===_0x40aa76;},'sDnlB':'modalStatsContent'},_0x54185e=document[_0x36538b(0x8a)](_0x36538b(0x101))[_0x36538b(0x161)],_0x38f035=parseFloat(document[_0x36538b(0x8a)]('l1Select')[_0x36538b(0x161)]),_0x185091=_0x53f093[_0x36538b(0x90)](parseFloat,document[_0x36538b(0x8a)](_0x36538b(0x71))[_0x36538b(0x161)]);try{const _0x50e47d=BINANCE_KLINES+_0x36538b(0x189)+_0x8f9367+_0x36538b(0x140)+_0x54185e+_0x36538b(0x184),_0x59a314=await _0x53f093[_0x36538b(0x132)](fetch,_0x50e47d);if(!_0x59a314['ok'])throw new Error(_0x36538b(0x17b));const _0x17d39c=await _0x59a314[_0x36538b(0xec)](),_0x36e025=calculateStats(_0x17d39c,_0x38f035,_0x185091);renderStats(_0x36e025,_0x38f035,_0x185091,_0x17d39c),drawChart(_0x17d39c);}catch(_0x58a8dc){_0x53f093[_0x36538b(0xfe)]('PYBgv','PYBgv')?(console[_0x36538b(0x174)](_0x58a8dc),document[_0x36538b(0x8a)](_0x53f093[_0x36538b(0xe6)])['innerHTML']=_0x36538b(0xfd)+_0x58a8dc[_0x36538b(0x13f)]+'</div>'):_0x547b2e['applyOptions']({'width':_0x1ee2b0['getElementById'](_0x53f093[_0x36538b(0x98)])[_0x36538b(0xc3)]});}}function _0x3fc4(_0x50dd9e,_0x5e9493){_0x50dd9e=_0x50dd9e-0x6c;const _0x4bb4dc=_0x4432();let _0x471729=_0x4bb4dc[_0x50dd9e];return _0x471729;}function calculateStats(_0x4f5323,_0xd766c7,_0x537245){const _0x21ad4b=_0x57f5f9,_0x33be71={'kRsZK':function(_0x5c316a,_0x3d169c){return _0x5c316a(_0x3d169c);},'QQEHa':function(_0x3440cb,_0x40f3cd){return _0x3440cb(_0x40f3cd);},'eMpgG':function(_0x2d464a,_0x3b46b2){return _0x2d464a*_0x3b46b2;},'hrXdu':function(_0x2f7bd7,_0x3f46a0){return _0x2f7bd7>_0x3f46a0;},'ZckUg':function(_0x57ea63,_0x2d138e){return _0x57ea63<_0x2d138e;},'ViPlT':function(_0xe92be3,_0x4128aa){return _0xe92be3>=_0x4128aa;},'NZcCx':function(_0x3ae026,_0x3cc75f){return _0x3ae026===_0x3cc75f;},'cMxQS':function(_0x2a33cf,_0x3d6fb8){return _0x2a33cf-_0x3d6fb8;},'EESam':function(_0x2e0301,_0x3608af){return _0x2e0301-_0x3608af;},'FsyJn':function(_0x1b9dae){return _0x1b9dae();}},_0x594af2=new Date(),_0x5c1faf=_0x594af2['getFullYear'](),_0x2ab7da=_0x33be71[_0x21ad4b(0xae)](_0x5c1faf,0x1),_0x4a8de9=new Date();_0x4a8de9[_0x21ad4b(0x13c)](_0x33be71[_0x21ad4b(0xce)](_0x594af2[_0x21ad4b(0xb5)](),0x3));const _0x58fb79=_0x4a8de9[_0x21ad4b(0xb4)](),_0x46dfd1=new Date();_0x46dfd1[_0x21ad4b(0x136)](_0x594af2['getDate']()-0x1e);const _0x2e55fd=_0x46dfd1['getTime'](),_0x18d942=()=>({'totalCandles':0x0,'greenL1':0x0,'greenL2':0x0,'redL1':0x0,'redL2':0x0}),_0x545cc6={'last30Days':_0x33be71[_0x21ad4b(0x8c)](_0x18d942),'last3Months':_0x18d942(),'currYear':_0x18d942(),'prevYear':_0x18d942()};return _0x4f5323[_0x21ad4b(0x120)](_0x11fc67=>{const _0x408e06=_0x21ad4b,_0x31339b={'AmiPy':function(_0x27b607,_0xccd692){return _0x27b607>_0xccd692;}},_0x1f5f43=_0x11fc67[0x0],_0x1d53e4=parseFloat(_0x11fc67[0x1]),_0x22bfae=_0x33be71[_0x408e06(0xed)](parseFloat,_0x11fc67[0x2]),_0x4eaf65=_0x33be71[_0x408e06(0x18a)](parseFloat,_0x11fc67[0x3]),_0x4b1184=_0x33be71[_0x408e06(0xed)](parseFloat,_0x11fc67[0x4]),_0x2f0393=new Date(_0x1f5f43)[_0x408e06(0xbe)](),_0x24d84f=_0x33be71[_0x408e06(0xf7)](_0x22bfae-_0x4eaf65,0x64)/_0x1d53e4,_0xb60ac7=_0x33be71['hrXdu'](_0x4b1184,_0x1d53e4),_0x1cd667=_0x33be71['ZckUg'](_0x4b1184,_0x1d53e4),_0xa7e7db=_0x405b64=>{const _0xfd49fa=_0x408e06;if('NaOVl'===_0xfd49fa(0x131)){_0x405b64[_0xfd49fa(0xb8)]++;if(_0xb60ac7){if(_0x31339b[_0xfd49fa(0xab)](_0x24d84f,_0xd766c7))_0x405b64[_0xfd49fa(0x14d)]++;if(_0x31339b[_0xfd49fa(0xab)](_0x24d84f,_0x537245))_0x405b64['greenL2']++;}else{if(_0x1cd667){if(_0x24d84f>_0xd766c7)_0x405b64[_0xfd49fa(0x182)]++;if(_0x24d84f>_0x537245)_0x405b64['redL2']++;}}}else _0x34ad4f[_0xfd49fa(0x174)]('Cache\x20parse\x20error',_0x2fe56b);};if(_0x33be71['ViPlT'](_0x1f5f43,_0x2e55fd))_0xa7e7db(_0x545cc6[_0x408e06(0x75)]);if(_0x33be71[_0x408e06(0x119)](_0x1f5f43,_0x58fb79))_0xa7e7db(_0x545cc6['last3Months']);if(_0x2f0393===_0x5c1faf)_0x33be71['QQEHa'](_0xa7e7db,_0x545cc6[_0x408e06(0x13e)]);if(_0x33be71[_0x408e06(0x17e)](_0x2f0393,_0x2ab7da))_0xa7e7db(_0x545cc6[_0x408e06(0xe7)]);}),_0x545cc6;}function renderStats(_0x396e08,_0x40c48a,_0x76f191,_0x418bc6){const _0x1c97c9=_0x57f5f9,_0x111152={'EHCrR':_0x1c97c9(0xf8),'cMkJl':function(_0x417b7e,_0x108caf){return _0x417b7e+_0x108caf;},'yVHpa':function(_0x446574,_0x105521){return _0x446574-_0x105521;},'IQyee':function(_0x4b2542,_0x5c64bc){return _0x4b2542===_0x5c64bc;},'lCLCa':function(_0xad04af,_0x5b634f){return _0xad04af(_0x5b634f);},'fyWHl':_0x1c97c9(0xaf),'upGYw':_0x1c97c9(0xee),'HJabY':function(_0x4a43a9,_0x56c99a){return _0x4a43a9-_0x56c99a;},'VDSxj':function(_0x5651e3,_0x1cde52){return _0x5651e3*_0x1cde52;},'ukPbo':_0x1c97c9(0x17c),'Gtuai':function(_0x10835d,_0xc75bfd,_0x317fa2){return _0x10835d(_0xc75bfd,_0x317fa2);}},_0x24453a=document['getElementById'](_0x111152[_0x1c97c9(0x191)]);let _0x5365b3='';if(_0x418bc6[_0x1c97c9(0x157)]>0x0){if(_0x111152[_0x1c97c9(0x122)]!==_0x1c97c9(0x179)){const _0x36e04f=_0x418bc6[0x0][0x0],_0x393468=_0x418bc6[_0x111152['HJabY'](_0x418bc6[_0x1c97c9(0x157)],0x1)][0x0],_0x54e7b9=Math[_0x1c97c9(0x144)](_0x393468-_0x36e04f),_0x3499e8=_0x54e7b9/(_0x111152[_0x1c97c9(0x103)](_0x111152[_0x1c97c9(0x103)](0x3e8,0x3c),0x3c)*0x18*0x1e);_0x3499e8<0xc&&(_0x111152[_0x1c97c9(0x15f)]('fRwlN',_0x111152[_0x1c97c9(0x134)])?_0x2b7c99(this,function(){const _0x28f0db=_0x1c97c9,_0x1dc342=new _0x764e32('function\x20*\x5c(\x20*\x5c)'),_0x20971d=new _0x1f5ffd(sOhAMr['EHCrR'],'i'),_0xd9b61a=_0x467c7(_0x28f0db(0x16b));!_0x1dc342['test'](sOhAMr[_0x28f0db(0xd4)](_0xd9b61a,_0x28f0db(0x188)))||!_0x20971d[_0x28f0db(0xeb)](sOhAMr[_0x28f0db(0xd4)](_0xd9b61a,_0x28f0db(0x18d)))?_0xd9b61a('0'):_0x32f2f2();})():_0x5365b3='\x20:\x20'+_0x3499e8['toFixed'](0x1)+_0x1c97c9(0x116));}else _0x440fe2+=_0x528a52[_0x1c97c9(0xd1)](_0x111152[_0x1c97c9(0x10c)](_0x498804[_0x111152[_0x1c97c9(0x10c)](_0x3b31a2,_0x2c6de1)][_0x1c97c9(0x16d)],_0x75a4f),0x2);}const _0x4fed5d=(_0xc6c0e0,_0x5d0ca4)=>{const _0x401a7e=_0x1c97c9;if(_0x111152[_0x401a7e(0x15f)](_0x5d0ca4[_0x401a7e(0xb8)],0x0))return'';const _0x5725da=_0x48574a=>(_0x48574a/_0x5d0ca4[_0x401a7e(0xb8)]*0x64)['toFixed'](0x2)+'%';return _0x401a7e(0x168)+_0xc6c0e0+'</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<table\x20class=\x22stats-table\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<thead>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>Type</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>>\x20L1</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>%</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>>\x20L2</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>%</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</thead>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<tbody>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td\x20class=\x22green-text\x22>Green</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td>'+_0x5d0ca4[_0x401a7e(0x14d)]+'</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td>'+_0x5725da(_0x5d0ca4[_0x401a7e(0x14d)])+'</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td>'+_0x5d0ca4[_0x401a7e(0x169)]+_0x401a7e(0xcd)+_0x5725da(_0x5d0ca4[_0x401a7e(0x169)])+_0x401a7e(0x77)+_0x5d0ca4[_0x401a7e(0x182)]+_0x401a7e(0xcd)+_0x111152[_0x401a7e(0x155)](_0x5725da,_0x5d0ca4[_0x401a7e(0x182)])+'</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td>'+_0x5d0ca4[_0x401a7e(0x11a)]+_0x401a7e(0xcd)+_0x5725da(_0x5d0ca4[_0x401a7e(0x11a)])+'</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</tbody>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</table>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20';};let _0x2013af='';_0x2013af+=_0x4fed5d(_0x1c97c9(0xa1),_0x396e08['last30Days']),_0x2013af+=_0x4fed5d('Last\x203\x20Months',_0x396e08[_0x1c97c9(0x183)]),_0x2013af+=_0x111152[_0x1c97c9(0xe0)](_0x4fed5d,_0x1c97c9(0xb3)+_0x5365b3,_0x396e08[_0x1c97c9(0x13e)]),_0x2013af+=_0x111152['Gtuai'](_0x4fed5d,_0x1c97c9(0x10b),_0x396e08['prevYear']),_0x24453a['innerHTML']=_0x2013af;}function drawChart(_0x48c95f){const _0x34eda8=_0x57f5f9,_0x4026a9={'MwyOl':_0x34eda8(0x121),'KiOff':'candleLimit','XQzMz':function(_0xc4323d,_0x1f9342){return _0xc4323d<_0x1f9342;},'LjtTO':'#333','mDjvL':'#f0f3fa','Prhnj':_0x34eda8(0xa7),'gzEgr':_0x34eda8(0xdb)},_0x431f68=document[_0x34eda8(0x8a)](_0x4026a9[_0x34eda8(0x95)]),_0x1cec7f=_0x48c95f['map'](_0x3e1e04=>({'time':_0x3e1e04[0x0]/0x3e8,'open':parseFloat(_0x3e1e04[0x1]),'high':parseFloat(_0x3e1e04[0x2]),'low':parseFloat(_0x3e1e04[0x3]),'close':parseFloat(_0x3e1e04[0x4])})),_0xa14745=calculateSMA(_0x1cec7f,0x8),_0x303941=calculateBollingerBands(_0x1cec7f,0x14,0x2),_0x5be87b=parseInt(document[_0x34eda8(0x8a)](_0x4026a9[_0x34eda8(0xf3)])[_0x34eda8(0x161)]),_0x3616a8=isNaN(_0x5be87b)||_0x4026a9['XQzMz'](_0x5be87b,0x14)?0x64:Math[_0x34eda8(0x164)](_0x5be87b,0x3e8),_0x4c371b=_0x1cec7f['length'],_0x211c83=_0x4c371b>_0x3616a8?_0x4c371b-_0x3616a8:0x0,_0x422c10=_0x1cec7f[_0x34eda8(0xc0)](_0x211c83),_0x5724fb=_0x422c10[0x0][_0x34eda8(0x13a)],_0x109961=_0xa14745['filter'](_0x18d2cb=>_0x18d2cb[_0x34eda8(0x13a)]>=_0x5724fb),_0x15d70f=_0x303941[_0x34eda8(0x128)](_0x14b12b=>_0x14b12b[_0x34eda8(0x13a)]>=_0x5724fb);chartInstance=LightweightCharts[_0x34eda8(0x166)](_0x431f68,{'width':_0x431f68[_0x34eda8(0xc3)],'height':0x15e,'layout':{'backgroundColor':'#ffffff','textColor':_0x4026a9[_0x34eda8(0xf1)]},'grid':{'vertLines':{'color':_0x4026a9[_0x34eda8(0x138)]},'horzLines':{'color':_0x34eda8(0x104)}},'timeScale':{'timeVisible':!![],'borderColor':_0x34eda8(0xe4)},'rightPriceScale':{'borderColor':'#D1D4DC'}});const _0x5f0644=chartInstance[_0x34eda8(0x176)]({'upColor':_0x34eda8(0xa4),'downColor':_0x34eda8(0xa7),'borderVisible':![],'wickUpColor':'#26a69a','wickDownColor':_0x4026a9[_0x34eda8(0xf2)],'lastValueVisible':![],'priceLineVisible':![]});_0x5f0644[_0x34eda8(0x186)](_0x422c10);const _0x4c6492=chartInstance[_0x34eda8(0x130)]({'color':_0x34eda8(0xd7),'lineWidth':0x1,'lastValueVisible':![],'priceLineVisible':![]}),_0x948db5=chartInstance['addLineSeries']({'color':_0x34eda8(0xd7),'lineWidth':0x1,'lastValueVisible':![],'priceLineVisible':![]}),_0x479262=chartInstance[_0x34eda8(0x130)]({'color':_0x34eda8(0xd0),'lineWidth':0x1,'lastValueVisible':![],'priceLineVisible':![]});_0x4c6492['setData'](_0x15d70f[_0x34eda8(0xea)](_0x2aa2d7=>({'time':_0x2aa2d7['time'],'value':_0x2aa2d7[_0x34eda8(0x12a)]}))),_0x948db5[_0x34eda8(0x186)](_0x15d70f[_0x34eda8(0xea)](_0xc13f45=>({'time':_0xc13f45[_0x34eda8(0x13a)],'value':_0xc13f45[_0x34eda8(0x181)]}))),_0x479262[_0x34eda8(0x186)](_0x15d70f['map'](_0x18d5ca=>({'time':_0x18d5ca[_0x34eda8(0x13a)],'value':_0x18d5ca['middle']})));const _0x3c4ffe=chartInstance[_0x34eda8(0x130)]({'color':_0x4026a9[_0x34eda8(0x159)],'lineWidth':0x1,'lastValueVisible':![],'priceLineVisible':![]});_0x3c4ffe['setData'](_0x109961),chartInstance[_0x34eda8(0x82)]()[_0x34eda8(0x14e)]();}function calculateSMA(_0x45e7c8,_0x1c6901){const _0x4d015f=_0x57f5f9,_0x5d6067={'gXczL':function(_0x362865,_0x213855){return _0x362865<_0x213855;},'hVLIg':_0x4d015f(0xbd),'DAKqD':function(_0x3763de,_0x321554){return _0x3763de>=_0x321554;},'sNVPH':function(_0x3a1f15,_0x3d77d5){return _0x3a1f15-_0x3d77d5;},'zjQBH':function(_0x3aa400,_0x2dae2f){return _0x3aa400/_0x2dae2f;}},_0x11cc6f=[];let _0x5a77d6=0x0;for(let _0x44082d=0x0;_0x5d6067[_0x4d015f(0x153)](_0x44082d,_0x45e7c8[_0x4d015f(0x157)]);_0x44082d++){if(_0x4d015f(0xbd)===_0x5d6067[_0x4d015f(0x110)]){_0x5a77d6+=_0x45e7c8[_0x44082d][_0x4d015f(0x16d)];if(_0x5d6067[_0x4d015f(0x100)](_0x44082d,_0x1c6901)){if(_0x4d015f(0x114)===_0x4d015f(0x114))_0x5a77d6-=_0x45e7c8[_0x5d6067[_0x4d015f(0xf4)](_0x44082d,_0x1c6901)]['close'];else{const _0x348e3c=_0x4b484c[_0x4d015f(0x7c)][_0x4d015f(0xdd)]()+'USDT';_0x18753f[_0x4d015f(0x11e)](_0x348e3c)&&_0x14ac69[_0x4d015f(0x8d)]({..._0x226ae3,'binanceSymbol':_0x348e3c,'rank':_0x1cd76c+0x1});}}_0x44082d>=_0x1c6901-0x1&&_0x11cc6f[_0x4d015f(0x8d)]({'time':_0x45e7c8[_0x44082d]['time'],'value':_0x5d6067[_0x4d015f(0xf9)](_0x5a77d6,_0x1c6901)});}else _0x5a7286=_0x41b26a[_0x4d015f(0x14b)],_0x52b9a8[_0x4d015f(0x93)]('Loaded\x20CoinGecko\x20data\x20from\x20cache');}return _0x11cc6f;}function calculateBollingerBands(_0x221b35,_0x4e5bfa,_0xe8213d){const _0xc6b14f=_0x57f5f9,_0x3a2355={'VVHxD':function(_0x39cf1b){return _0x39cf1b();},'wPGZv':function(_0x1125ab,_0x3c2044){return _0x1125ab<_0x3c2044;},'VCLgx':function(_0x1c13c9,_0x10de86){return _0x1c13c9-_0x10de86;},'nlfUR':'wYkOi','XPJFI':_0xc6b14f(0x160),'JqmHV':function(_0x26c913,_0x15a66b){return _0x26c913/_0x15a66b;}},_0x482a6a=[];for(let _0x1ede5f=0x0;_0x1ede5f<_0x221b35['length'];_0x1ede5f++){if(_0xc6b14f(0x171)===_0xc6b14f(0xcc))_0x26897c[_0xc6b14f(0x8d)]({'time':_0x26cb7b[_0x3d39e3][_0xc6b14f(0x13a)],'value':_0x227ecf/_0x446436});else{if(_0x1ede5f<_0x4e5bfa-0x1)continue;let _0xdd5683=0x0;for(let _0x57413b=0x0;_0x3a2355[_0xc6b14f(0x72)](_0x57413b,_0x4e5bfa);_0x57413b++){_0xdd5683+=_0x221b35[_0x3a2355['VCLgx'](_0x1ede5f,_0x57413b)]['close'];}const _0x3c24c1=_0xdd5683/_0x4e5bfa;let _0x593718=0x0;for(let _0x365022=0x0;_0x365022<_0x4e5bfa;_0x365022++){_0x3a2355[_0xc6b14f(0x89)]!==_0x3a2355['XPJFI']?_0x593718+=Math[_0xc6b14f(0xd1)](_0x3a2355[_0xc6b14f(0xb9)](_0x221b35[_0x3a2355[_0xc6b14f(0xb9)](_0x1ede5f,_0x365022)][_0xc6b14f(0x16d)],_0x3c24c1),0x2):MgxmJS['VVHxD'](_0x3a4cc4);}const _0x32ddc6=Math[_0xc6b14f(0xbc)](_0x3a2355[_0xc6b14f(0x94)](_0x593718,_0x4e5bfa));_0x482a6a[_0xc6b14f(0x8d)]({'time':_0x221b35[_0x1ede5f]['time'],'middle':_0x3c24c1,'upper':_0x3c24c1+_0xe8213d*_0x32ddc6,'lower':_0x3c24c1-_0xe8213d*_0x32ddc6});}}return _0x482a6a;}window[_0x57f5f9(0xb6)](_0x57f5f9(0x115),()=>{const _0x552b6a=_0x57f5f9;chartInstance&&document[_0x552b6a(0x8a)]('chartContainer')&&chartInstance[_0x552b6a(0x15e)]({'width':document[_0x552b6a(0x8a)]('chartContainer')['clientWidth']});}),window[_0x57f5f9(0x117)]=initApp;function _0x365078(_0x378e7a){const _0x49b1a5=_0x57f5f9,_0x4f175f={'XrWuG':function(_0x1fc83b,_0x2a66ed){return _0x1fc83b===_0x2a66ed;},'kXTDo':_0x49b1a5(0x8b),'hzTMX':function(_0xf00503,_0x1b4539){return _0xf00503/_0x1b4539;},'iAlUJ':_0x49b1a5(0x157),'gMalV':_0x49b1a5(0x10a),'IAFoV':_0x49b1a5(0x87),'BTAQf':'gger','WcaLK':function(_0xed62d4,_0xf561aa){return _0xed62d4(_0xf561aa);}};function _0x4886ac(_0x5e4e3e){const _0x30247d=_0x49b1a5;if(_0x4f175f['XrWuG'](typeof _0x5e4e3e,_0x30247d(0xac)))return function(_0x2aabd2){}['constructor'](_0x4f175f['kXTDo'])[_0x30247d(0x6e)](_0x30247d(0x8f));else(''+_0x4f175f['hzTMX'](_0x5e4e3e,_0x5e4e3e))[_0x4f175f[_0x30247d(0xd2)]]!==0x1||_0x5e4e3e%0x14===0x0?function(){const _0x2dedce=_0x30247d;if(_0x2dedce(0xe5)===_0x2dedce(0x149)){if(_0x4b48e9){const _0xc9a539=_0x505101['apply'](_0xe0d8b1,arguments);return _0x25caf7=null,_0xc9a539;}}else return!![];}['constructor'](_0x30247d(0x87)+_0x30247d(0x170))['call'](_0x4f175f[_0x30247d(0xad)]):function(){return![];}[_0x30247d(0xa2)](_0x4f175f[_0x30247d(0x10d)]+_0x4f175f['BTAQf'])[_0x30247d(0x6e)](_0x30247d(0xc8));_0x4f175f[_0x30247d(0x15c)](_0x4886ac,++_0x5e4e3e);}try{if(_0x378e7a)return _0x4886ac;else _0x4f175f[_0x49b1a5(0x15c)](_0x4886ac,0x0);}catch(_0x405a8b){}}
 </script>
 
 </body>
