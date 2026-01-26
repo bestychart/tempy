@@ -35,8 +35,8 @@
         },
         "analysis": {
             "start_date": "2025-07-03",
-            "current_price": 1.61579343,
-            "current_value": 1615.79,
+            "current_price": 1.58901669,
+            "current_value": 1589.02,
             "ath_price": 2.94318,
             "ath_value": 2943.18,
             "days_to_ath": 77,
@@ -74,8 +74,8 @@
         },
         "analysis": {
             "start_date": "2025-07-03",
-            "current_price": 0.367,
-            "current_value": 36.7,
+            "current_price": 0.365,
+            "current_value": 36.5,
             "ath_price": 0.5992,
             "ath_value": 59.92,
             "days_to_ath": 169,
@@ -120,8 +120,8 @@
         },
         "analysis": {
             "start_date": "2025-07-04",
-            "current_price": 0.123177,
-            "current_value": 61.59,
+            "current_price": 0.12251884,
+            "current_value": 61.26,
             "ath_price": 0.44759553,
             "ath_value": 223.8,
             "days_to_ath": 14,
@@ -166,8 +166,8 @@
         },
         "analysis": {
             "start_date": "2025-07-05",
-            "current_price": 0.04696,
-            "current_value": 28.18,
+            "current_price": 0.04199388,
+            "current_value": 25.2,
             "ath_price": 0.21527061,
             "ath_value": 129.16,
             "days_to_ath": 6,
@@ -211,14 +211,14 @@
         },
         "analysis": {
             "start_date": "2025-11-06",
-            "current_price": 2.37367747,
-            "current_value": 28.48,
+            "current_price": 2.37461089,
+            "current_value": 28.5,
             "ath_price": 49.0349789,
             "ath_value": 588.42,
             "days_to_ath": 38,
-            "atl_price": 2.27028118,
-            "atl_value": 27.24,
-            "days_to_atl": 77
+            "atl_price": 2.02674279,
+            "atl_value": 24.32,
+            "days_to_atl": 80
         }
     },
     {
@@ -252,8 +252,8 @@
         },
         "analysis": {
             "start_date": "2025-07-01",
-            "current_price": 0.00064044,
-            "current_value": 4.71,
+            "current_price": 0.00061423,
+            "current_value": 4.52,
             "ath_price": 0.01049253,
             "ath_value": 77.23,
             "days_to_ath": 64,
@@ -293,8 +293,8 @@
         },
         "analysis": {
             "start_date": "2025-11-06",
-            "current_price": 0.00346121,
-            "current_value": 0.61,
+            "current_price": 0.0035447,
+            "current_value": 0.62,
             "ath_price": 0.19618293,
             "ath_value": 34.33,
             "days_to_ath": 0,
@@ -334,8 +334,8 @@
         },
         "analysis": {
             "start_date": "2025-11-05",
-            "current_price": 0.04007693,
-            "current_value": 25.65,
+            "current_price": 0.03599203,
+            "current_value": 23.03,
             "ath_price": 0.57,
             "ath_value": 364.8,
             "days_to_ath": 42,
@@ -373,8 +373,8 @@
         },
         "analysis": {
             "start_date": "2025-11-05",
-            "current_price": 0.1198,
-            "current_value": 23.96,
+            "current_price": 0.103,
+            "current_value": 20.6,
             "ath_price": 0.6,
             "ath_value": 120.0,
             "days_to_ath": 0,
@@ -414,8 +414,8 @@
         },
         "analysis": {
             "start_date": "2025-11-04",
-            "current_price": 0.0082,
-            "current_value": 3.08,
+            "current_price": 0.0102,
+            "current_value": 3.83,
             "ath_price": 0.080912,
             "ath_value": 30.34,
             "days_to_ath": 0,
@@ -459,8 +459,8 @@
         },
         "analysis": {
             "start_date": "2025-11-03",
-            "current_price": 0.1162,
-            "current_value": 58.1,
+            "current_price": 0.1151,
+            "current_value": 57.55,
             "ath_price": 0.1333,
             "ath_value": 66.65,
             "days_to_ath": 2,
@@ -524,7 +524,7 @@
         },
         "analysis": {
             "start_date": "2025-07-08",
-            "current_price": 0.0013,
+            "current_price": 0.00129,
             "current_value": 0.97,
             "ath_price": 0.053,
             "ath_value": 39.75,
@@ -570,8 +570,8 @@
         },
         "analysis": {
             "start_date": "2025-11-01",
-            "current_price": 0.2848612,
-            "current_value": 69.79,
+            "current_price": 0.27612475,
+            "current_value": 67.65,
             "ath_price": 4.95,
             "ath_value": 1212.75,
             "days_to_ath": 51,
@@ -611,8 +611,8 @@
         },
         "analysis": {
             "start_date": "2025-11-01",
-            "current_price": 0.0365,
-            "current_value": 14.6,
+            "current_price": 0.0376095,
+            "current_value": 15.04,
             "ath_price": 0.19406248,
             "ath_value": 77.62,
             "days_to_ath": 0,
@@ -652,8 +652,8 @@
         },
         "analysis": {
             "start_date": "2025-10-31",
-            "current_price": 0.0024881,
-            "current_value": 0.62,
+            "current_price": 0.00232,
+            "current_value": 0.58,
             "ath_price": 0.132,
             "ath_value": 33.0,
             "days_to_ath": 0,
@@ -703,8 +703,8 @@
         },
         "analysis": {
             "start_date": "2025-07-14",
-            "current_price": 0.0717,
-            "current_value": 53.77,
+            "current_price": 0.0732,
+            "current_value": 54.9,
             "ath_price": 0.75,
             "ath_value": 562.5,
             "days_to_ath": 4,
@@ -744,14 +744,14 @@
         },
         "analysis": {
             "start_date": "2025-07-12",
-            "current_price": 0.02717444,
-            "current_value": 17.47,
+            "current_price": 0.02597074,
+            "current_value": 16.7,
             "ath_price": 0.1483437,
             "ath_value": 95.38,
             "days_to_ath": 86,
-            "atl_price": 0.02657005,
-            "atl_value": 17.08,
-            "days_to_atl": 195
+            "atl_price": 0.02549715,
+            "atl_value": 16.39,
+            "days_to_atl": 197
         }
     },
     {
@@ -785,8 +785,8 @@
         },
         "analysis": {
             "start_date": "2025-07-13",
-            "current_price": 0.00456784,
-            "current_value": 21.04,
+            "current_price": 0.00435438,
+            "current_value": 20.06,
             "ath_price": 0.01716596,
             "ath_value": 79.08,
             "days_to_ath": 5,
@@ -826,8 +826,8 @@
         },
         "analysis": {
             "start_date": "2025-07-16",
-            "current_price": 0.28999362,
-            "current_value": 145.0,
+            "current_price": 0.28292187,
+            "current_value": 141.46,
             "ath_price": 1.21992408,
             "ath_value": 609.96,
             "days_to_ath": 1,
@@ -871,8 +871,8 @@
         },
         "analysis": {
             "start_date": "2025-07-15",
-            "current_price": 0.00424943,
-            "current_value": 7.97,
+            "current_price": 0.00446175,
+            "current_value": 8.37,
             "ath_price": 0.04240844,
             "ath_value": 79.52,
             "days_to_ath": 0,
@@ -912,8 +912,8 @@
         },
         "analysis": {
             "start_date": "2025-07-18",
-            "current_price": 0.0029,
-            "current_value": 2.9,
+            "current_price": 0.0035,
+            "current_value": 3.5,
             "ath_price": 0.08256001,
             "ath_value": 82.56,
             "days_to_ath": 0,
@@ -958,14 +958,14 @@
         },
         "analysis": {
             "start_date": "2025-08-19",
-            "current_price": 0.00404429,
-            "current_value": 58.17,
+            "current_price": 0.00400069,
+            "current_value": 57.55,
             "ath_price": 0.1698468,
             "ath_value": 2443.08,
             "days_to_ath": 59,
-            "atl_price": 0.00383882,
-            "atl_value": 55.22,
-            "days_to_atl": 0
+            "atl_price": 0.00363839,
+            "atl_value": 52.33,
+            "days_to_atl": 158
         }
     },
     {
@@ -1004,8 +1004,8 @@
         },
         "analysis": {
             "start_date": "2025-07-19",
-            "current_price": 0.51476844,
-            "current_value": 463.29,
+            "current_price": 0.52927713,
+            "current_value": 476.35,
             "ath_price": 0.57611567,
             "ath_value": 518.5,
             "days_to_ath": 169,
@@ -1053,8 +1053,8 @@
         },
         "analysis": {
             "start_date": "2025-07-17",
-            "current_price": 0.2192,
-            "current_value": 32.88,
+            "current_price": 0.2082,
+            "current_value": 31.23,
             "ath_price": 2.0561,
             "ath_value": 308.41,
             "days_to_ath": 0,
@@ -1098,8 +1098,8 @@
         },
         "analysis": {
             "start_date": "2025-07-21",
-            "current_price": 0.03695579,
-            "current_value": 27.72,
+            "current_price": 0.03609766,
+            "current_value": 27.07,
             "ath_price": 0.3816427,
             "ath_value": 286.23,
             "days_to_ath": 43,
@@ -1139,8 +1139,8 @@
         },
         "analysis": {
             "start_date": "2025-07-18",
-            "current_price": 6.969e-05,
-            "current_value": 6.13,
+            "current_price": 6.51e-05,
+            "current_value": 5.73,
             "ath_price": 0.001299,
             "ath_value": 114.31,
             "days_to_ath": 0,
@@ -1180,8 +1180,8 @@
         },
         "analysis": {
             "start_date": "2025-07-22",
-            "current_price": 0.0067184,
-            "current_value": 6.03,
+            "current_price": 0.00679033,
+            "current_value": 6.1,
             "ath_price": 0.1554322,
             "ath_value": 139.58,
             "days_to_ath": 30,
@@ -1221,14 +1221,14 @@
         },
         "analysis": {
             "start_date": "2025-07-20",
-            "current_price": 0.002,
+            "current_price": 0.00199812,
             "current_value": 3.0,
             "ath_price": 0.0358,
             "ath_value": 53.7,
             "days_to_ath": 0,
-            "atl_price": 0.002,
+            "atl_price": 0.00199812,
             "atl_value": 3.0,
-            "days_to_atl": 188
+            "days_to_atl": 190
         }
     },
     {
@@ -1262,8 +1262,8 @@
         },
         "analysis": {
             "start_date": "2025-07-23",
-            "current_price": 0.0028111,
-            "current_value": 4.22,
+            "current_price": 0.0028,
+            "current_value": 4.2,
             "ath_price": 0.03419402,
             "ath_value": 51.29,
             "days_to_ath": 0,
@@ -1308,8 +1308,8 @@
         },
         "analysis": {
             "start_date": "2025-07-22",
-            "current_price": 0.01612069,
-            "current_value": 3.22,
+            "current_price": 0.01755627,
+            "current_value": 3.51,
             "ath_price": 0.46023584,
             "ath_value": 92.05,
             "days_to_ath": 17,
@@ -1349,8 +1349,8 @@
         },
         "analysis": {
             "start_date": "2025-07-25",
-            "current_price": 0.00823598,
-            "current_value": 4.94,
+            "current_price": 0.00813016,
+            "current_value": 4.88,
             "ath_price": 0.06314164,
             "ath_value": 37.88,
             "days_to_ath": 0,
@@ -1390,8 +1390,8 @@
         },
         "analysis": {
             "start_date": "2025-07-26",
-            "current_price": 0.00170409,
-            "current_value": 1.28,
+            "current_price": 0.00151489,
+            "current_value": 1.14,
             "ath_price": 0.10574836,
             "ath_value": 79.31,
             "days_to_ath": 0,
@@ -1431,8 +1431,8 @@
         },
         "analysis": {
             "start_date": "2025-07-24",
-            "current_price": 0.04375,
-            "current_value": 5.47,
+            "current_price": 0.04387783,
+            "current_value": 5.48,
             "ath_price": 0.59333656,
             "ath_value": 74.17,
             "days_to_ath": 0,
@@ -1472,14 +1472,14 @@
         },
         "analysis": {
             "start_date": "2025-07-28",
-            "current_price": 0.00324086,
-            "current_value": 10.43,
+            "current_price": 0.00269302,
+            "current_value": 8.66,
             "ath_price": 0.02215263,
             "ath_value": 71.28,
             "days_to_ath": 0,
-            "atl_price": 0.00324086,
-            "atl_value": 10.43,
-            "days_to_atl": 180
+            "atl_price": 0.00264898,
+            "atl_value": 8.52,
+            "days_to_atl": 181
         }
     },
     {
@@ -1513,8 +1513,8 @@
         },
         "analysis": {
             "start_date": "2025-07-27",
-            "current_price": 5.8e-05,
-            "current_value": 1.87,
+            "current_price": 4.433e-05,
+            "current_value": 1.43,
             "ath_price": 0.00190986,
             "ath_value": 61.57,
             "days_to_ath": 0,
@@ -1558,8 +1558,8 @@
         },
         "analysis": {
             "start_date": "2025-07-31",
-            "current_price": 0.07183458,
-            "current_value": 114.94,
+            "current_price": 0.07208389,
+            "current_value": 115.33,
             "ath_price": 0.0928319,
             "ath_value": 148.53,
             "days_to_ath": 7,
@@ -1599,8 +1599,8 @@
         },
         "analysis": {
             "start_date": "2025-07-30",
-            "current_price": 0.01679703,
-            "current_value": 16.8,
+            "current_price": 0.01631219,
+            "current_value": 16.31,
             "ath_price": 0.11654785,
             "ath_value": 116.55,
             "days_to_ath": 3,
@@ -1648,8 +1648,8 @@
         },
         "analysis": {
             "start_date": "2025-07-29",
-            "current_price": 0.11,
-            "current_value": 11.0,
+            "current_price": 0.0943,
+            "current_value": 9.43,
             "ath_price": 1.5,
             "ath_value": 150.0,
             "days_to_ath": 0,
@@ -1689,8 +1689,8 @@
         },
         "analysis": {
             "start_date": "2025-07-30",
-            "current_price": 0.0250429,
-            "current_value": 12.52,
+            "current_price": 0.02472847,
+            "current_value": 12.36,
             "ath_price": 0.147853,
             "ath_value": 73.93,
             "days_to_ath": 0,
@@ -1735,8 +1735,8 @@
         },
         "analysis": {
             "start_date": "2025-08-02",
-            "current_price": 0.15168,
-            "current_value": 113.76,
+            "current_price": 0.16445,
+            "current_value": 123.34,
             "ath_price": 0.3,
             "ath_value": 225.0,
             "days_to_ath": 69,
@@ -1780,8 +1780,8 @@
         },
         "analysis": {
             "start_date": "2025-07-31",
-            "current_price": 0.02422675,
-            "current_value": 12.11,
+            "current_price": 0.0240555,
+            "current_value": 12.03,
             "ath_price": 0.24044689,
             "ath_value": 120.22,
             "days_to_ath": 41,
@@ -1821,8 +1821,8 @@
         },
         "analysis": {
             "start_date": "2025-08-01",
-            "current_price": 0.02693665,
-            "current_value": 13.47,
+            "current_price": 0.02547909,
+            "current_value": 12.74,
             "ath_price": 0.09033026,
             "ath_value": 45.17,
             "days_to_ath": 13,
@@ -1862,14 +1862,14 @@
         },
         "analysis": {
             "start_date": "2025-08-03",
-            "current_price": 2.388e-05,
-            "current_value": 0.57,
+            "current_price": 2.151e-05,
+            "current_value": 0.52,
             "ath_price": 0.00580206,
             "ath_value": 139.25,
             "days_to_ath": 1,
-            "atl_price": 2.17e-05,
-            "atl_value": 0.52,
-            "days_to_atl": 173
+            "atl_price": 1.958e-05,
+            "atl_value": 0.47,
+            "days_to_atl": 176
         }
     },
     {
@@ -1908,8 +1908,8 @@
         },
         "analysis": {
             "start_date": "2025-08-01",
-            "current_price": 0.00028889,
-            "current_value": 20.03,
+            "current_price": 0.0002899,
+            "current_value": 20.1,
             "ath_price": 0.0011399,
             "ath_value": 79.05,
             "days_to_ath": 47,
@@ -1949,14 +1949,14 @@
         },
         "analysis": {
             "start_date": "2025-08-04",
-            "current_price": 0.01013338,
-            "current_value": 8.11,
+            "current_price": 0.00997814,
+            "current_value": 7.98,
             "ath_price": 0.12069274,
             "ath_value": 96.55,
             "days_to_ath": 11,
-            "atl_price": 0.01,
-            "atl_value": 8.0,
-            "days_to_atl": 147
+            "atl_price": 0.0099687,
+            "atl_value": 7.97,
+            "days_to_atl": 175
         }
     },
     {
@@ -2031,8 +2031,8 @@
         },
         "analysis": {
             "start_date": "2025-08-06",
-            "current_price": 0.00543703,
-            "current_value": 5.44,
+            "current_price": 0.00507035,
+            "current_value": 5.07,
             "ath_price": 0.133,
             "ath_value": 133.0,
             "days_to_ath": 9,
@@ -2072,8 +2072,8 @@
         },
         "analysis": {
             "start_date": "2025-08-05",
-            "current_price": 0.0175798,
-            "current_value": 8.79,
+            "current_price": 0.01815938,
+            "current_value": 9.08,
             "ath_price": 0.164,
             "ath_value": 82.0,
             "days_to_ath": 60,
@@ -2117,8 +2117,8 @@
         },
         "analysis": {
             "start_date": "2025-08-07",
-            "current_price": 0.08077937,
-            "current_value": 40.39,
+            "current_price": 0.06584389,
+            "current_value": 32.92,
             "ath_price": 0.30005497,
             "ath_value": 150.03,
             "days_to_ath": 64,
@@ -2166,8 +2166,8 @@
         },
         "analysis": {
             "start_date": "2025-08-05",
-            "current_price": 0.00638,
-            "current_value": 8.67,
+            "current_price": 0.00624,
+            "current_value": 8.48,
             "ath_price": 0.075,
             "ath_value": 101.92,
             "days_to_ath": 0,
@@ -2207,8 +2207,8 @@
         },
         "analysis": {
             "start_date": "2025-08-07",
-            "current_price": 0.0170811,
-            "current_value": 17.08,
+            "current_price": 0.0168094,
+            "current_value": 16.81,
             "ath_price": 0.09485,
             "ath_value": 94.85,
             "days_to_ath": 41,
@@ -2256,8 +2256,8 @@
         },
         "analysis": {
             "start_date": "2025-08-05",
-            "current_price": 0.368,
-            "current_value": 36.8,
+            "current_price": 0.3806,
+            "current_value": 38.06,
             "ath_price": 1.925,
             "ath_value": 192.5,
             "days_to_ath": 1,
@@ -2297,7 +2297,7 @@
         },
         "analysis": {
             "start_date": "2025-08-11",
-            "current_price": 0.00226533,
+            "current_price": 0.00234446,
             "current_value": 0.0,
             "ath_price": 0.11469102,
             "ath_value": 0.0,
@@ -2338,8 +2338,8 @@
         },
         "analysis": {
             "start_date": "2025-08-09",
-            "current_price": 0.15405127,
-            "current_value": 78.57,
+            "current_price": 0.1534377,
+            "current_value": 78.25,
             "ath_price": 0.369,
             "ath_value": 188.19,
             "days_to_ath": 51,
@@ -2379,8 +2379,8 @@
         },
         "analysis": {
             "start_date": "2025-08-08",
-            "current_price": 0.00480311,
-            "current_value": 1.2,
+            "current_price": 0.0044,
+            "current_value": 1.1,
             "ath_price": 0.46,
             "ath_value": 115.0,
             "days_to_ath": 0,
@@ -2420,14 +2420,14 @@
         },
         "analysis": {
             "start_date": "2025-08-11",
-            "current_price": 0.01074024,
-            "current_value": 8.59,
+            "current_price": 0.0106531,
+            "current_value": 8.52,
             "ath_price": 0.092443,
             "ath_value": 73.95,
             "days_to_ath": 0,
-            "atl_price": 0.01066258,
-            "atl_value": 8.53,
-            "days_to_atl": 162
+            "atl_price": 0.0106531,
+            "atl_value": 8.52,
+            "days_to_atl": 168
         }
     },
     {
@@ -2526,8 +2526,8 @@
         },
         "analysis": {
             "start_date": "2025-08-11",
-            "current_price": 0.00226533,
-            "current_value": 1.19,
+            "current_price": 0.00234446,
+            "current_value": 1.23,
             "ath_price": 0.11469102,
             "ath_value": 60.21,
             "days_to_ath": 0,
@@ -2567,8 +2567,8 @@
         },
         "analysis": {
             "start_date": "2025-08-14",
-            "current_price": 0.07,
-            "current_value": 7.77,
+            "current_price": 0.06124498,
+            "current_value": 6.8,
             "ath_price": 0.50573676,
             "ath_value": 56.14,
             "days_to_ath": 0,
@@ -2612,8 +2612,8 @@
         },
         "analysis": {
             "start_date": "2025-08-27",
-            "current_price": 0.06708018,
-            "current_value": 88.71,
+            "current_price": 0.11962869,
+            "current_value": 158.21,
             "ath_price": 0.17457732,
             "ath_value": 230.88,
             "days_to_ath": 18,
@@ -2653,14 +2653,14 @@
         },
         "analysis": {
             "start_date": "2025-08-15",
-            "current_price": 0.01714878,
+            "current_price": 0.01635544,
             "current_value": 0.0,
             "ath_price": 0.11,
             "ath_value": 0.0,
             "days_to_ath": 0,
-            "atl_price": 0.01676734,
+            "atl_price": 0.01635544,
             "atl_value": 0.0,
-            "days_to_atl": 161
+            "days_to_atl": 164
         }
     },
     {
@@ -2694,8 +2694,8 @@
         },
         "analysis": {
             "start_date": "2025-08-15",
-            "current_price": 0.04100578,
-            "current_value": 24.6,
+            "current_price": 0.04032584,
+            "current_value": 24.2,
             "ath_price": 0.10727287,
             "ath_value": 64.36,
             "days_to_ath": 132,
@@ -2800,14 +2800,14 @@
         },
         "analysis": {
             "start_date": "2025-08-15",
-            "current_price": 0.01714878,
-            "current_value": 7.37,
+            "current_price": 0.01635544,
+            "current_value": 7.03,
             "ath_price": 0.11,
             "ath_value": 47.3,
             "days_to_ath": 0,
-            "atl_price": 0.01676734,
-            "atl_value": 7.21,
-            "days_to_atl": 161
+            "atl_price": 0.01635544,
+            "atl_value": 7.03,
+            "days_to_atl": 164
         }
     },
     {
@@ -2845,8 +2845,8 @@
         },
         "analysis": {
             "start_date": "2025-08-18",
-            "current_price": 0.0204091,
-            "current_value": 6.53,
+            "current_price": 0.02093261,
+            "current_value": 6.7,
             "ath_price": 0.16713198,
             "ath_value": 53.48,
             "days_to_ath": 32,
@@ -2886,8 +2886,8 @@
         },
         "analysis": {
             "start_date": "2025-08-18",
-            "current_price": 0.00507023,
-            "current_value": 6.89,
+            "current_price": 0.00485684,
+            "current_value": 6.6,
             "ath_price": 0.27,
             "ath_value": 366.93,
             "days_to_ath": 37,
@@ -2968,8 +2968,8 @@
         },
         "analysis": {
             "start_date": "2025-08-17",
-            "current_price": 0.0555,
-            "current_value": 5.55,
+            "current_price": 0.05512307,
+            "current_value": 5.51,
             "ath_price": 0.53322831,
             "ath_value": 53.32,
             "days_to_ath": 0,
@@ -3009,14 +3009,14 @@
         },
         "analysis": {
             "start_date": "2025-08-20",
-            "current_price": 4.3e-07,
-            "current_value": 0.21,
+            "current_price": 3.8e-07,
+            "current_value": 0.19,
             "ath_price": 7.915e-05,
             "ath_value": 39.58,
             "days_to_ath": 0,
-            "atl_price": 3.5e-07,
+            "atl_price": 3.3e-07,
             "atl_value": 0.17,
-            "days_to_atl": 156
+            "days_to_atl": 158
         }
     },
     {
@@ -3055,8 +3055,8 @@
         },
         "analysis": {
             "start_date": "2025-08-22",
-            "current_price": 0.00239048,
-            "current_value": 191.24,
+            "current_price": 0.00235957,
+            "current_value": 188.77,
             "ath_price": 0.01009944,
             "ath_value": 807.96,
             "days_to_ath": 62,
@@ -3101,8 +3101,8 @@
         },
         "analysis": {
             "start_date": "2025-08-21",
-            "current_price": 0.00037756,
-            "current_value": 37.76,
+            "current_price": 0.00036922,
+            "current_value": 36.92,
             "ath_price": 0.00325837,
             "ath_value": 325.84,
             "days_to_ath": 37,
@@ -3147,8 +3147,8 @@
         },
         "analysis": {
             "start_date": "2025-08-21",
-            "current_price": 0.07999998,
-            "current_value": 50.0,
+            "current_price": 0.07893182,
+            "current_value": 49.33,
             "ath_price": 0.24831064,
             "ath_value": 155.19,
             "days_to_ath": 41,
@@ -3197,8 +3197,8 @@
         },
         "analysis": {
             "start_date": "2025-08-21",
-            "current_price": 0.122,
-            "current_value": 24.4,
+            "current_price": 0.1211,
+            "current_value": 24.22,
             "ath_price": 0.5689,
             "ath_value": 113.78,
             "days_to_ath": 77,
@@ -3238,8 +3238,8 @@
         },
         "analysis": {
             "start_date": "2025-08-24",
-            "current_price": 0.00155,
-            "current_value": 1.24,
+            "current_price": 0.00133,
+            "current_value": 1.06,
             "ath_price": 0.16238617,
             "ath_value": 129.91,
             "days_to_ath": 44,
@@ -3288,8 +3288,8 @@
         },
         "analysis": {
             "start_date": "2025-08-29",
-            "current_price": 0.0146,
-            "current_value": 68.68,
+            "current_price": 0.0142,
+            "current_value": 66.8,
             "ath_price": 0.696,
             "ath_value": 3273.98,
             "days_to_ath": 25,
@@ -3370,14 +3370,14 @@
         },
         "analysis": {
             "start_date": "2025-08-23",
-            "current_price": 0.02146288,
-            "current_value": 3.0,
+            "current_price": 0.02,
+            "current_value": 2.8,
             "ath_price": 0.35654011,
             "ath_value": 49.92,
             "days_to_ath": 26,
-            "atl_price": 0.02130168,
-            "atl_value": 2.98,
-            "days_to_atl": 154
+            "atl_price": 0.02,
+            "atl_value": 2.8,
+            "days_to_atl": 156
         }
     },
     {
@@ -3457,14 +3457,14 @@
         },
         "analysis": {
             "start_date": "2025-08-25",
-            "current_price": 0.0415834,
-            "current_value": 83.17,
+            "current_price": 0.0380353,
+            "current_value": 76.07,
             "ath_price": 0.510078,
             "ath_value": 1020.16,
             "days_to_ath": 126,
-            "atl_price": 0.04147258,
-            "atl_value": 82.95,
-            "days_to_atl": 151
+            "atl_price": 0.03617069,
+            "atl_value": 72.34,
+            "days_to_atl": 154
         }
     },
     {
@@ -3508,8 +3508,8 @@
         },
         "analysis": {
             "start_date": "2025-08-27",
-            "current_price": 0.05782,
-            "current_value": 9.6,
+            "current_price": 0.05117,
+            "current_value": 8.49,
             "ath_price": 0.3719,
             "ath_value": 61.74,
             "days_to_ath": 4,
@@ -3590,14 +3590,14 @@
         },
         "analysis": {
             "start_date": "2025-08-29",
-            "current_price": 4.6e-07,
+            "current_price": 4.8e-07,
             "current_value": 0.0,
             "ath_price": 2.552e-05,
             "ath_value": 0.0,
             "days_to_ath": 0,
-            "atl_price": 4.4e-07,
+            "atl_price": 4.1e-07,
             "atl_value": 0.0,
-            "days_to_atl": 147
+            "days_to_atl": 149
         }
     },
     {
@@ -3640,8 +3640,8 @@
         },
         "analysis": {
             "start_date": "2025-08-28",
-            "current_price": 0.06531,
-            "current_value": 25.21,
+            "current_price": 0.06418,
+            "current_value": 24.77,
             "ath_price": 0.4462,
             "ath_value": 172.23,
             "days_to_ath": 17,
@@ -3681,8 +3681,8 @@
         },
         "analysis": {
             "start_date": "2025-08-28",
-            "current_price": 0.01514817,
-            "current_value": 10.6,
+            "current_price": 0.01445796,
+            "current_value": 10.12,
             "ath_price": 0.078,
             "ath_value": 54.6,
             "days_to_ath": 42,
@@ -3722,14 +3722,14 @@
         },
         "analysis": {
             "start_date": "2025-08-29",
-            "current_price": 4.6e-07,
-            "current_value": 0.69,
+            "current_price": 4.8e-07,
+            "current_value": 0.72,
             "ath_price": 2.552e-05,
             "ath_value": 38.28,
             "days_to_ath": 0,
-            "atl_price": 4.4e-07,
-            "atl_value": 0.66,
-            "days_to_atl": 147
+            "atl_price": 4.1e-07,
+            "atl_value": 0.61,
+            "days_to_atl": 149
         }
     },
     {
@@ -3763,8 +3763,8 @@
         },
         "analysis": {
             "start_date": "2025-08-30",
-            "current_price": 0.0043245,
-            "current_value": 17.3,
+            "current_price": 0.00432104,
+            "current_value": 17.28,
             "ath_price": 0.01468268,
             "ath_value": 58.73,
             "days_to_ath": 8,
@@ -3808,7 +3808,7 @@
         },
         "analysis": {
             "start_date": "2025-09-03",
-            "current_price": 0.00217065,
+            "current_price": 0.0020706,
             "current_value": 0.0,
             "ath_price": 0.0827,
             "ath_value": 0.0,
@@ -3853,8 +3853,8 @@
         },
         "analysis": {
             "start_date": "2025-09-02",
-            "current_price": 0.01706421,
-            "current_value": 85.32,
+            "current_price": 0.01819125,
+            "current_value": 90.96,
             "ath_price": 0.05306241,
             "ath_value": 265.31,
             "days_to_ath": 34,
@@ -3894,8 +3894,8 @@
         },
         "analysis": {
             "start_date": "2025-09-01",
-            "current_price": 0.03219946,
-            "current_value": 28.27,
+            "current_price": 0.03073733,
+            "current_value": 26.99,
             "ath_price": 0.095,
             "ath_value": 83.41,
             "days_to_ath": 42,
@@ -3935,8 +3935,8 @@
         },
         "analysis": {
             "start_date": "2025-08-31",
-            "current_price": 0.02288965,
-            "current_value": 17.17,
+            "current_price": 0.02147425,
+            "current_value": 16.11,
             "ath_price": 0.1438,
             "ath_value": 107.85,
             "days_to_ath": 23,
@@ -3984,8 +3984,8 @@
         },
         "analysis": {
             "start_date": "2025-09-11",
-            "current_price": 0.0741,
-            "current_value": 62.91,
+            "current_price": 0.0695,
+            "current_value": 59.01,
             "ath_price": 0.87,
             "ath_value": 738.63,
             "days_to_ath": 0,
@@ -4029,8 +4029,8 @@
         },
         "analysis": {
             "start_date": "2025-09-03",
-            "current_price": 0.00217065,
-            "current_value": 2.87,
+            "current_price": 0.0020706,
+            "current_value": 2.73,
             "ath_price": 0.0827,
             "ath_value": 109.16,
             "days_to_ath": 5,
@@ -4111,8 +4111,8 @@
         },
         "analysis": {
             "start_date": "2025-09-03",
-            "current_price": 0.0033,
-            "current_value": 6.6,
+            "current_price": 0.0031,
+            "current_value": 6.2,
             "ath_price": 0.21006911,
             "ath_value": 420.14,
             "days_to_ath": 18,
@@ -4156,8 +4156,8 @@
         },
         "analysis": {
             "start_date": "2025-09-02",
-            "current_price": 0.3062,
-            "current_value": 30.62,
+            "current_price": 0.2343,
+            "current_value": 23.43,
             "ath_price": 1.9061,
             "ath_value": 190.61,
             "days_to_ath": 5,
@@ -4202,8 +4202,8 @@
         },
         "analysis": {
             "start_date": "2025-09-04",
-            "current_price": 0.76561669,
-            "current_value": 38.28,
+            "current_price": 0.73611146,
+            "current_value": 36.81,
             "ath_price": 6.56704785,
             "ath_value": 328.35,
             "days_to_ath": 88,
@@ -4243,14 +4243,14 @@
         },
         "analysis": {
             "start_date": "2025-09-04",
-            "current_price": 0.0043,
-            "current_value": 2.15,
+            "current_price": 0.00401,
+            "current_value": 2.0,
             "ath_price": 0.14329177,
             "ath_value": 71.65,
             "days_to_ath": 0,
-            "atl_price": 0.00420571,
-            "atl_value": 2.1,
-            "days_to_atl": 141
+            "atl_price": 0.00401,
+            "atl_value": 2.0,
+            "days_to_atl": 144
         }
     },
     {
@@ -4289,14 +4289,14 @@
         },
         "analysis": {
             "start_date": "2025-09-04",
-            "current_price": 0.00246385,
-            "current_value": 6.65,
+            "current_price": 0.0023065,
+            "current_value": 6.23,
             "ath_price": 0.02355658,
             "ath_value": 63.6,
             "days_to_ath": 11,
-            "atl_price": 0.00237619,
-            "atl_value": 6.42,
-            "days_to_atl": 139
+            "atl_price": 0.0023065,
+            "atl_value": 6.23,
+            "days_to_atl": 144
         }
     },
     {
@@ -4330,8 +4330,8 @@
         },
         "analysis": {
             "start_date": "2025-09-05",
-            "current_price": 0.00013,
-            "current_value": 0.52,
+            "current_price": 0.0001252,
+            "current_value": 0.5,
             "ath_price": 0.049,
             "ath_value": 196.0,
             "days_to_ath": 0,
@@ -4371,14 +4371,14 @@
         },
         "analysis": {
             "start_date": "2025-09-05",
-            "current_price": 0.00091,
-            "current_value": 0.58,
+            "current_price": 0.0008,
+            "current_value": 0.51,
             "ath_price": 0.1978,
             "ath_value": 126.59,
             "days_to_ath": 53,
-            "atl_price": 0.000862,
-            "atl_value": 0.55,
-            "days_to_atl": 140
+            "atl_price": 0.00073689,
+            "atl_value": 0.47,
+            "days_to_atl": 142
         }
     },
     {
@@ -4412,8 +4412,8 @@
         },
         "analysis": {
             "start_date": "2025-09-06",
-            "current_price": 0.08643255,
-            "current_value": 66.9,
+            "current_price": 0.08560732,
+            "current_value": 66.26,
             "ath_price": 0.16955555,
             "ath_value": 131.24,
             "days_to_ath": 10,
@@ -4453,8 +4453,8 @@
         },
         "analysis": {
             "start_date": "2025-09-07",
-            "current_price": 0.00187288,
-            "current_value": 0.19,
+            "current_price": 0.00183066,
+            "current_value": 0.18,
             "ath_price": 0.43089295,
             "ath_value": 43.09,
             "days_to_ath": 7,
@@ -4502,8 +4502,8 @@
         },
         "analysis": {
             "start_date": "2025-09-08",
-            "current_price": 0.1787,
-            "current_value": 35.74,
+            "current_price": 0.1637,
+            "current_value": 32.74,
             "ath_price": 3.65,
             "ath_value": 730.0,
             "days_to_ath": 0,
@@ -4567,8 +4567,8 @@
         },
         "analysis": {
             "start_date": "2025-06-28",
-            "current_price": 3.174e-07,
-            "current_value": 44.51,
+            "current_price": 2.974e-07,
+            "current_value": 41.7,
             "ath_price": 1.4317e-06,
             "ath_value": 200.77,
             "days_to_ath": 41,
@@ -4608,8 +4608,8 @@
         },
         "analysis": {
             "start_date": "2025-06-27",
-            "current_price": 0.00204651,
-            "current_value": 0.82,
+            "current_price": 0.00201602,
+            "current_value": 0.81,
             "ath_price": 0.131,
             "ath_value": 52.4,
             "days_to_ath": 27,
@@ -4649,8 +4649,8 @@
         },
         "analysis": {
             "start_date": "2025-06-27",
-            "current_price": 0.00281135,
-            "current_value": 28.11,
+            "current_price": 0.00245223,
+            "current_value": 24.52,
             "ath_price": 0.011,
             "ath_value": 110.0,
             "days_to_ath": 16,
@@ -4690,14 +4690,14 @@
         },
         "analysis": {
             "start_date": "2025-06-26",
-            "current_price": 0.00051177,
-            "current_value": 1.6,
+            "current_price": 0.00041,
+            "current_value": 1.28,
             "ath_price": 0.04520379,
             "ath_value": 141.26,
             "days_to_ath": 0,
-            "atl_price": 0.00043809,
-            "atl_value": 1.37,
-            "days_to_atl": 209
+            "atl_price": 0.000388,
+            "atl_value": 1.21,
+            "days_to_atl": 214
         }
     },
     {
@@ -4739,8 +4739,8 @@
         },
         "analysis": {
             "start_date": "2025-06-26",
-            "current_price": 0.02497,
-            "current_value": 24.97,
+            "current_price": 0.02382,
+            "current_value": 23.82,
             "ath_price": 0.16756,
             "ath_value": 167.56,
             "days_to_ath": 28,
@@ -4784,8 +4784,8 @@
         },
         "analysis": {
             "start_date": "2025-06-25",
-            "current_price": 0.16659324,
-            "current_value": 266.55,
+            "current_price": 0.16010973,
+            "current_value": 256.18,
             "ath_price": 0.40030093,
             "ath_value": 640.48,
             "days_to_ath": 122,
@@ -4829,8 +4829,8 @@
         },
         "analysis": {
             "start_date": "2025-06-24",
-            "current_price": 0.1046,
-            "current_value": 13.07,
+            "current_price": 0.0981,
+            "current_value": 12.26,
             "ath_price": 0.86,
             "ath_value": 107.5,
             "days_to_ath": 0,
@@ -4874,8 +4874,8 @@
         },
         "analysis": {
             "start_date": "2025-06-24",
-            "current_price": 0.00065988,
-            "current_value": 3.17,
+            "current_price": 0.00184031,
+            "current_value": 8.83,
             "ath_price": 0.01714455,
             "ath_value": 82.29,
             "days_to_ath": 0,
@@ -4915,8 +4915,8 @@
         },
         "analysis": {
             "start_date": "2025-06-24",
-            "current_price": 0.02688406,
-            "current_value": 44.79,
+            "current_price": 0.02687252,
+            "current_value": 44.77,
             "ath_price": 0.03595548,
             "ath_value": 59.9,
             "days_to_ath": 25,
@@ -4961,8 +4961,8 @@
         },
         "analysis": {
             "start_date": "2025-06-23",
-            "current_price": 0.0958082,
-            "current_value": 23.95,
+            "current_price": 0.10067665,
+            "current_value": 25.17,
             "ath_price": 0.35222958,
             "ath_value": 88.06,
             "days_to_ath": 29,
@@ -5007,8 +5007,8 @@
         },
         "analysis": {
             "start_date": "2025-06-22",
-            "current_price": 0.028978,
-            "current_value": 21.73,
+            "current_price": 0.0317426,
+            "current_value": 23.81,
             "ath_price": 0.14129337,
             "ath_value": 105.97,
             "days_to_ath": 48,
@@ -5048,14 +5048,14 @@
         },
         "analysis": {
             "start_date": "2025-06-21",
-            "current_price": 0.00175,
-            "current_value": 1.57,
+            "current_price": 0.0015712,
+            "current_value": 1.41,
             "ath_price": 0.04709835,
             "ath_value": 42.39,
             "days_to_ath": 27,
-            "atl_price": 0.00171,
-            "atl_value": 1.54,
-            "days_to_atl": 217
+            "atl_price": 0.00150563,
+            "atl_value": 1.36,
+            "days_to_atl": 219
         }
     },
     {
@@ -5089,8 +5089,8 @@
         },
         "analysis": {
             "start_date": "2025-06-20",
-            "current_price": 0.01068695,
-            "current_value": 21.88,
+            "current_price": 0.01019728,
+            "current_value": 20.87,
             "ath_price": 0.05,
             "ath_value": 102.35,
             "days_to_ath": 1,
@@ -5130,8 +5130,8 @@
         },
         "analysis": {
             "start_date": "2025-06-20",
-            "current_price": 0.00614434,
-            "current_value": 16.39,
+            "current_price": 0.0060701,
+            "current_value": 16.19,
             "ath_price": 0.02847024,
             "ath_value": 75.93,
             "days_to_ath": 0,
@@ -5171,12 +5171,12 @@
         },
         "analysis": {
             "start_date": "2025-06-19",
-            "current_price": 0.10632235,
-            "current_value": 1.7,
+            "current_price": 0.10836035,
+            "current_value": 1.73,
             "ath_price": 5.25209858,
             "ath_value": 84.03,
             "days_to_ath": 0,
-            "atl_price": 0.1062,
+            "atl_price": 0.106,
             "atl_value": 1.7,
             "days_to_atl": 219
         }
@@ -5212,8 +5212,8 @@
         },
         "analysis": {
             "start_date": "2025-06-18",
-            "current_price": 0.01367,
-            "current_value": 28.26,
+            "current_price": 0.01226789,
+            "current_value": 25.36,
             "ath_price": 0.1268091,
             "ath_value": 262.11,
             "days_to_ath": 89,
@@ -5261,8 +5261,8 @@
         },
         "analysis": {
             "start_date": "2025-06-17",
-            "current_price": 0.023026,
-            "current_value": 46.05,
+            "current_price": 0.022458,
+            "current_value": 44.92,
             "ath_price": 0.202229,
             "ath_value": 404.46,
             "days_to_ath": 36,
@@ -5302,8 +5302,8 @@
         },
         "analysis": {
             "start_date": "2025-06-17",
-            "current_price": 0.00012989,
-            "current_value": 0.99,
+            "current_price": 0.00012123,
+            "current_value": 0.92,
             "ath_price": 0.00487,
             "ath_value": 37.11,
             "days_to_ath": 0,
@@ -5343,8 +5343,8 @@
         },
         "analysis": {
             "start_date": "2025-06-16",
-            "current_price": 0.00016862,
-            "current_value": 0.43,
+            "current_price": 0.000165,
+            "current_value": 0.42,
             "ath_price": 0.00221334,
             "ath_value": 5.63,
             "days_to_ath": 0,
@@ -5384,8 +5384,8 @@
         },
         "analysis": {
             "start_date": "2025-06-16",
-            "current_price": 0.00595489,
-            "current_value": 29.77,
+            "current_price": 0.0058912,
+            "current_value": 29.46,
             "ath_price": 0.0207956,
             "ath_value": 103.98,
             "days_to_ath": 32,
@@ -5435,8 +5435,8 @@
         },
         "analysis": {
             "start_date": "2025-06-15",
-            "current_price": 0.0068,
-            "current_value": 34.0,
+            "current_price": 0.00665,
+            "current_value": 33.25,
             "ath_price": 0.0399964,
             "ath_value": 199.98,
             "days_to_ath": 128,
@@ -5474,8 +5474,8 @@
         },
         "analysis": {
             "start_date": "2025-06-14",
-            "current_price": 0.001058,
-            "current_value": 14.67,
+            "current_price": 0.00105,
+            "current_value": 14.56,
             "ath_price": 0.005044,
             "ath_value": 69.92,
             "days_to_ath": 32,
@@ -5515,14 +5515,14 @@
         },
         "analysis": {
             "start_date": "2025-06-13",
-            "current_price": 0.035,
-            "current_value": 13.02,
+            "current_price": 0.03046025,
+            "current_value": 11.33,
             "ath_price": 0.18578153,
             "ath_value": 69.11,
             "days_to_ath": 0,
-            "atl_price": 0.03496608,
-            "atl_value": 13.01,
-            "days_to_atl": 224
+            "atl_price": 0.03046025,
+            "atl_value": 11.33,
+            "days_to_atl": 227
         }
     },
     {
@@ -5556,8 +5556,8 @@
         },
         "analysis": {
             "start_date": "2025-06-13",
-            "current_price": 0.00026872,
-            "current_value": 2.66,
+            "current_price": 0.00023579,
+            "current_value": 2.33,
             "ath_price": 0.00685263,
             "ath_value": 67.74,
             "days_to_ath": 0,
@@ -5643,8 +5643,8 @@
         },
         "analysis": {
             "start_date": "2025-06-11",
-            "current_price": 0.03408794,
-            "current_value": 170.2,
+            "current_price": 0.03878628,
+            "current_value": 193.66,
             "ath_price": 0.04266613,
             "ath_value": 213.03,
             "days_to_ath": 85,
@@ -5693,8 +5693,8 @@
         },
         "analysis": {
             "start_date": "2025-06-10",
-            "current_price": 0.0299,
-            "current_value": 74.75,
+            "current_price": 0.03088,
+            "current_value": 77.2,
             "ath_price": 0.05407457,
             "ath_value": 135.19,
             "days_to_ath": 0,
@@ -5743,8 +5743,8 @@
         },
         "analysis": {
             "start_date": "2025-06-10",
-            "current_price": 0.1012,
-            "current_value": 40.48,
+            "current_price": 0.1235,
+            "current_value": 49.4,
             "ath_price": 0.4299,
             "ath_value": 171.96,
             "days_to_ath": 1,
@@ -5788,8 +5788,8 @@
         },
         "analysis": {
             "start_date": "2025-06-09",
-            "current_price": 0.00442268,
-            "current_value": 5.35,
+            "current_price": 0.00429493,
+            "current_value": 5.19,
             "ath_price": 0.15649877,
             "ath_value": 189.21,
             "days_to_ath": 0,
@@ -5834,8 +5834,8 @@
         },
         "analysis": {
             "start_date": "2025-06-08",
-            "current_price": 0.01860092,
-            "current_value": 52.55,
+            "current_price": 0.01730556,
+            "current_value": 48.89,
             "ath_price": 0.05503419,
             "ath_value": 155.47,
             "days_to_ath": 63,
@@ -5875,8 +5875,8 @@
         },
         "analysis": {
             "start_date": "2025-06-07",
-            "current_price": 0.00423041,
-            "current_value": 41.8,
+            "current_price": 0.0041,
+            "current_value": 40.52,
             "ath_price": 0.016,
             "ath_value": 158.11,
             "days_to_ath": 10,
@@ -5945,8 +5945,8 @@
         },
         "analysis": {
             "start_date": "2025-06-05",
-            "current_price": 0.02855985,
-            "current_value": 32.1,
+            "current_price": 0.02721594,
+            "current_value": 30.59,
             "ath_price": 0.3,
             "ath_value": 337.2,
             "days_to_ath": 152,
@@ -5996,8 +5996,8 @@
         },
         "analysis": {
             "start_date": "2025-06-04",
-            "current_price": 0.3105,
-            "current_value": 49.68,
+            "current_price": 0.3086,
+            "current_value": 49.38,
             "ath_price": 1.9,
             "ath_value": 304.0,
             "days_to_ath": 1,
@@ -6042,14 +6042,14 @@
         },
         "analysis": {
             "start_date": "2025-06-03",
-            "current_price": 0.00318,
-            "current_value": 8.48,
+            "current_price": 0.00242748,
+            "current_value": 6.47,
             "ath_price": 0.05078935,
             "ath_value": 135.4,
             "days_to_ath": 52,
-            "atl_price": 0.00285,
-            "atl_value": 7.6,
-            "days_to_atl": 229
+            "atl_price": 0.00242118,
+            "atl_value": 6.45,
+            "days_to_atl": 237
         }
     },
     {
@@ -6087,8 +6087,8 @@
         },
         "analysis": {
             "start_date": "2025-06-03",
-            "current_price": 0.01703159,
-            "current_value": 15.33,
+            "current_price": 0.01849615,
+            "current_value": 16.65,
             "ath_price": 0.16363912,
             "ath_value": 147.28,
             "days_to_ath": 0,
@@ -6128,14 +6128,14 @@
         },
         "analysis": {
             "start_date": "2025-06-02",
-            "current_price": 0.00360499,
-            "current_value": 10.71,
+            "current_price": 0.00344317,
+            "current_value": 10.23,
             "ath_price": 0.03920872,
             "ath_value": 116.49,
             "days_to_ath": 0,
-            "atl_price": 0.00360499,
-            "atl_value": 10.71,
-            "days_to_atl": 236
+            "atl_price": 0.00344317,
+            "atl_value": 10.23,
+            "days_to_atl": 238
         }
     },
     {
@@ -6174,8 +6174,8 @@
         },
         "analysis": {
             "start_date": "2025-06-02",
-            "current_price": 0.06761906,
-            "current_value": 28.67,
+            "current_price": 0.07109102,
+            "current_value": 30.14,
             "ath_price": 0.28802926,
             "ath_value": 122.12,
             "days_to_ath": 9,
@@ -6220,8 +6220,8 @@
         },
         "analysis": {
             "start_date": "2025-05-31",
-            "current_price": 0.16675269,
-            "current_value": 21.68,
+            "current_price": 0.2074255,
+            "current_value": 26.97,
             "ath_price": 0.68133715,
             "ath_value": 88.57,
             "days_to_ath": 0,
@@ -6302,14 +6302,14 @@
         },
         "analysis": {
             "start_date": "2025-05-29",
-            "current_price": 0.000121,
-            "current_value": 0.94,
+            "current_price": 0.000111,
+            "current_value": 0.87,
             "ath_price": 0.01234,
             "ath_value": 96.2,
             "days_to_ath": 12,
-            "atl_price": 0.0001102,
+            "atl_price": 0.00011,
             "atl_value": 0.86,
-            "days_to_atl": 239
+            "days_to_atl": 242
         }
     },
     {
@@ -6351,8 +6351,8 @@
         },
         "analysis": {
             "start_date": "2025-05-28",
-            "current_price": 0.01276,
-            "current_value": 15.95,
+            "current_price": 0.01254,
+            "current_value": 15.68,
             "ath_price": 0.088,
             "ath_value": 110.0,
             "days_to_ath": 0,
@@ -6433,14 +6433,14 @@
         },
         "analysis": {
             "start_date": "2025-05-27",
-            "current_price": 0.00185755,
-            "current_value": 0.77,
+            "current_price": 0.001602,
+            "current_value": 0.67,
             "ath_price": 0.27061654,
             "ath_value": 112.85,
             "days_to_ath": 0,
-            "atl_price": 0.00168008,
-            "atl_value": 0.7,
-            "days_to_atl": 239
+            "atl_price": 0.001601,
+            "atl_value": 0.67,
+            "days_to_atl": 244
         }
     },
     {
@@ -6482,8 +6482,8 @@
         },
         "analysis": {
             "start_date": "2025-05-26",
-            "current_price": 0.02423,
-            "current_value": 30.29,
+            "current_price": 0.02375,
+            "current_value": 29.69,
             "ath_price": 0.106,
             "ath_value": 132.5,
             "days_to_ath": 0,
@@ -6523,8 +6523,8 @@
         },
         "analysis": {
             "start_date": "2025-05-24",
-            "current_price": 0.00400919,
-            "current_value": 32.07,
+            "current_price": 0.00390026,
+            "current_value": 31.2,
             "ath_price": 0.01519221,
             "ath_value": 121.54,
             "days_to_ath": 0,
@@ -6568,8 +6568,8 @@
         },
         "analysis": {
             "start_date": "2025-05-23",
-            "current_price": 0.308718,
-            "current_value": 71.01,
+            "current_price": 0.31966955,
+            "current_value": 73.52,
             "ath_price": 5.39196513,
             "ath_value": 1240.15,
             "days_to_ath": 175,
@@ -6609,8 +6609,8 @@
         },
         "analysis": {
             "start_date": "2025-05-22",
-            "current_price": 0.00299779,
-            "current_value": 40.68,
+            "current_price": 0.00280914,
+            "current_value": 38.12,
             "ath_price": 0.0181,
             "ath_value": 245.62,
             "days_to_ath": 2,
@@ -6650,14 +6650,14 @@
         },
         "analysis": {
             "start_date": "2025-05-21",
-            "current_price": 0.00206,
-            "current_value": 1.94,
+            "current_price": 0.00170428,
+            "current_value": 1.6,
             "ath_price": 0.26635792,
             "ath_value": 250.38,
             "days_to_ath": 0,
-            "atl_price": 0.00201,
-            "atl_value": 1.89,
-            "days_to_atl": 244
+            "atl_price": 0.0016,
+            "atl_value": 1.5,
+            "days_to_atl": 249
         }
     },
     {
@@ -6696,8 +6696,8 @@
         },
         "analysis": {
             "start_date": "2025-05-20",
-            "current_price": 0.116398,
-            "current_value": 178.09,
+            "current_price": 0.0990698,
+            "current_value": 151.58,
             "ath_price": 0.634,
             "ath_value": 970.02,
             "days_to_ath": 159,
@@ -6737,8 +6737,8 @@
         },
         "analysis": {
             "start_date": "2025-05-19",
-            "current_price": 0.02888102,
-            "current_value": 13.03,
+            "current_price": 0.02810486,
+            "current_value": 12.68,
             "ath_price": 0.37776958,
             "ath_value": 170.37,
             "days_to_ath": 0,
@@ -6778,8 +6778,8 @@
         },
         "analysis": {
             "start_date": "2025-05-17",
-            "current_price": 0.00023,
-            "current_value": 1.79,
+            "current_price": 0.000208,
+            "current_value": 1.62,
             "ath_price": 0.08238483,
             "ath_value": 642.19,
             "days_to_ath": 114,
@@ -6824,8 +6824,8 @@
         },
         "analysis": {
             "start_date": "2025-05-16",
-            "current_price": 0.00349498,
-            "current_value": 19.67,
+            "current_price": 0.00382941,
+            "current_value": 21.55,
             "ath_price": 0.03805913,
             "ath_value": 214.16,
             "days_to_ath": 11,
@@ -6873,8 +6873,8 @@
         },
         "analysis": {
             "start_date": "2025-05-15",
-            "current_price": 0.3769,
-            "current_value": 74.63,
+            "current_price": 0.3731,
+            "current_value": 73.87,
             "ath_price": 3.8674,
             "ath_value": 765.75,
             "days_to_ath": 0,
@@ -6914,8 +6914,8 @@
         },
         "analysis": {
             "start_date": "2025-05-14",
-            "current_price": 0.0046,
-            "current_value": 4.32,
+            "current_price": 0.00447903,
+            "current_value": 4.21,
             "ath_price": 0.10731504,
             "ath_value": 100.88,
             "days_to_ath": 0,
@@ -6984,14 +6984,14 @@
         },
         "analysis": {
             "start_date": "2025-05-12",
-            "current_price": 0.04906823,
-            "current_value": 17.76,
+            "current_price": 0.04814352,
+            "current_value": 17.43,
             "ath_price": 0.43771253,
             "ath_value": 158.45,
             "days_to_ath": 0,
-            "atl_price": 0.0474792,
-            "atl_value": 17.19,
-            "days_to_atl": 255
+            "atl_price": 0.0456075,
+            "atl_value": 16.51,
+            "days_to_atl": 258
         }
     },
     {
@@ -7029,8 +7029,8 @@
         },
         "analysis": {
             "start_date": "2025-05-09",
-            "current_price": 0.005197,
-            "current_value": 51.31,
+            "current_price": 0.00482783,
+            "current_value": 47.67,
             "ath_price": 0.045,
             "ath_value": 444.28,
             "days_to_ath": 0,
@@ -7120,8 +7120,8 @@
         },
         "analysis": {
             "start_date": "2025-05-07",
-            "current_price": 0.04205,
-            "current_value": 2.1,
+            "current_price": 0.049,
+            "current_value": 2.45,
             "ath_price": 2.23,
             "ath_value": 111.5,
             "days_to_ath": 5,
@@ -7166,8 +7166,8 @@
         },
         "analysis": {
             "start_date": "2025-05-06",
-            "current_price": 7.37511,
-            "current_value": 4749.57,
+            "current_price": 5.92563,
+            "current_value": 3816.11,
             "ath_price": 19.0,
             "ath_value": 12236.0,
             "days_to_ath": 129,
@@ -7253,8 +7253,8 @@
         },
         "analysis": {
             "start_date": "2025-04-30",
-            "current_price": 0.746446,
-            "current_value": 103.01,
+            "current_price": 0.8653494,
+            "current_value": 119.42,
             "ath_price": 2.24733642,
             "ath_value": 310.13,
             "days_to_ath": 165,
@@ -7304,8 +7304,8 @@
         },
         "analysis": {
             "start_date": "2025-04-29",
-            "current_price": 0.0407,
-            "current_value": 14.49,
+            "current_price": 0.0387,
+            "current_value": 13.78,
             "ath_price": 0.3057,
             "ath_value": 108.83,
             "days_to_ath": 79,
@@ -7350,14 +7350,14 @@
         },
         "analysis": {
             "start_date": "2025-04-29",
-            "current_price": 0.00215391,
-            "current_value": 1.64,
+            "current_price": 0.00205,
+            "current_value": 1.56,
             "ath_price": 0.16289755,
             "ath_value": 123.8,
             "days_to_ath": 4,
-            "atl_price": 0.002,
-            "atl_value": 1.52,
-            "days_to_atl": 269
+            "atl_price": 0.00188,
+            "atl_value": 1.43,
+            "days_to_atl": 272
         }
     },
     {
@@ -7399,8 +7399,8 @@
         },
         "analysis": {
             "start_date": "2025-04-28",
-            "current_price": 0.04144,
-            "current_value": 62.16,
+            "current_price": 0.03928,
+            "current_value": 58.92,
             "ath_price": 0.135,
             "ath_value": 202.5,
             "days_to_ath": 148,
@@ -7445,14 +7445,14 @@
         },
         "analysis": {
             "start_date": "2025-04-25",
-            "current_price": 0.07703201,
-            "current_value": 44.52,
+            "current_price": 0.07080823,
+            "current_value": 40.93,
             "ath_price": 2.02458999,
             "ath_value": 1170.21,
             "days_to_ath": 116,
-            "atl_price": 0.06521026,
-            "atl_value": 37.69,
-            "days_to_atl": 269
+            "atl_price": 0.064,
+            "atl_value": 36.99,
+            "days_to_atl": 276
         }
     },
     {
@@ -7486,14 +7486,14 @@
         },
         "analysis": {
             "start_date": "2025-09-09",
-            "current_price": 0.0144458,
-            "current_value": 4.62,
+            "current_price": 0.016,
+            "current_value": 5.12,
             "ath_price": 0.20572352,
             "ath_value": 65.83,
             "days_to_ath": 1,
-            "atl_price": 0.014,
-            "atl_value": 4.48,
-            "days_to_atl": 136
+            "atl_price": 0.0123358,
+            "atl_value": 3.95,
+            "days_to_atl": 138
         }
     },
     {
@@ -7527,8 +7527,8 @@
         },
         "analysis": {
             "start_date": "2025-09-10",
-            "current_price": 0.00052655,
-            "current_value": 3.37,
+            "current_price": 0.00052043,
+            "current_value": 3.33,
             "ath_price": 0.01228022,
             "ath_value": 78.59,
             "days_to_ath": 20,
@@ -7568,8 +7568,8 @@
         },
         "analysis": {
             "start_date": "2025-09-09",
-            "current_price": 0.2837,
-            "current_value": 51.07,
+            "current_price": 0.3075,
+            "current_value": 55.35,
             "ath_price": 2.668,
             "ath_value": 480.24,
             "days_to_ath": 13,
@@ -7613,8 +7613,8 @@
         },
         "analysis": {
             "start_date": "2025-09-10",
-            "current_price": 0.00629,
-            "current_value": 48.43,
+            "current_price": 0.00642,
+            "current_value": 49.43,
             "ath_price": 0.04353,
             "ath_value": 335.18,
             "days_to_ath": 0,
@@ -7654,7 +7654,7 @@
         },
         "analysis": {
             "start_date": "2025-09-11",
-            "current_price": 0.00278705,
+            "current_price": 0.00278,
             "current_value": 1.67,
             "ath_price": 0.16,
             "ath_value": 96.0,
@@ -7699,8 +7699,8 @@
         },
         "analysis": {
             "start_date": "2025-09-12",
-            "current_price": 0.035587,
-            "current_value": 142.35,
+            "current_price": 0.03548638,
+            "current_value": 141.95,
             "ath_price": 0.0919854,
             "ath_value": 367.94,
             "days_to_ath": 46,
@@ -7740,8 +7740,8 @@
         },
         "analysis": {
             "start_date": "2025-09-12",
-            "current_price": 0.00932628,
-            "current_value": 7.46,
+            "current_price": 0.00907382,
+            "current_value": 7.26,
             "ath_price": 0.19977711,
             "ath_value": 159.82,
             "days_to_ath": 4,
@@ -7781,8 +7781,8 @@
         },
         "analysis": {
             "start_date": "2025-09-13",
-            "current_price": 0.010395,
-            "current_value": 2.6,
+            "current_price": 0.01279619,
+            "current_value": 3.2,
             "ath_price": 0.24,
             "ath_value": 60.0,
             "days_to_ath": 0,
@@ -7822,8 +7822,8 @@
         },
         "analysis": {
             "start_date": "2025-09-14",
-            "current_price": 0.1136268,
-            "current_value": 18.75,
+            "current_price": 0.1123748,
+            "current_value": 18.54,
             "ath_price": 0.455,
             "ath_value": 75.08,
             "days_to_ath": 23,
@@ -7871,8 +7871,8 @@
         },
         "analysis": {
             "start_date": "2025-09-15",
-            "current_price": 0.1119,
-            "current_value": 10.07,
+            "current_price": 0.1353,
+            "current_value": 12.18,
             "ath_price": 1.884,
             "ath_value": 169.56,
             "days_to_ath": 0,
@@ -7912,14 +7912,14 @@
         },
         "analysis": {
             "start_date": "2025-09-16",
-            "current_price": 0.00179275,
-            "current_value": 2.69,
+            "current_price": 0.0024,
+            "current_value": 3.6,
             "ath_price": 0.0679,
             "ath_value": 101.85,
             "days_to_ath": 0,
-            "atl_price": 0.0017499,
-            "atl_value": 2.62,
-            "days_to_atl": 127
+            "atl_price": 0.00168799,
+            "atl_value": 2.53,
+            "days_to_atl": 132
         }
     },
     {
@@ -7958,8 +7958,8 @@
         },
         "analysis": {
             "start_date": "2025-09-16",
-            "current_price": 0.0423526,
-            "current_value": 169.41,
+            "current_price": 0.04009869,
+            "current_value": 160.39,
             "ath_price": 0.60632626,
             "ath_value": 2425.31,
             "days_to_ath": 8,
@@ -7999,8 +7999,8 @@
         },
         "analysis": {
             "start_date": "2025-09-17",
-            "current_price": 0.01387722,
-            "current_value": 8.88,
+            "current_price": 0.01345361,
+            "current_value": 8.61,
             "ath_price": 0.2,
             "ath_value": 128.0,
             "days_to_ath": 0,
@@ -8042,8 +8042,8 @@
         },
         "analysis": {
             "start_date": "2025-09-18",
-            "current_price": 0.21566,
-            "current_value": 51.76,
+            "current_price": 0.17846,
+            "current_value": 42.83,
             "ath_price": 20.65233888,
             "ath_value": 4956.56,
             "days_to_ath": 50,
@@ -8091,8 +8091,8 @@
         },
         "analysis": {
             "start_date": "2025-09-18",
-            "current_price": 0.7787,
-            "current_value": 77.87,
+            "current_price": 0.8079,
+            "current_value": 80.79,
             "ath_price": 1.5358,
             "ath_value": 153.58,
             "days_to_ath": 5,
@@ -8137,11 +8137,11 @@
         },
         "analysis": {
             "start_date": "2025-09-22",
-            "current_price": 55.00655178,
-            "current_value": 3290.49,
-            "ath_price": 68.83,
-            "ath_value": 4117.41,
-            "days_to_ath": 121,
+            "current_price": 77.04161926,
+            "current_value": 4608.63,
+            "ath_price": 87.9,
+            "ath_value": 5258.18,
+            "days_to_ath": 125,
             "atl_price": 0.94355377,
             "atl_value": 56.44,
             "days_to_atl": 0
@@ -8178,14 +8178,14 @@
         },
         "analysis": {
             "start_date": "2025-09-19",
-            "current_price": 0.01380036,
-            "current_value": 8.5,
+            "current_price": 0.01300536,
+            "current_value": 8.01,
             "ath_price": 0.9,
             "ath_value": 554.4,
             "days_to_ath": 101,
-            "atl_price": 0.0137,
-            "atl_value": 8.44,
-            "days_to_atl": 125
+            "atl_price": 0.0125,
+            "atl_value": 7.7,
+            "days_to_atl": 128
         }
     },
     {
@@ -8219,8 +8219,8 @@
         },
         "analysis": {
             "start_date": "2025-09-19",
-            "current_price": 0.0021281,
-            "current_value": 10.64,
+            "current_price": 0.0021,
+            "current_value": 10.5,
             "ath_price": 0.02,
             "ath_value": 100.0,
             "days_to_ath": 0,
@@ -8260,8 +8260,8 @@
         },
         "analysis": {
             "start_date": "2025-09-19",
-            "current_price": 0.03323936,
-            "current_value": 42.55,
+            "current_price": 0.03311703,
+            "current_value": 42.39,
             "ath_price": 0.0875,
             "ath_value": 112.0,
             "days_to_ath": 25,
@@ -8301,8 +8301,8 @@
         },
         "analysis": {
             "start_date": "2025-09-20",
-            "current_price": 0.00331,
-            "current_value": 2.65,
+            "current_price": 0.00349911,
+            "current_value": 2.8,
             "ath_price": 0.062,
             "ath_value": 49.6,
             "days_to_ath": 0,
@@ -8342,14 +8342,14 @@
         },
         "analysis": {
             "start_date": "2025-09-21",
-            "current_price": 0.05242703,
-            "current_value": 17.56,
+            "current_price": 0.04896554,
+            "current_value": 16.4,
             "ath_price": 0.20044,
             "ath_value": 67.15,
             "days_to_ath": 54,
-            "atl_price": 0.05242703,
-            "atl_value": 17.56,
-            "days_to_atl": 125
+            "atl_price": 0.04660908,
+            "atl_value": 15.61,
+            "days_to_atl": 126
         }
     },
     {
@@ -8387,8 +8387,8 @@
         },
         "analysis": {
             "start_date": "2025-09-22",
-            "current_price": 1.09,
-            "current_value": 21.8,
+            "current_price": 0.932,
+            "current_value": 18.64,
             "ath_price": 7.26,
             "ath_value": 145.2,
             "days_to_ath": 0,
@@ -8432,14 +8432,14 @@
         },
         "analysis": {
             "start_date": "2025-09-23",
-            "current_price": 0.00854184,
-            "current_value": 27.33,
+            "current_price": 0.0077465,
+            "current_value": 24.79,
             "ath_price": 0.22580611,
             "ath_value": 722.58,
             "days_to_ath": 22,
-            "atl_price": 0.00728161,
-            "atl_value": 23.3,
-            "days_to_atl": 118
+            "atl_price": 0.00727029,
+            "atl_value": 23.26,
+            "days_to_atl": 124
         }
     },
     {
@@ -8481,8 +8481,8 @@
         },
         "analysis": {
             "start_date": "2025-10-17",
-            "current_price": 0.1029,
-            "current_value": 36.84,
+            "current_price": 0.0944,
+            "current_value": 33.8,
             "ath_price": 0.8887,
             "ath_value": 318.15,
             "days_to_ath": 0,
@@ -8522,8 +8522,8 @@
         },
         "analysis": {
             "start_date": "2025-10-07",
-            "current_price": 0.00276439,
-            "current_value": 2.21,
+            "current_price": 0.00271,
+            "current_value": 2.17,
             "ath_price": 0.0701,
             "ath_value": 56.08,
             "days_to_ath": 0,
@@ -8567,8 +8567,8 @@
         },
         "analysis": {
             "start_date": "2025-09-25",
-            "current_price": 0.40063,
-            "current_value": 100.16,
+            "current_price": 0.363631,
+            "current_value": 90.91,
             "ath_price": 46.12798804,
             "ath_value": 11532.0,
             "days_to_ath": 17,
@@ -8612,8 +8612,8 @@
         },
         "analysis": {
             "start_date": "2025-09-25",
-            "current_price": 0.1283,
-            "current_value": 23.09,
+            "current_price": 0.125,
+            "current_value": 22.5,
             "ath_price": 1.693,
             "ath_value": 304.74,
             "days_to_ath": 3,
@@ -8653,8 +8653,8 @@
         },
         "analysis": {
             "start_date": "2025-09-26",
-            "current_price": 0.139,
-            "current_value": 13.9,
+            "current_price": 0.126,
+            "current_value": 12.6,
             "ath_price": 1.9066,
             "ath_value": 190.66,
             "days_to_ath": 0,
@@ -8698,8 +8698,8 @@
         },
         "analysis": {
             "start_date": "2025-09-26",
-            "current_price": 0.02438503,
-            "current_value": 6.58,
+            "current_price": 0.02439719,
+            "current_value": 6.59,
             "ath_price": 0.27,
             "ath_value": 72.9,
             "days_to_ath": 0,
@@ -8784,8 +8784,8 @@
         },
         "analysis": {
             "start_date": "2025-09-27",
-            "current_price": 0.46737927,
-            "current_value": 70.11,
+            "current_price": 0.42153841,
+            "current_value": 63.23,
             "ath_price": 4.84655085,
             "ath_value": 726.98,
             "days_to_ath": 85,
@@ -8825,14 +8825,14 @@
         },
         "analysis": {
             "start_date": "2025-09-28",
-            "current_price": 0.00813032,
-            "current_value": 1.63,
+            "current_price": 0.00665,
+            "current_value": 1.33,
             "ath_price": 0.65,
             "ath_value": 130.0,
             "days_to_ath": 8,
-            "atl_price": 0.00797681,
-            "atl_value": 1.6,
-            "days_to_atl": 109
+            "atl_price": 0.00652068,
+            "atl_value": 1.3,
+            "days_to_atl": 120
         }
     },
     {
@@ -8870,14 +8870,14 @@
         },
         "analysis": {
             "start_date": "2025-09-29",
-            "current_price": 0.01208844,
-            "current_value": 12.09,
+            "current_price": 0.011,
+            "current_value": 11.0,
             "ath_price": 0.25818212,
             "ath_value": 258.18,
             "days_to_ath": 0,
-            "atl_price": 0.01208612,
-            "atl_value": 12.09,
-            "days_to_atl": 117
+            "atl_price": 0.011,
+            "atl_value": 11.0,
+            "days_to_atl": 119
         }
     },
     {
@@ -8919,8 +8919,8 @@
         },
         "analysis": {
             "start_date": "2025-09-29",
-            "current_price": 0.08801,
-            "current_value": 44.01,
+            "current_price": 0.09496,
+            "current_value": 47.48,
             "ath_price": 0.58,
             "ath_value": 290.0,
             "days_to_ath": 0,
@@ -8968,8 +8968,8 @@
         },
         "analysis": {
             "start_date": "2025-09-30",
-            "current_price": 0.0611,
-            "current_value": 3.06,
+            "current_price": 0.0571,
+            "current_value": 2.85,
             "ath_price": 1.401,
             "ath_value": 70.05,
             "days_to_ath": 0,
@@ -9007,8 +9007,8 @@
         },
         "analysis": {
             "start_date": "2025-09-30",
-            "current_price": 0.02729,
-            "current_value": 8.19,
+            "current_price": 0.02633,
+            "current_value": 7.9,
             "ath_price": 0.20939,
             "ath_value": 62.82,
             "days_to_ath": 0,
@@ -9048,8 +9048,8 @@
         },
         "analysis": {
             "start_date": "2025-10-01",
-            "current_price": 0.00663371,
-            "current_value": 6.63,
+            "current_price": 0.00675183,
+            "current_value": 6.75,
             "ath_price": 0.0484,
             "ath_value": 48.4,
             "days_to_ath": 0,
@@ -9093,8 +9093,8 @@
         },
         "analysis": {
             "start_date": "2025-10-01",
-            "current_price": 0.0130997,
-            "current_value": 52.4,
+            "current_price": 0.013625,
+            "current_value": 54.5,
             "ath_price": 0.05166745,
             "ath_value": 206.67,
             "days_to_ath": 40,
@@ -9142,8 +9142,8 @@
         },
         "analysis": {
             "start_date": "2025-10-02",
-            "current_price": 0.14123,
-            "current_value": 56.49,
+            "current_price": 0.12368,
+            "current_value": 49.47,
             "ath_price": 1.28,
             "ath_value": 512.0,
             "days_to_ath": 0,
@@ -9183,8 +9183,8 @@
         },
         "analysis": {
             "start_date": "2025-10-02",
-            "current_price": 6.30169973,
-            "current_value": 63.02,
+            "current_price": 6.1447354,
+            "current_value": 61.45,
             "ath_price": 18.8,
             "ath_value": 188.0,
             "days_to_ath": 22,
@@ -9228,8 +9228,8 @@
         },
         "analysis": {
             "start_date": "2025-10-03",
-            "current_price": 0.841602,
-            "current_value": 16.83,
+            "current_price": 0.85667869,
+            "current_value": 17.13,
             "ath_price": 13.712013,
             "ath_value": 274.24,
             "days_to_ath": 24,
@@ -9269,14 +9269,14 @@
         },
         "analysis": {
             "start_date": "2025-10-03",
-            "current_price": 0.01276176,
-            "current_value": 6.38,
+            "current_price": 0.01230256,
+            "current_value": 6.15,
             "ath_price": 0.15145167,
             "ath_value": 75.73,
             "days_to_ath": 0,
-            "atl_price": 0.0123,
-            "atl_value": 6.15,
-            "days_to_atl": 112
+            "atl_price": 0.01167,
+            "atl_value": 5.83,
+            "days_to_atl": 115
         }
     },
     {
@@ -9338,8 +9338,8 @@
         },
         "analysis": {
             "start_date": "2025-10-06",
-            "current_price": 0.09312888,
-            "current_value": 10.24,
+            "current_price": 0.108213,
+            "current_value": 11.9,
             "ath_price": 0.85477551,
             "ath_value": 94.03,
             "days_to_ath": 0,
@@ -9379,14 +9379,14 @@
         },
         "analysis": {
             "start_date": "2025-10-07",
-            "current_price": 0.00115,
-            "current_value": 1.12,
+            "current_price": 0.001,
+            "current_value": 0.97,
             "ath_price": 0.16225193,
             "ath_value": 158.1,
             "days_to_ath": 2,
-            "atl_price": 0.0011,
-            "atl_value": 1.07,
-            "days_to_atl": 109
+            "atl_price": 0.001,
+            "atl_value": 0.97,
+            "days_to_atl": 111
         }
     },
     {
@@ -9424,8 +9424,8 @@
         },
         "analysis": {
             "start_date": "2025-10-07",
-            "current_price": 0.310926,
-            "current_value": 31.09,
+            "current_price": 0.31456458,
+            "current_value": 31.46,
             "ath_price": 0.67549741,
             "ath_value": 67.55,
             "days_to_ath": 11,
@@ -9465,14 +9465,14 @@
         },
         "analysis": {
             "start_date": "2025-10-08",
-            "current_price": 0.0054028,
-            "current_value": 27.01,
+            "current_price": 0.00530427,
+            "current_value": 26.52,
             "ath_price": 0.03,
             "ath_value": 150.0,
             "days_to_ath": 0,
-            "atl_price": 0.00529712,
-            "atl_value": 26.49,
-            "days_to_atl": 106
+            "atl_price": 0.00527,
+            "atl_value": 26.35,
+            "days_to_atl": 110
         }
     },
     {
@@ -9506,8 +9506,8 @@
         },
         "analysis": {
             "start_date": "2025-10-08",
-            "current_price": 0.0134628,
-            "current_value": 2.15,
+            "current_price": 0.03434005,
+            "current_value": 5.49,
             "ath_price": 0.37,
             "ath_value": 59.2,
             "days_to_ath": 0,
@@ -9552,8 +9552,8 @@
         },
         "analysis": {
             "start_date": "2025-10-09",
-            "current_price": 0.1279,
-            "current_value": 19.19,
+            "current_price": 0.1237,
+            "current_value": 18.55,
             "ath_price": 0.40066563,
             "ath_value": 60.1,
             "days_to_ath": 0,
@@ -9603,8 +9603,8 @@
         },
         "analysis": {
             "start_date": "2025-10-10",
-            "current_price": 2.055,
-            "current_value": 10.28,
+            "current_price": 1.862,
+            "current_value": 9.31,
             "ath_price": 11.985,
             "ath_value": 59.92,
             "days_to_ath": 3,
@@ -9644,8 +9644,8 @@
         },
         "analysis": {
             "start_date": "2025-10-11",
-            "current_price": 0.02650814,
-            "current_value": 16.97,
+            "current_price": 0.02649339,
+            "current_value": 16.96,
             "ath_price": 0.14260857,
             "ath_value": 91.27,
             "days_to_ath": 10,
@@ -9685,8 +9685,8 @@
         },
         "analysis": {
             "start_date": "2025-10-12",
-            "current_price": 0.00111114,
-            "current_value": 0.56,
+            "current_price": 0.00138866,
+            "current_value": 0.69,
             "ath_price": 0.158962,
             "ath_value": 79.48,
             "days_to_ath": 0,
@@ -9730,8 +9730,8 @@
         },
         "analysis": {
             "start_date": "2025-10-15",
-            "current_price": 0.2683,
-            "current_value": 44.12,
+            "current_price": 0.2482,
+            "current_value": 40.82,
             "ath_price": 0.8444,
             "ath_value": 138.86,
             "days_to_ath": 0,
@@ -9779,8 +9779,8 @@
         },
         "analysis": {
             "start_date": "2025-10-14",
-            "current_price": 1.389,
-            "current_value": 13.89,
+            "current_price": 1.33,
+            "current_value": 13.3,
             "ath_price": 4.15,
             "ath_value": 41.5,
             "days_to_ath": 0,
@@ -9825,8 +9825,8 @@
         },
         "analysis": {
             "start_date": "2025-10-14",
-            "current_price": 0.15936282,
-            "current_value": 104.85,
+            "current_price": 0.15501236,
+            "current_value": 101.99,
             "ath_price": 0.48988,
             "ath_value": 322.31,
             "days_to_ath": 16,
@@ -9870,8 +9870,8 @@
         },
         "analysis": {
             "start_date": "2025-10-14",
-            "current_price": 0.45286243,
-            "current_value": 144.92,
+            "current_price": 0.39907528,
+            "current_value": 127.7,
             "ath_price": 0.922651,
             "ath_value": 295.25,
             "days_to_ath": 91,
@@ -9911,14 +9911,14 @@
         },
         "analysis": {
             "start_date": "2025-10-15",
-            "current_price": 0.0054,
-            "current_value": 2.7,
+            "current_price": 0.0047721,
+            "current_value": 2.39,
             "ath_price": 0.09776437,
             "ath_value": 48.88,
             "days_to_ath": 0,
-            "atl_price": 0.00518,
-            "atl_value": 2.59,
-            "days_to_atl": 70
+            "atl_price": 0.0047721,
+            "atl_value": 2.39,
+            "days_to_atl": 103
         }
     },
     {
@@ -9950,14 +9950,14 @@
         },
         "analysis": {
             "start_date": "2025-10-15",
-            "current_price": 0.0882,
-            "current_value": 8.82,
+            "current_price": 0.0822,
+            "current_value": 8.22,
             "ath_price": 0.855,
             "ath_value": 85.5,
             "days_to_ath": 0,
-            "atl_price": 0.0782,
-            "atl_value": 7.82,
-            "days_to_atl": 96
+            "atl_price": 0.0761,
+            "atl_value": 7.61,
+            "days_to_atl": 102
         }
     },
     {
@@ -9995,8 +9995,8 @@
         },
         "analysis": {
             "start_date": "2025-10-18",
-            "current_price": 0.00278931,
-            "current_value": 12.98,
+            "current_price": 0.00277,
+            "current_value": 12.89,
             "ath_price": 0.03334605,
             "ath_value": 155.12,
             "days_to_ath": 0,
@@ -10036,14 +10036,14 @@
         },
         "analysis": {
             "start_date": "2025-10-17",
-            "current_price": 0.04913214,
-            "current_value": 15.72,
+            "current_price": 0.0478633,
+            "current_value": 15.32,
             "ath_price": 0.21150179,
             "ath_value": 67.68,
             "days_to_ath": 0,
-            "atl_price": 0.04855,
-            "atl_value": 15.54,
-            "days_to_atl": 97
+            "atl_price": 0.047,
+            "atl_value": 15.04,
+            "days_to_atl": 101
         }
     },
     {
@@ -10077,8 +10077,8 @@
         },
         "analysis": {
             "start_date": "2025-10-17",
-            "current_price": 0.000874,
-            "current_value": 0.28,
+            "current_price": 0.00094504,
+            "current_value": 0.3,
             "ath_price": 0.167,
             "ath_value": 53.44,
             "days_to_ath": 0,
@@ -10123,14 +10123,14 @@
         },
         "analysis": {
             "start_date": "2025-10-18",
-            "current_price": 0.116398,
-            "current_value": 14.67,
+            "current_price": 0.0990698,
+            "current_value": 12.48,
             "ath_price": 0.634,
             "ath_value": 79.88,
             "days_to_ath": 8,
-            "atl_price": 0.1127398,
-            "atl_value": 14.21,
-            "days_to_atl": 97
+            "atl_price": 0.09625848,
+            "atl_value": 12.13,
+            "days_to_atl": 100
         }
     },
     {
@@ -10169,8 +10169,8 @@
         },
         "analysis": {
             "start_date": "2025-10-19",
-            "current_price": 7.16545,
-            "current_value": 78.82,
+            "current_price": 5.92563,
+            "current_value": 65.18,
             "ath_price": 7.56592,
             "ath_value": 83.23,
             "days_to_ath": 97,
@@ -10210,7 +10210,7 @@
         },
         "analysis": {
             "start_date": "2025-10-20",
-            "current_price": 0.00202,
+            "current_price": 0.0020133,
             "current_value": 1.01,
             "ath_price": 0.11669773,
             "ath_value": 58.35,
@@ -10251,8 +10251,8 @@
         },
         "analysis": {
             "start_date": "2025-10-21",
-            "current_price": 0.03651514,
-            "current_value": 23.37,
+            "current_price": 0.03991734,
+            "current_value": 25.55,
             "ath_price": 0.065,
             "ath_value": 41.6,
             "days_to_ath": 0,
@@ -10296,8 +10296,8 @@
         },
         "analysis": {
             "start_date": "2025-10-21",
-            "current_price": 0.00654454,
-            "current_value": 10.47,
+            "current_price": 0.00701693,
+            "current_value": 11.23,
             "ath_price": 0.03748836,
             "ath_value": 59.98,
             "days_to_ath": 5,
@@ -10345,8 +10345,8 @@
         },
         "analysis": {
             "start_date": "2025-10-22",
-            "current_price": 0.0587,
-            "current_value": 11.74,
+            "current_price": 0.0593,
+            "current_value": 11.86,
             "ath_price": 0.4555,
             "ath_value": 91.1,
             "days_to_ath": 0,
@@ -10390,8 +10390,8 @@
         },
         "analysis": {
             "start_date": "2025-10-23",
-            "current_price": 0.09562603,
-            "current_value": 19.3,
+            "current_price": 0.10278402,
+            "current_value": 20.74,
             "ath_price": 0.7477,
             "ath_value": 150.89,
             "days_to_ath": 1,
@@ -10436,8 +10436,8 @@
         },
         "analysis": {
             "start_date": "2025-10-23",
-            "current_price": 0.2684,
-            "current_value": 8.59,
+            "current_price": 0.2434,
+            "current_value": 7.79,
             "ath_price": 0.91579195,
             "ath_value": 29.31,
             "days_to_ath": 0,
@@ -10481,7 +10481,7 @@
         },
         "analysis": {
             "start_date": "2025-10-24",
-            "current_price": 0.0985036,
+            "current_price": 0.09848747,
             "current_value": 19.7,
             "ath_price": 0.3975,
             "ath_value": 79.5,
@@ -10532,8 +10532,8 @@
         },
         "analysis": {
             "start_date": "2025-10-24",
-            "current_price": 0.162,
-            "current_value": 32.4,
+            "current_price": 0.1609,
+            "current_value": 32.18,
             "ath_price": 0.88,
             "ath_value": 176.0,
             "days_to_ath": 0,
@@ -10578,8 +10578,8 @@
         },
         "analysis": {
             "start_date": "2025-10-25",
-            "current_price": 0.746446,
-            "current_value": 11.94,
+            "current_price": 0.8653494,
+            "current_value": 13.85,
             "ath_price": 2.12217,
             "ath_value": 33.95,
             "days_to_ath": 1,
@@ -10624,8 +10624,8 @@
         },
         "analysis": {
             "start_date": "2025-10-26",
-            "current_price": 0.15073,
-            "current_value": 37.68,
+            "current_price": 0.1648,
+            "current_value": 41.2,
             "ath_price": 0.20043,
             "ath_value": 50.11,
             "days_to_ath": 0,
@@ -10665,14 +10665,14 @@
         },
         "analysis": {
             "start_date": "2025-10-27",
-            "current_price": 0.00089,
-            "current_value": 0.44,
+            "current_price": 0.00083,
+            "current_value": 0.41,
             "ath_price": 0.09270155,
             "ath_value": 46.35,
             "days_to_ath": 0,
-            "atl_price": 0.00073,
+            "atl_price": 0.00072,
             "atl_value": 0.36,
-            "days_to_atl": 85
+            "days_to_atl": 91
         }
     },
     {
@@ -10710,14 +10710,14 @@
         },
         "analysis": {
             "start_date": "2025-10-27",
-            "current_price": 0.03681159,
-            "current_value": 7.36,
+            "current_price": 0.03467478,
+            "current_value": 6.93,
             "ath_price": 0.311,
             "ath_value": 62.2,
             "days_to_ath": 0,
-            "atl_price": 0.03465963,
-            "atl_value": 6.93,
-            "days_to_atl": 53
+            "atl_price": 0.0333,
+            "atl_value": 6.66,
+            "days_to_atl": 91
         }
     },
     {
@@ -10755,8 +10755,8 @@
         },
         "analysis": {
             "start_date": "2025-10-27",
-            "current_price": 0.00292315,
-            "current_value": 3.33,
+            "current_price": 0.00268405,
+            "current_value": 3.06,
             "ath_price": 0.04379092,
             "ath_value": 49.92,
             "days_to_ath": 0,
@@ -10796,8 +10796,8 @@
         },
         "analysis": {
             "start_date": "2025-10-28",
-            "current_price": 0.07,
-            "current_value": 2.66,
+            "current_price": 0.069,
+            "current_value": 2.62,
             "ath_price": 2.696,
             "ath_value": 102.45,
             "days_to_ath": 1,
@@ -10841,8 +10841,8 @@
         },
         "analysis": {
             "start_date": "2025-11-14",
-            "current_price": 0.57889966,
-            "current_value": 147.62,
+            "current_price": 0.59402104,
+            "current_value": 151.48,
             "ath_price": 1.01044834,
             "ath_value": 257.66,
             "days_to_ath": 23,
@@ -10882,14 +10882,14 @@
         },
         "analysis": {
             "start_date": "2025-10-29",
-            "current_price": 0.00167117,
-            "current_value": 4.49,
+            "current_price": 0.00163221,
+            "current_value": 4.39,
             "ath_price": 0.015,
             "ath_value": 40.32,
             "days_to_ath": 0,
-            "atl_price": 0.00161965,
-            "atl_value": 4.35,
-            "days_to_atl": 82
+            "atl_price": 0.001531,
+            "atl_value": 4.12,
+            "days_to_atl": 89
         }
     },
     {
@@ -10932,8 +10932,8 @@
         },
         "analysis": {
             "start_date": "2025-10-30",
-            "current_price": 0.0509,
-            "current_value": 18.02,
+            "current_price": 0.0541,
+            "current_value": 19.15,
             "ath_price": 0.10406407,
             "ath_value": 36.84,
             "days_to_ath": 1,
@@ -10981,8 +10981,8 @@
         },
         "analysis": {
             "start_date": "2025-11-04",
-            "current_price": 0.2316,
-            "current_value": 46.49,
+            "current_price": 0.2151,
+            "current_value": 43.18,
             "ath_price": 4.4754,
             "ath_value": 898.44,
             "days_to_ath": 0,
@@ -11022,8 +11022,8 @@
         },
         "analysis": {
             "start_date": "2025-11-02",
-            "current_price": 0.01683004,
-            "current_value": 4.21,
+            "current_price": 0.01555,
+            "current_value": 3.89,
             "ath_price": 0.1416732,
             "ath_value": 35.42,
             "days_to_ath": 0,
@@ -11067,8 +11067,8 @@
         },
         "analysis": {
             "start_date": "2025-11-06",
-            "current_price": 0.17741724,
-            "current_value": 56.77,
+            "current_price": 0.17598384,
+            "current_value": 56.31,
             "ath_price": 0.29477402,
             "ath_value": 94.33,
             "days_to_ath": 1,
@@ -11108,14 +11108,14 @@
         },
         "analysis": {
             "start_date": "2025-11-07",
-            "current_price": 0.01514555,
-            "current_value": 3.03,
+            "current_price": 0.01293363,
+            "current_value": 2.59,
             "ath_price": 0.21300397,
             "ath_value": 42.6,
             "days_to_ath": 0,
-            "atl_price": 0.01510278,
-            "atl_value": 3.02,
-            "days_to_atl": 77
+            "atl_price": 0.01242986,
+            "atl_value": 2.49,
+            "days_to_atl": 80
         }
     },
     {
@@ -11149,13 +11149,13 @@
         },
         "analysis": {
             "start_date": "2025-11-09",
-            "current_price": 0.00346525,
-            "current_value": 3.33,
+            "current_price": 0.0044496,
+            "current_value": 4.27,
             "ath_price": 0.10199999,
             "ath_value": 97.92,
             "days_to_ath": 15,
-            "atl_price": 0.00331333,
-            "atl_value": 3.18,
+            "atl_price": 0.00324832,
+            "atl_value": 3.12,
             "days_to_atl": 76
         }
     },
@@ -11194,8 +11194,8 @@
         },
         "analysis": {
             "start_date": "2025-11-10",
-            "current_price": 0.00171218,
-            "current_value": 27.39,
+            "current_price": 0.00167861,
+            "current_value": 26.86,
             "ath_price": 0.012373,
             "ath_value": 197.97,
             "days_to_ath": 0,
@@ -11243,8 +11243,8 @@
         },
         "analysis": {
             "start_date": "2025-11-11",
-            "current_price": 0.0897,
-            "current_value": 4.49,
+            "current_price": 0.087,
+            "current_value": 4.35,
             "ath_price": 0.9887,
             "ath_value": 49.44,
             "days_to_ath": 0,
@@ -11289,8 +11289,8 @@
         },
         "analysis": {
             "start_date": "2025-11-12",
-            "current_price": 0.122968,
-            "current_value": 39.35,
+            "current_price": 0.12251884,
+            "current_value": 39.21,
             "ath_price": 0.22,
             "ath_value": 70.4,
             "days_to_ath": 3,
@@ -11330,14 +11330,14 @@
         },
         "analysis": {
             "start_date": "2025-11-13",
-            "current_price": 0.00780187,
-            "current_value": 1.56,
+            "current_price": 0.00614188,
+            "current_value": 1.23,
             "ath_price": 0.41422658,
             "ath_value": 82.85,
             "days_to_ath": 0,
-            "atl_price": 0.00760455,
-            "atl_value": 1.52,
-            "days_to_atl": 72
+            "atl_price": 0.00528579,
+            "atl_value": 1.06,
+            "days_to_atl": 74
         }
     },
     {
@@ -11371,14 +11371,14 @@
         },
         "analysis": {
             "start_date": "2025-11-15",
-            "current_price": 0.0024461,
-            "current_value": 10.7,
+            "current_price": 0.00219082,
+            "current_value": 9.58,
             "ath_price": 0.01286,
             "ath_value": 56.26,
             "days_to_ath": 4,
-            "atl_price": 0.00219626,
-            "atl_value": 9.61,
-            "days_to_atl": 41
+            "atl_price": 0.00217565,
+            "atl_value": 9.52,
+            "days_to_atl": 72
         }
     },
     {
@@ -11412,14 +11412,14 @@
         },
         "analysis": {
             "start_date": "2025-11-16",
-            "current_price": 0.00307199,
-            "current_value": 7.68,
+            "current_price": 0.00304921,
+            "current_value": 7.62,
             "ath_price": 0.00931155,
             "ath_value": 23.28,
             "days_to_ath": 0,
-            "atl_price": 0.00307199,
-            "atl_value": 7.68,
-            "days_to_atl": 69
+            "atl_price": 0.00303507,
+            "atl_value": 7.59,
+            "days_to_atl": 70
         }
     },
     {
@@ -11453,14 +11453,14 @@
         },
         "analysis": {
             "start_date": "2025-11-18",
-            "current_price": 0.00043187,
-            "current_value": 1.44,
+            "current_price": 0.00037211,
+            "current_value": 1.24,
             "ath_price": 0.0195,
             "ath_value": 65.13,
             "days_to_ath": 1,
-            "atl_price": 0.00040793,
-            "atl_value": 1.36,
-            "days_to_atl": 63
+            "atl_price": 0.00037,
+            "atl_value": 1.24,
+            "days_to_atl": 69
         }
     },
     {
@@ -11494,8 +11494,8 @@
         },
         "analysis": {
             "start_date": "2025-11-19",
-            "current_price": 0.04060275,
-            "current_value": 7.11,
+            "current_price": 0.0502858,
+            "current_value": 8.8,
             "ath_price": 0.3,
             "ath_value": 52.5,
             "days_to_ath": 0,
@@ -11540,7 +11540,7 @@
         },
         "analysis": {
             "start_date": "2025-11-20",
-            "current_price": 1.7068e-08,
+            "current_price": 1.64e-08,
             "current_value": 0.0,
             "ath_price": 3.3466e-08,
             "ath_value": 0.0,
@@ -11581,8 +11581,8 @@
         },
         "analysis": {
             "start_date": "2025-11-21",
-            "current_price": 0.34475287,
-            "current_value": 68.95,
+            "current_price": 0.33240819,
+            "current_value": 66.48,
             "ath_price": 0.72,
             "ath_value": 144.0,
             "days_to_ath": 39,
@@ -11622,14 +11622,14 @@
         },
         "analysis": {
             "start_date": "2025-11-22",
-            "current_price": 1.57e-05,
-            "current_value": 1.18,
+            "current_price": 1.323e-05,
+            "current_value": 0.99,
             "ath_price": 0.00061004,
             "ath_value": 45.75,
             "days_to_ath": 0,
-            "atl_price": 1.5e-05,
-            "atl_value": 1.12,
-            "days_to_atl": 60
+            "atl_price": 1.323e-05,
+            "atl_value": 0.99,
+            "days_to_atl": 65
         }
     },
     {
@@ -11663,8 +11663,8 @@
         },
         "analysis": {
             "start_date": "2025-11-23",
-            "current_price": 0.11700138,
-            "current_value": 74.88,
+            "current_price": 0.07645196,
+            "current_value": 48.93,
             "ath_price": 0.17326628,
             "ath_value": 110.89,
             "days_to_ath": 61,
@@ -11704,8 +11704,8 @@
         },
         "analysis": {
             "start_date": "2025-11-24",
-            "current_price": 0.00099611,
-            "current_value": 0.64,
+            "current_price": 0.00114177,
+            "current_value": 0.73,
             "ath_price": 0.0675339,
             "ath_value": 43.22,
             "days_to_ath": 0,
@@ -11750,8 +11750,8 @@
         },
         "analysis": {
             "start_date": "2025-11-25",
-            "current_price": 0.0481508,
-            "current_value": 57.78,
+            "current_price": 0.0452604,
+            "current_value": 54.31,
             "ath_price": 0.06946355,
             "ath_value": 83.36,
             "days_to_ath": 60,
@@ -11795,14 +11795,14 @@
         },
         "analysis": {
             "start_date": "2025-11-26",
-            "current_price": 0.308624,
-            "current_value": 16.97,
+            "current_price": 0.31966955,
+            "current_value": 17.58,
             "ath_price": 0.63498597,
             "ath_value": 34.92,
             "days_to_ath": 1,
-            "atl_price": 0.297437,
-            "atl_value": 16.36,
-            "days_to_atl": 23
+            "atl_price": 0.27617888,
+            "atl_value": 15.19,
+            "days_to_atl": 61
         }
     },
     {
@@ -11841,8 +11841,8 @@
         },
         "analysis": {
             "start_date": "2025-11-27",
-            "current_price": 0.13906272,
-            "current_value": 104.3,
+            "current_price": 0.13881376,
+            "current_value": 104.11,
             "ath_price": 0.245,
             "ath_value": 183.75,
             "days_to_ath": 24,
@@ -11882,14 +11882,14 @@
         },
         "analysis": {
             "start_date": "2025-11-28",
-            "current_price": 0.06174965,
-            "current_value": 24.7,
+            "current_price": 0.05586,
+            "current_value": 22.34,
             "ath_price": 0.09810338,
             "ath_value": 39.24,
             "days_to_ath": 11,
-            "atl_price": 0.05399865,
-            "atl_value": 21.6,
-            "days_to_atl": 55
+            "atl_price": 0.052,
+            "atl_value": 20.8,
+            "days_to_atl": 59
         }
     },
     {
@@ -11923,8 +11923,8 @@
         },
         "analysis": {
             "start_date": "2025-11-29",
-            "current_price": 0.08875189,
-            "current_value": 35.5,
+            "current_price": 0.08893413,
+            "current_value": 35.57,
             "ath_price": 0.233,
             "ath_value": 93.2,
             "days_to_ath": 8,
@@ -11969,8 +11969,8 @@
         },
         "analysis": {
             "start_date": "2025-11-30",
-            "current_price": 0.06761906,
-            "current_value": 33.81,
+            "current_price": 0.07109102,
+            "current_value": 35.55,
             "ath_price": 0.12385933,
             "ath_value": 61.93,
             "days_to_ath": 29,
@@ -12015,14 +12015,14 @@
         },
         "analysis": {
             "start_date": "2025-12-01",
-            "current_price": 0.00799538,
-            "current_value": 6.4,
+            "current_price": 0.00820909,
+            "current_value": 6.57,
             "ath_price": 0.0812298,
             "ath_value": 64.98,
             "days_to_ath": 0,
-            "atl_price": 0.00734317,
-            "atl_value": 5.87,
-            "days_to_atl": 49
+            "atl_price": 0.00677672,
+            "atl_value": 5.42,
+            "days_to_atl": 55
         }
     },
     {
@@ -12061,14 +12061,14 @@
         },
         "analysis": {
             "start_date": "2025-12-02",
-            "current_price": 0.04122575,
-            "current_value": 4.33,
+            "current_price": 0.0380501,
+            "current_value": 4.0,
             "ath_price": 0.510078,
             "ath_value": 53.56,
             "days_to_ath": 27,
-            "atl_price": 0.04122575,
-            "atl_value": 4.33,
-            "days_to_atl": 53
+            "atl_price": 0.03617069,
+            "atl_value": 3.8,
+            "days_to_atl": 55
         }
     },
     {
@@ -12106,8 +12106,8 @@
         },
         "analysis": {
             "start_date": "2025-12-03",
-            "current_price": 0.16659324,
-            "current_value": 49.15,
+            "current_price": 0.15871188,
+            "current_value": 46.82,
             "ath_price": 0.21716802,
             "ath_value": 64.06,
             "days_to_ath": 19,
@@ -12152,8 +12152,8 @@
         },
         "analysis": {
             "start_date": "2025-12-04",
-            "current_price": 0.50901317,
-            "current_value": 40.72,
+            "current_price": 0.53150142,
+            "current_value": 42.52,
             "ath_price": 0.57611567,
             "ath_value": 46.09,
             "days_to_ath": 31,
@@ -12198,8 +12198,8 @@
         },
         "analysis": {
             "start_date": "2025-12-05",
-            "current_price": 0.21977477,
-            "current_value": 82.42,
+            "current_price": 0.21438341,
+            "current_value": 80.39,
             "ath_price": 0.42399302,
             "ath_value": 159.0,
             "days_to_ath": 12,
@@ -12239,8 +12239,8 @@
         },
         "analysis": {
             "start_date": "2025-12-08",
-            "current_price": 0.02018115,
-            "current_value": 40.36,
+            "current_price": 0.02092476,
+            "current_value": 41.85,
             "ath_price": 0.02838625,
             "ath_value": 56.77,
             "days_to_ath": 0,
@@ -12285,8 +12285,8 @@
         },
         "analysis": {
             "start_date": "2025-12-09",
-            "current_price": 0.05855123,
-            "current_value": 35.13,
+            "current_price": 0.05937743,
+            "current_value": 35.63,
             "ath_price": 0.13413408,
             "ath_value": 80.48,
             "days_to_ath": 0,
@@ -12331,14 +12331,14 @@
         },
         "analysis": {
             "start_date": "2025-12-09",
-            "current_price": 0.11566151,
-            "current_value": 23.13,
+            "current_price": 0.10990197,
+            "current_value": 21.98,
             "ath_price": 0.33887079,
             "ath_value": 67.77,
             "days_to_ath": 1,
-            "atl_price": 0.10508973,
-            "atl_value": 21.02,
-            "days_to_atl": 44
+            "atl_price": 0.10407125,
+            "atl_value": 20.81,
+            "days_to_atl": 48
         }
     },
     {
@@ -12372,8 +12372,8 @@
         },
         "analysis": {
             "start_date": "2025-12-10",
-            "current_price": 0.08832241,
-            "current_value": 14.57,
+            "current_price": 0.08328488,
+            "current_value": 13.74,
             "ath_price": 0.2166349,
             "ath_value": 35.74,
             "days_to_ath": 0,
@@ -12418,8 +12418,8 @@
         },
         "analysis": {
             "start_date": "2025-12-11",
-            "current_price": 0.34058775,
-            "current_value": 68.12,
+            "current_price": 0.27840282,
+            "current_value": 55.68,
             "ath_price": 0.5545449,
             "ath_value": 110.91,
             "days_to_ath": 35,
@@ -12459,8 +12459,8 @@
         },
         "analysis": {
             "start_date": "2025-12-11",
-            "current_price": 0.00933429,
-            "current_value": 11.2,
+            "current_price": 0.00929643,
+            "current_value": 11.16,
             "ath_price": 0.055,
             "ath_value": 66.0,
             "days_to_ath": 0,
@@ -12505,14 +12505,14 @@
         },
         "analysis": {
             "start_date": "2025-12-11",
-            "current_price": 0.00611144,
-            "current_value": 12.22,
+            "current_price": 0.00617382,
+            "current_value": 12.35,
             "ath_price": 0.02651649,
             "ath_value": 53.03,
             "days_to_ath": 1,
-            "atl_price": 0.0052953,
+            "atl_price": 0.00529259,
             "atl_value": 10.59,
-            "days_to_atl": 39
+            "days_to_atl": 45
         }
     },
     {
@@ -12551,8 +12551,8 @@
         },
         "analysis": {
             "start_date": "2025-12-12",
-            "current_price": 0.32190099,
-            "current_value": 128.76,
+            "current_price": 0.31902547,
+            "current_value": 127.61,
             "ath_price": 0.788233,
             "ath_value": 315.29,
             "days_to_ath": 9,
@@ -12597,14 +12597,14 @@
         },
         "analysis": {
             "start_date": "2025-12-15",
-            "current_price": 0.07703201,
-            "current_value": 12.33,
+            "current_price": 0.07080823,
+            "current_value": 11.33,
             "ath_price": 0.28550918,
             "ath_value": 45.68,
             "days_to_ath": 0,
-            "atl_price": 0.06521026,
-            "atl_value": 10.43,
-            "days_to_atl": 35
+            "atl_price": 0.064,
+            "atl_value": 10.24,
+            "days_to_atl": 42
         }
     },
     {
@@ -12643,14 +12643,14 @@
         },
         "analysis": {
             "start_date": "2025-12-16",
-            "current_price": 0.10343509,
-            "current_value": 25.86,
+            "current_price": 0.09546652,
+            "current_value": 23.87,
             "ath_price": 0.20364,
             "ath_value": 50.91,
             "days_to_ath": 0,
-            "atl_price": 0.08959951,
-            "atl_value": 22.4,
-            "days_to_atl": 38
+            "atl_price": 0.08814728,
+            "atl_value": 22.04,
+            "days_to_atl": 40
         }
     },
     {
@@ -12713,14 +12713,14 @@
         },
         "analysis": {
             "start_date": "2025-12-17",
-            "current_price": 0.06028582,
-            "current_value": 10.79,
+            "current_price": 0.0571116,
+            "current_value": 10.22,
             "ath_price": 0.5,
             "ath_value": 89.5,
             "days_to_ath": 0,
-            "atl_price": 0.0572956,
-            "atl_value": 10.26,
-            "days_to_atl": 33
+            "atl_price": 0.0525207,
+            "atl_value": 9.4,
+            "days_to_atl": 40
         }
     },
     {
@@ -12754,8 +12754,8 @@
         },
         "analysis": {
             "start_date": "2025-12-18",
-            "current_price": 0.01127839,
-            "current_value": 2.59,
+            "current_price": 0.01110945,
+            "current_value": 2.56,
             "ath_price": 0.204,
             "ath_value": 46.92,
             "days_to_ath": 4,
@@ -12795,14 +12795,14 @@
         },
         "analysis": {
             "start_date": "2025-12-18",
-            "current_price": 0.0115687,
-            "current_value": 3.88,
+            "current_price": 0.01170957,
+            "current_value": 3.92,
             "ath_price": 0.25,
             "ath_value": 83.75,
             "days_to_ath": 0,
-            "atl_price": 0.01147382,
-            "atl_value": 3.84,
-            "days_to_atl": 37
+            "atl_price": 0.01094806,
+            "atl_value": 3.67,
+            "days_to_atl": 38
         }
     },
     {
@@ -12836,8 +12836,8 @@
         },
         "analysis": {
             "start_date": "2025-12-19",
-            "current_price": 2.52057805,
-            "current_value": 63.01,
+            "current_price": 2.42309367,
+            "current_value": 60.58,
             "ath_price": 4.52,
             "ath_value": 113.0,
             "days_to_ath": 3,
@@ -12887,8 +12887,8 @@
         },
         "analysis": {
             "start_date": "2025-12-19",
-            "current_price": 0.1284,
-            "current_value": 25.68,
+            "current_price": 0.1184,
+            "current_value": 23.68,
             "ath_price": 0.3,
             "ath_value": 60.0,
             "days_to_ath": 0,
@@ -12928,8 +12928,8 @@
         },
         "analysis": {
             "start_date": "2025-12-20",
-            "current_price": 0.00212072,
-            "current_value": 1.42,
+            "current_price": 0.00195146,
+            "current_value": 1.31,
             "ath_price": 0.09791228,
             "ath_value": 65.6,
             "days_to_ath": 0,
@@ -12998,14 +12998,14 @@
         },
         "analysis": {
             "start_date": "2025-12-23",
-            "current_price": 0.28578604,
-            "current_value": 2.57,
+            "current_price": 0.27226322,
+            "current_value": 2.45,
             "ath_price": 4.95,
             "ath_value": 44.55,
             "days_to_ath": 0,
-            "atl_price": 0.25348926,
-            "atl_value": 2.28,
-            "days_to_atl": 30
+            "atl_price": 0.23426103,
+            "atl_value": 2.11,
+            "days_to_atl": 34
         }
     },
     {
@@ -13043,8 +13043,8 @@
         },
         "analysis": {
             "start_date": "2025-12-24",
-            "current_price": 0.035587,
-            "current_value": 35.59,
+            "current_price": 0.03548638,
+            "current_value": 35.49,
             "ath_price": 0.0492046,
             "ath_value": 49.2,
             "days_to_ath": 15,
@@ -13088,8 +13088,8 @@
         },
         "analysis": {
             "start_date": "2025-12-25",
-            "current_price": 0.3110055,
-            "current_value": 55.98,
+            "current_price": 0.314082,
+            "current_value": 56.53,
             "ath_price": 0.349181,
             "ath_value": 62.85,
             "days_to_ath": 28,
@@ -13129,14 +13129,14 @@
         },
         "analysis": {
             "start_date": "2025-12-26",
-            "current_price": 0.03989001,
-            "current_value": 12.76,
+            "current_price": 0.03599203,
+            "current_value": 11.52,
             "ath_price": 0.31244595,
             "ath_value": 99.98,
             "days_to_ath": 0,
-            "atl_price": 0.03764425,
-            "atl_value": 12.05,
-            "days_to_atl": 24
+            "atl_price": 0.034,
+            "atl_value": 10.88,
+            "days_to_atl": 30
         }
     },
     {
@@ -13175,8 +13175,8 @@
         },
         "analysis": {
             "start_date": "2025-12-27",
-            "current_price": 0.07945552,
-            "current_value": 165.19,
+            "current_price": 0.07772647,
+            "current_value": 161.59,
             "ath_price": 0.11629013,
             "ath_value": 241.77,
             "days_to_ath": 20,
@@ -13216,13 +13216,13 @@
         },
         "analysis": {
             "start_date": "2025-12-29",
-            "current_price": 0.00345556,
-            "current_value": 3.46,
+            "current_price": 0.00444851,
+            "current_value": 4.45,
             "ath_price": 0.078,
             "ath_value": 78.0,
             "days_to_ath": 0,
-            "atl_price": 0.00331333,
-            "atl_value": 3.31,
+            "atl_price": 0.00324832,
+            "atl_value": 3.25,
             "days_to_atl": 26
         }
     },
@@ -13257,8 +13257,8 @@
         },
         "analysis": {
             "start_date": "2025-12-30",
-            "current_price": 0.0028367,
-            "current_value": 1.42,
+            "current_price": 0.00266,
+            "current_value": 1.33,
             "ath_price": 0.12463752,
             "ath_value": 62.32,
             "days_to_ath": 0,
@@ -13302,8 +13302,8 @@
         },
         "analysis": {
             "start_date": "2025-12-31",
-            "current_price": 0.01706421,
-            "current_value": 42.66,
+            "current_price": 0.01819125,
+            "current_value": 45.48,
             "ath_price": 0.02253663,
             "ath_value": 56.34,
             "days_to_ath": 1,
@@ -13343,8 +13343,8 @@
         },
         "analysis": {
             "start_date": "2026-01-02",
-            "current_price": 0.03262658,
-            "current_value": 9.95,
+            "current_price": 0.03332932,
+            "current_value": 10.17,
             "ath_price": 0.205,
             "ath_value": 62.52,
             "days_to_ath": 0,
@@ -13384,8 +13384,8 @@
         },
         "analysis": {
             "start_date": "2026-01-05",
-            "current_price": 0.02803871,
-            "current_value": 10.51,
+            "current_price": 0.02287757,
+            "current_value": 8.58,
             "ath_price": 0.2,
             "ath_value": 75.0,
             "days_to_ath": 0,
@@ -13429,8 +13429,8 @@
         },
         "analysis": {
             "start_date": "2026-01-06",
-            "current_price": 0.2476,
-            "current_value": 43.33,
+            "current_price": 0.2068,
+            "current_value": 36.19,
             "ath_price": 0.596,
             "ath_value": 104.3,
             "days_to_ath": 1,
@@ -13470,14 +13470,14 @@
         },
         "analysis": {
             "start_date": "2026-01-07",
-            "current_price": 0.00181832,
-            "current_value": 8.27,
+            "current_price": 0.00210599,
+            "current_value": 9.58,
             "ath_price": 0.009,
             "ath_value": 40.94,
             "days_to_ath": 0,
-            "atl_price": 0.00171659,
-            "atl_value": 7.81,
-            "days_to_atl": 17
+            "atl_price": 0.00171001,
+            "atl_value": 7.78,
+            "days_to_atl": 18
         }
     },
     {
@@ -13515,14 +13515,14 @@
         },
         "analysis": {
             "start_date": "2026-01-08",
-            "current_price": 0.00854184,
-            "current_value": 21.35,
+            "current_price": 0.0077465,
+            "current_value": 19.37,
             "ath_price": 0.01459993,
             "ath_value": 36.5,
             "days_to_ath": 0,
-            "atl_price": 0.00728161,
-            "atl_value": 18.2,
-            "days_to_atl": 11
+            "atl_price": 0.00727029,
+            "atl_value": 18.18,
+            "days_to_atl": 17
         }
     },
     {
@@ -13556,8 +13556,8 @@
         },
         "analysis": {
             "start_date": "2026-01-09",
-            "current_price": 0.16919829,
-            "current_value": 6.77,
+            "current_price": 0.16733315,
+            "current_value": 6.69,
             "ath_price": 2.55790911,
             "ath_value": 102.32,
             "days_to_ath": 0,
@@ -13597,8 +13597,8 @@
         },
         "analysis": {
             "start_date": "2026-01-12",
-            "current_price": 0.05126999,
-            "current_value": 2.05,
+            "current_price": 0.04546,
+            "current_value": 1.82,
             "ath_price": 1.2,
             "ath_value": 48.0,
             "days_to_ath": 0,
@@ -13642,8 +13642,8 @@
         },
         "analysis": {
             "start_date": "2026-01-15",
-            "current_price": 0.04011,
-            "current_value": 152.1,
+            "current_price": 0.03745,
+            "current_value": 142.01,
             "ath_price": 0.09708,
             "ath_value": 368.13,
             "days_to_ath": 0,
@@ -13683,14 +13683,14 @@
         },
         "analysis": {
             "start_date": "2026-01-14",
-            "current_price": 0.00167709,
-            "current_value": 1.34,
+            "current_price": 0.00159,
+            "current_value": 1.27,
             "ath_price": 0.07529619,
             "ath_value": 60.24,
             "days_to_ath": 0,
-            "atl_price": 0.00156184,
-            "atl_value": 1.25,
-            "days_to_atl": 7
+            "atl_price": 0.0015,
+            "atl_value": 1.2,
+            "days_to_atl": 11
         }
     },
     {
@@ -13724,8 +13724,8 @@
         },
         "analysis": {
             "start_date": "2026-01-15",
-            "current_price": 0.06095458,
-            "current_value": 40.66,
+            "current_price": 0.05229868,
+            "current_value": 34.88,
             "ath_price": 0.12581567,
             "ath_value": 83.92,
             "days_to_ath": 1,
@@ -13765,14 +13765,14 @@
         },
         "analysis": {
             "start_date": "2026-01-15",
-            "current_price": 0.001457,
-            "current_value": 0.44,
+            "current_price": 0.001371,
+            "current_value": 0.41,
             "ath_price": 0.00201,
             "ath_value": 0.6,
             "days_to_ath": 0,
-            "atl_price": 0.001442,
-            "atl_value": 0.43,
-            "days_to_atl": 8
+            "atl_price": 0.001303,
+            "atl_value": 0.39,
+            "days_to_atl": 10
         }
     },
     {
@@ -13809,7 +13809,7 @@
         "status": "Active",
         "delisted_date": null,
         "type": "Sale",
-        "market_source": "Alpha",
+        "market_source": "Alpha + Spot",
         "markets_availability": {
             "alpha": true,
             "futures": true,
@@ -13834,13 +13834,13 @@
         },
         "analysis": {
             "start_date": "2026-01-22",
-            "current_price": 0.02497001,
-            "current_value": 295.87,
-            "ath_price": 0.02785334,
-            "ath_value": 330.03,
+            "current_price": 0.02823,
+            "current_value": 334.5,
+            "ath_price": 0.0338,
+            "ath_value": 400.5,
             "days_to_ath": 0,
-            "atl_price": 0.01709124,
-            "atl_value": 202.51,
+            "atl_price": 0.011,
+            "atl_value": 130.34,
             "days_to_atl": 0
         }
     },
@@ -13873,14 +13873,14 @@
         },
         "analysis": {
             "start_date": "2026-01-22",
-            "current_price": 0.15075,
-            "current_value": 30.15,
+            "current_price": 0.11643,
+            "current_value": 23.29,
             "ath_price": 0.2571,
             "ath_value": 51.42,
             "days_to_ath": 0,
-            "atl_price": 0.14317,
-            "atl_value": 28.63,
-            "days_to_atl": 2
+            "atl_price": 0.10759,
+            "atl_value": 21.52,
+            "days_to_atl": 4
         }
     },
     {
@@ -13919,8 +13919,8 @@
         },
         "analysis": {
             "start_date": "2026-01-20",
-            "current_price": 0.19876589,
-            "current_value": 63.61,
+            "current_price": 0.25948972,
+            "current_value": 83.04,
             "ath_price": 0.38599362,
             "ath_value": 123.52,
             "days_to_ath": 4,
@@ -13960,8 +13960,8 @@
         },
         "analysis": {
             "start_date": "2026-01-21",
-            "current_price": 0.02674573,
-            "current_value": 64.19,
+            "current_price": 0.0262999,
+            "current_value": 63.12,
             "ath_price": 0.13,
             "ath_value": 312.0,
             "days_to_ath": 0,
@@ -14006,8 +14006,8 @@
         },
         "analysis": {
             "start_date": "2026-01-22",
-            "current_price": 0.02764125,
-            "current_value": 55.28,
+            "current_price": 0.02326181,
+            "current_value": 46.52,
             "ath_price": 0.0345,
             "ath_value": 69.0,
             "days_to_ath": 0,
@@ -14051,13 +14051,54 @@
         },
         "analysis": {
             "start_date": "2026-01-23",
-            "current_price": 0.0167685,
-            "current_value": 112.68,
+            "current_price": 0.01655449,
+            "current_value": 111.25,
             "ath_price": 0.0288,
             "ath_value": 193.54,
             "days_to_ath": 0,
             "atl_price": 0.00957517,
             "atl_value": 64.35,
+            "days_to_atl": 0
+        }
+    },
+    {
+        "token": "WMTX",
+        "amount": "580",
+        "input_date": "2026-01-26",
+        "points": "241",
+        "slots": "17k slots",
+        "link": "https://debot.ai/token/bsc/245734_0xdbb5cf12408a3ac17d668037ce289f9ea75439d7",
+        "status": "Active",
+        "delisted_date": null,
+        "type": "Airdrop",
+        "market_source": "Alpha",
+        "markets_availability": {
+            "alpha": true,
+            "futures": false,
+            "spot": false
+        },
+        "listing_lags": {
+            "alpha_to_spot_days": null,
+            "alpha_to_futures_days": null
+        },
+        "listing_analytics": {
+            "alpha_first_day": {
+                "date": "2026-01-26",
+                "min_drop_value": 27.24,
+                "max_drop_value": 46.4
+            },
+            "spot_comparison": null,
+            "futures_comparison": null
+        },
+        "analysis": {
+            "start_date": "2026-01-26",
+            "current_price": 0.054,
+            "current_value": 31.32,
+            "ath_price": 0.08,
+            "ath_value": 46.4,
+            "days_to_ath": 0,
+            "atl_price": 0.0469674,
+            "atl_value": 27.24,
             "days_to_atl": 0
         }
     }
