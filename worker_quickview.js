@@ -1,1 +1,791 @@
-const _0x4d4b3a=_0x219b;(function(_0x29f0ad,_0x4d1047){const _0x408ef0=_0x219b,_0x262298=_0x29f0ad();while(!![]){try{const _0x32d568=-parseInt(_0x408ef0(0x178))/0x1+parseInt(_0x408ef0(0x1cf))/0x2*(-parseInt(_0x408ef0(0x1af))/0x3)+-parseInt(_0x408ef0(0x181))/0x4+-parseInt(_0x408ef0(0x1b2))/0x5*(parseInt(_0x408ef0(0x19e))/0x6)+parseInt(_0x408ef0(0x166))/0x7+parseInt(_0x408ef0(0x177))/0x8+parseInt(_0x408ef0(0x151))/0x9;if(_0x32d568===_0x4d1047)break;else _0x262298['push'](_0x262298['shift']());}catch(_0x320cb8){_0x262298['push'](_0x262298['shift']());}}}(_0x65d0,0x9328c));const NEW_COIN_PERIOD_MS=0x8*0x7*0x18*0x3c*0x3c*0x3e8,MID_COIN_PERIOD_MS=0x16d*0x18*0x3c*0x3c*0x3e8,MAX_BUFFER_SIZE=0x5dc,CALC_LOOKBACK=0x10e,ENDPOINTS={'ALPHA_LIST':_0x4d4b3a(0x168),'ALPHA_KLINES':_0x4d4b3a(0x199),'FUTURES_INFO':_0x4d4b3a(0x196),'FUTURES_KLINES':_0x4d4b3a(0x186),'SPOT_INFO':_0x4d4b3a(0x17d),'SPOT_KLINES':_0x4d4b3a(0x179)};let marketLists={'ALPHA':[],'FUTURES':[],'SPOT':[]},activeSubs={},isPolling=![],areMarketsLoaded=![],indicatorConfig={'sma':{'length':0x7},'bb':{'length':0x14,'multiplier':0x2},'hma25':{'length':0x19},'hma35':{'length':0x23},'hma55':{'length':0x37},'hma100':{'length':0x64},'devCloud':{'emaLength':0x84,'basisMode':_0x4d4b3a(0x18b)}},incrementalState={},chartCount=0x2;function createEmptySub(){return{'market':null,'symbol':null,'timeframe':null,'controller':null,'isLoading':![],'buffer':[]};}function initChartSlots(_0x16bdcc){chartCount=_0x16bdcc,activeSubs={},incrementalState={};for(let _0x23aab2=0x1;_0x23aab2<=_0x16bdcc;_0x23aab2++){activeSubs[_0x23aab2]=createEmptySub(),incrementalState[_0x23aab2]=null;}}const fetchWithTimeout=async(_0x5110ed,_0x89684c={},_0x3ea4c8=0x1f40)=>{const _0x3f550c=_0x4d4b3a,_0x599c63=new AbortController();_0x89684c[_0x3f550c(0x195)]&&_0x89684c[_0x3f550c(0x195)][_0x3f550c(0x17a)](_0x3f550c(0x174),()=>_0x599c63['abort']());const _0x342c8b=setTimeout(()=>_0x599c63[_0x3f550c(0x174)](),_0x3ea4c8);try{const _0x385313=await fetch(_0x5110ed,{..._0x89684c,'signal':_0x599c63[_0x3f550c(0x195)]});clearTimeout(_0x342c8b);if(!_0x385313['ok'])throw new Error(_0x3f550c(0x16d)+_0x385313[_0x3f550c(0x1a0)]);return _0x385313;}catch(_0x2a83be){clearTimeout(_0x342c8b);throw _0x2a83be;}},getKlinesUrl=(_0x192cab,_0x50e2a5,_0x18ab8e,_0x37bdd5,_0x15837c=null)=>{const _0x373bb3=_0x4d4b3a;if(_0x192cab===_0x373bb3(0x1c5)){const _0x3becd3=_0x15837c?_0x15837c+_0x373bb3(0x1b8):_0x50e2a5+_0x373bb3(0x1b8);return ENDPOINTS[_0x373bb3(0x184)]+'?symbol='+_0x3becd3+'&interval='+_0x18ab8e+'&limit='+_0x37bdd5;}else return _0x192cab===_0x373bb3(0x15d)?ENDPOINTS['SPOT_KLINES']+_0x373bb3(0x164)+_0x50e2a5+_0x373bb3(0x198)+_0x18ab8e+'&limit='+_0x37bdd5:ENDPOINTS['FUTURES_KLINES']+_0x373bb3(0x164)+_0x50e2a5+_0x373bb3(0x198)+_0x18ab8e+_0x373bb3(0x16e)+_0x37bdd5;};function applyWMA(_0x1447f0,_0xe26280,_0xd8735b,_0xffe469){const _0x50340a=_0x4d4b3a,_0x1decd5=_0x1447f0[_0x50340a(0x157)];if(_0x1decd5<_0xe26280)return;const _0x242efa=_0xe26280*(_0xe26280+0x1)/0x2;let _0x4e8024=0x0,_0x52ef9b=0x0,_0x3dbca7=-0x1;for(let _0x1a5394=0x0;_0x1a5394<_0x1decd5;_0x1a5394++){if(_0x1447f0[_0x1a5394][_0xd8735b]!==undefined&&_0x1447f0[_0x1a5394][_0xd8735b]!==null){_0x3dbca7=_0x1a5394;break;}}if(_0x3dbca7===-0x1||_0x1decd5-_0x3dbca7<_0xe26280)return;for(let _0x27df79=0x0;_0x27df79<_0xe26280;_0x27df79++){const _0xf63f92=_0x1447f0[_0x3dbca7+_0x27df79][_0xd8735b];_0x4e8024+=_0xf63f92,_0x52ef9b+=_0xf63f92*(_0x27df79+0x1);}_0x1447f0[_0x3dbca7+_0xe26280-0x1][_0xffe469]=_0x52ef9b/_0x242efa;for(let _0x553b57=_0x3dbca7+_0xe26280;_0x553b57<_0x1decd5;_0x553b57++){const _0x5886a3=_0x1447f0[_0x553b57][_0xd8735b],_0x206447=_0x1447f0[_0x553b57-_0xe26280][_0xd8735b];_0x52ef9b=_0x52ef9b-_0x4e8024+_0x5886a3*_0xe26280,_0x4e8024=_0x4e8024-_0x206447+_0x5886a3,_0x1447f0[_0x553b57][_0xffe469]=_0x52ef9b/_0x242efa;}}function applyHMA(_0x44011e,_0x16f928,_0x4bf080,_0x1fd966){const _0x18686c=_0x4d4b3a,_0x2d7cde=Math[_0x18686c(0x1bb)](_0x16f928/0x2),_0x4d93e4=Math[_0x18686c(0x1bb)](Math['sqrt'](_0x16f928)),_0x5c8e69=_0x18686c(0x18c)+_0x16f928,_0x292884=_0x18686c(0x156)+_0x16f928,_0x21f55d=_0x18686c(0x1c7)+_0x16f928;applyWMA(_0x44011e,_0x2d7cde,_0x4bf080,_0x5c8e69),applyWMA(_0x44011e,_0x16f928,_0x4bf080,_0x292884);for(let _0x5b557c=0x0;_0x5b557c<_0x44011e[_0x18686c(0x157)];_0x5b557c++){const _0x8b8c35=_0x44011e[_0x5b557c][_0x5c8e69],_0x329263=_0x44011e[_0x5b557c][_0x292884];_0x8b8c35!==undefined&&_0x329263!==undefined&&(_0x44011e[_0x5b557c][_0x21f55d]=0x2*_0x8b8c35-_0x329263);}applyWMA(_0x44011e,_0x4d93e4,_0x21f55d,_0x1fd966);}function applyDeviationCloud(_0x5af310,_0x57ae6b,_0xcdaf4){const _0x448d5d=_0x4d4b3a;if(_0x5af310[_0x448d5d(0x157)]<_0x57ae6b*0x2)return;const _0x3166cc=_0x57ae6b*0x2,_0x437604=0.92,_0x4a5c86=0x2,_0x48588d=3.8,_0x2c20e6=5.5,_0x5dcae8=0x6,_0x3c169f=0x8;if(_0xcdaf4==='vwap'){let _0x35dc7e=0x0,_0xa3ef47=0x0;for(let _0x18b6c2=0x0;_0x18b6c2<_0x5af310[_0x448d5d(0x157)];_0x18b6c2++){const _0x460a42=_0x5af310[_0x18b6c2],_0xd604ec=(_0x460a42[_0x448d5d(0x1ab)]+_0x460a42[_0x448d5d(0x15a)]+_0x460a42[_0x448d5d(0x1b9)])/0x3,_0x5af125=_0x460a42[_0x448d5d(0x1c8)]||0x0;_0x35dc7e+=_0xd604ec*_0x5af125,_0xa3ef47+=_0x5af125;if(_0x18b6c2>=_0x57ae6b){const _0xd772f9=_0x5af310[_0x18b6c2-_0x57ae6b],_0x5bb5f6=(_0xd772f9['high']+_0xd772f9['low']+_0xd772f9['close'])/0x3;_0x35dc7e-=_0x5bb5f6*(_0xd772f9['volume']||0x0),_0xa3ef47-=_0xd772f9[_0x448d5d(0x1c8)]||0x0;}_0x460a42['threeEma']=_0xa3ef47>0x0?_0x35dc7e/_0xa3ef47:_0x460a42[_0x448d5d(0x1b9)];}}else{const _0x578f89=0x2/(_0x57ae6b+0x1);let _0x538193=null;for(let _0x2c3433=0x0;_0x2c3433<_0x5af310['length'];_0x2c3433++){const _0x51ac5a=_0x5af310[_0x2c3433][_0x448d5d(0x1b9)];if(_0x538193===null)_0x538193=_0x51ac5a;else _0x538193=(_0x51ac5a-_0x538193)*_0x578f89+_0x538193;_0x5af310[_0x2c3433][_0x448d5d(0x1a6)]=_0x538193;}}let _0x5c786f=0x0,_0x30893b=0x0;for(let _0x5a8f5b=0x0;_0x5a8f5b<_0x5af310['length'];_0x5a8f5b++){const _0x30478d=_0x5af310[_0x5a8f5b];_0x5c786f+=_0x30478d[_0x448d5d(0x1b9)],_0x30893b+=_0x30478d[_0x448d5d(0x1b9)]*_0x30478d[_0x448d5d(0x1b9)];if(_0x5a8f5b>=_0x3166cc){const _0x5c030c=_0x5af310[_0x5a8f5b-_0x3166cc]['close'];_0x5c786f-=_0x5c030c,_0x30893b-=_0x5c030c*_0x5c030c;}if(_0x5a8f5b>=_0x3166cc-0x1){const _0xac43e9=_0x5c786f/_0x3166cc,_0x1d3110=Math[_0x448d5d(0x175)](0x0,_0x30893b/_0x3166cc-_0xac43e9*_0xac43e9),_0xcacd95=Math[_0x448d5d(0x1b3)](_0x1d3110),_0x2b089b=_0xcacd95/0x4;_0x30478d[_0x448d5d(0x15b)]=_0x2b089b;if(_0x2b089b>0x0){const _0x19e8a7=_0x30478d[_0x448d5d(0x1a6)];_0x30478d[_0x448d5d(0x1a2)]=_0x19e8a7-_0x2b089b*_0x437604,_0x30478d['devH1']=_0x19e8a7+_0x2b089b*_0x437604,_0x30478d[_0x448d5d(0x150)]=_0x19e8a7-_0x2b089b*_0x4a5c86,_0x30478d[_0x448d5d(0x1cd)]=_0x19e8a7+_0x2b089b*_0x4a5c86,_0x30478d['devL4']=_0x19e8a7-_0x2b089b*_0x48588d,_0x30478d['devH4']=_0x19e8a7+_0x2b089b*_0x48588d,_0x30478d['devL5']=_0x19e8a7-_0x2b089b*_0x2c20e6,_0x30478d['devH5']=_0x19e8a7+_0x2b089b*_0x2c20e6,_0x30478d[_0x448d5d(0x176)]=_0x19e8a7-_0x2b089b*_0x5dcae8,_0x30478d[_0x448d5d(0x1b1)]=_0x19e8a7+_0x2b089b*_0x5dcae8,_0x30478d[_0x448d5d(0x169)]=_0x19e8a7-_0x2b089b*_0x3c169f,_0x30478d[_0x448d5d(0x1bd)]=_0x19e8a7+_0x2b089b*_0x3c169f;}}}}function calculateIndicators(_0x9ce32f){const _0x121d82=_0x4d4b3a;if(!_0x9ce32f||_0x9ce32f[_0x121d82(0x157)]===0x0)return _0x9ce32f;const _0x554be1=indicatorConfig,_0x48cd32=_0x554be1[_0x121d82(0x1a7)][_0x121d82(0x157)],_0x27dccb=_0x554be1['bb'][_0x121d82(0x157)],_0x596113=_0x554be1['bb'][_0x121d82(0x1a4)];for(let _0x36b8d0=0x0;_0x36b8d0<_0x9ce32f[_0x121d82(0x157)];_0x36b8d0++){if(_0x36b8d0>=_0x48cd32-0x1){let _0x1ce3a3=0x0;for(let _0x5ca4fe=0x0;_0x5ca4fe<_0x48cd32;_0x5ca4fe++)_0x1ce3a3+=_0x9ce32f[_0x36b8d0-_0x5ca4fe][_0x121d82(0x1b9)];_0x9ce32f[_0x36b8d0]['sma7']=_0x1ce3a3/_0x48cd32;}if(_0x36b8d0>=_0x27dccb-0x1){let _0x3bf0a3=0x0;for(let _0x38768e=0x0;_0x38768e<_0x27dccb;_0x38768e++)_0x3bf0a3+=_0x9ce32f[_0x36b8d0-_0x38768e]['close'];const _0x53d7de=_0x3bf0a3/_0x27dccb;_0x9ce32f[_0x36b8d0][_0x121d82(0x1c0)]=_0x53d7de;let _0x50c1da=0x0;for(let _0x1886f5=0x0;_0x1886f5<_0x27dccb;_0x1886f5++){_0x50c1da+=Math['pow'](_0x9ce32f[_0x36b8d0-_0x1886f5][_0x121d82(0x1b9)]-_0x53d7de,0x2);}const _0x58337a=Math[_0x121d82(0x1b3)](_0x50c1da/_0x27dccb);_0x9ce32f[_0x36b8d0]['bbUpper']=_0x53d7de+_0x58337a*_0x596113,_0x9ce32f[_0x36b8d0]['bbLower']=_0x53d7de-_0x58337a*_0x596113;}}return applyHMA(_0x9ce32f,_0x554be1[_0x121d82(0x163)][_0x121d82(0x157)],'close','hma25'),applyHMA(_0x9ce32f,_0x554be1[_0x121d82(0x15e)]['length'],_0x121d82(0x1b9),_0x121d82(0x15e)),applyHMA(_0x9ce32f,_0x554be1[_0x121d82(0x19b)]['length'],_0x121d82(0x1b9),_0x121d82(0x19b)),applyHMA(_0x9ce32f,0x50,_0x121d82(0x1b9),_0x121d82(0x153)),applyHMA(_0x9ce32f,_0x554be1['hma100'][_0x121d82(0x157)],_0x121d82(0x1b9),_0x121d82(0x154)),applyDeviationCloud(_0x9ce32f,_0x554be1[_0x121d82(0x182)]['emaLength'],_0x554be1[_0x121d82(0x182)][_0x121d82(0x1c4)]),_0x9ce32f;}function mapCandleData(_0x58f155){const _0x28e3d7=_0x4d4b3a;if(!Array[_0x28e3d7(0x1c1)](_0x58f155))return[];const _0x3083a3=[];for(let _0xfe129a=0x0;_0xfe129a<_0x58f155[_0x28e3d7(0x157)];_0xfe129a++){const _0x4b6e68=_0x58f155[_0xfe129a];if(!Array[_0x28e3d7(0x1c1)](_0x4b6e68)||_0x4b6e68[_0x28e3d7(0x157)]<0x6)continue;const _0xf7d183=_0x4b6e68[0x0]/0x3e8,_0x420cc3=parseFloat(_0x4b6e68[0x1]),_0x258036=parseFloat(_0x4b6e68[0x2]),_0x2eaa7a=parseFloat(_0x4b6e68[0x3]),_0x14e86f=parseFloat(_0x4b6e68[0x4]),_0xe05b75=parseFloat(_0x4b6e68[0x5]);if(!isFinite(_0xf7d183)||!isFinite(_0x420cc3)||!isFinite(_0x258036)||!isFinite(_0x2eaa7a)||!isFinite(_0x14e86f)||!isFinite(_0xe05b75))continue;if(_0xf7d183<=0x0||_0x420cc3<=0x0||_0x258036<=0x0||_0x2eaa7a<=0x0||_0x14e86f<=0x0)continue;_0x3083a3[_0x28e3d7(0x1a8)]({'time':_0xf7d183,'open':_0x420cc3,'high':_0x258036,'low':_0x2eaa7a,'close':_0x14e86f,'volume':_0xe05b75});}return _0x3083a3;}function getPrecisionFromTickSize(_0x540481){const _0x1f4277=_0x4d4b3a;if(!Array[_0x1f4277(0x1c1)](_0x540481))return 0x8;const _0x38fcc9=_0x540481[_0x1f4277(0x1a5)](_0x4f22fa=>_0x4f22fa['filterType']==='PRICE_FILTER');if(!_0x38fcc9||!_0x38fcc9[_0x1f4277(0x1ce)])return 0x8;const _0x3f669a=_0x38fcc9['tickSize'],_0x36c2ae=_0x3f669a[_0x1f4277(0x1cc)]('.');if(_0x36c2ae===-0x1)return 0x0;const _0x2108ab=_0x3f669a[_0x1f4277(0x1c3)](_0x36c2ae+0x1);let _0x137861=0x0;for(let _0x4fecf9=0x0;_0x4fecf9<_0x2108ab[_0x1f4277(0x157)];_0x4fecf9++){if(_0x2108ab[_0x4fecf9]!=='0')_0x137861=_0x4fecf9+0x1;}return _0x137861;}function buildExchangeInfoCoins(_0x4e6579,_0x3d556a,_0x2b40b5){const _0x34f3cd=_0x4d4b3a,{quoteAsset:_0x5b81fe,filterFn:_0x21cac2,getSymbol:_0x254f5f,getDispName:_0x5ad45e,getPrecision:_0x54af61,getListingTime:_0x52ac54}=_0x2b40b5;return _0x4e6579['filter'](_0x37de86=>{const _0x3d8dd3=_0x219b;if(_0x37de86[_0x3d8dd3(0x1a0)]!==_0x3d8dd3(0x1b4))return![];if(_0x5b81fe&&_0x37de86['quoteAsset']!==_0x5b81fe)return![];if(_0x21cac2&&!_0x21cac2(_0x37de86))return![];return!![];})[_0x34f3cd(0x16b)](_0x2b18e5=>{const _0xc646b=_0x52ac54(_0x2b18e5),_0x46ee60=_0x3d556a-_0xc646b;let _0x47e4aa=0x2;if(_0xc646b>0x0&&_0x46ee60<NEW_COIN_PERIOD_MS)_0x47e4aa=0x0;else{if(_0xc646b>0x0&&_0x46ee60<MID_COIN_PERIOD_MS)_0x47e4aa=0x1;}return{'symbol':_0x254f5f(_0x2b18e5),'dispName':_0x5ad45e(_0x2b18e5),'alphaId':null,'listingDate':_0xc646b,'precision':_0x54af61(_0x2b18e5),'isNew':_0x47e4aa===0x0,'isMid':_0x47e4aa===0x1,'group':_0x47e4aa};})[_0x34f3cd(0x158)]((_0x1bac77,_0x25d48e)=>_0x1bac77[_0x34f3cd(0x190)]!==_0x25d48e[_0x34f3cd(0x190)]?_0x1bac77['group']-_0x25d48e[_0x34f3cd(0x190)]:_0x1bac77[_0x34f3cd(0x1aa)][_0x34f3cd(0x15c)](_0x25d48e[_0x34f3cd(0x1aa)]));}async function fetchAllMarkets(){const _0x406930=_0x4d4b3a;try{const _0x3044eb=Date[_0x406930(0x1b6)](),[_0x10d0a2,_0x5c8b4c,_0x215c0a]=await Promise[_0x406930(0x16c)]([fetchWithTimeout(ENDPOINTS['ALPHA_LIST'],{},0x2ee0)[_0x406930(0x18f)](_0x9c3d96=>_0x9c3d96['json']()),fetchWithTimeout(ENDPOINTS[_0x406930(0x155)],{},0x2ee0)['then'](_0x4b9351=>_0x4b9351[_0x406930(0x194)]()),fetchWithTimeout(ENDPOINTS[_0x406930(0x1be)],{},0x2ee0)[_0x406930(0x18f)](_0x2d1696=>_0x2d1696[_0x406930(0x194)]())]);if(_0x10d0a2[_0x406930(0x1a0)]===_0x406930(0x152)){const _0x40b4ac=_0x10d0a2['value'][_0x406930(0x173)]||[];marketLists[_0x406930(0x1c5)]=_0x40b4ac[_0x406930(0x19c)](_0x40666a=>!_0x40666a['cexOffDisplay']&&!_0x40666a[_0x406930(0x17c)])[_0x406930(0x16b)](_0x21babe=>{const _0x1556ee=_0x406930,_0x40bb6c=_0x21babe['listingTime']||0x0,_0x28e1b7=_0x3044eb-_0x40bb6c;let _0x2dfbbf=0x2;if(_0x28e1b7<NEW_COIN_PERIOD_MS)_0x2dfbbf=0x0;else{if(_0x28e1b7<MID_COIN_PERIOD_MS)_0x2dfbbf=0x1;}return{'symbol':_0x21babe['symbol'],'dispName':_0x21babe[_0x1556ee(0x16a)],'alphaId':_0x21babe['alphaId'],'listingDate':_0x40bb6c,'precision':_0x21babe[_0x1556ee(0x1a3)]!==undefined?_0x21babe[_0x1556ee(0x1a3)]:0x4,'isNew':_0x2dfbbf===0x0,'isMid':_0x2dfbbf===0x1,'group':_0x2dfbbf};})['sort']((_0x1bc805,_0x569d03)=>_0x1bc805[_0x406930(0x190)]!==_0x569d03[_0x406930(0x190)]?_0x1bc805[_0x406930(0x190)]-_0x569d03['group']:_0x1bc805[_0x406930(0x1aa)][_0x406930(0x15c)](_0x569d03[_0x406930(0x1aa)]));}else console['error']('Failed\x20to\x20load\x20ALPHA\x20market:',_0x10d0a2['reason']);if(_0x5c8b4c['status']===_0x406930(0x152)){const _0x452dd7=_0x5c8b4c['value'];marketLists[_0x406930(0x19a)]=buildExchangeInfoCoins(_0x452dd7[_0x406930(0x1b0)]||[],_0x3044eb,{'quoteAsset':_0x406930(0x1b8),'filterFn':_0xc0e87f=>_0xc0e87f[_0x406930(0x197)]==='PERPETUAL','getSymbol':_0x9b3f8=>_0x9b3f8['symbol'],'getDispName':_0x417ecd=>_0x417ecd[_0x406930(0x183)],'getPrecision':_0x135ee3=>_0x135ee3[_0x406930(0x19f)]||0x4,'getListingTime':_0x1f04f9=>_0x1f04f9['onboardDate']||0x0});}else console['error'](_0x406930(0x17e),_0x5c8b4c[_0x406930(0x1ba)]);if(_0x215c0a[_0x406930(0x1a0)]===_0x406930(0x152)){const _0x2c50a6=_0x215c0a[_0x406930(0x180)];marketLists[_0x406930(0x15d)]=buildExchangeInfoCoins(_0x2c50a6[_0x406930(0x1b0)]||[],_0x3044eb,{'quoteAsset':_0x406930(0x1b8),'filterFn':_0x5a45fe=>_0x5a45fe[_0x406930(0x171)]===!![],'getSymbol':_0x22c354=>_0x22c354[_0x406930(0x16a)],'getDispName':_0x2a510c=>_0x2a510c[_0x406930(0x183)],'getPrecision':_0xb58d1c=>getPrecisionFromTickSize(_0xb58d1c['filters']),'getListingTime':_0x2fd8cd=>0x0});}else console[_0x406930(0x1b5)](_0x406930(0x1ca),_0x215c0a[_0x406930(0x1ba)]);const _0x2ceb97=marketLists[_0x406930(0x1c5)][_0x406930(0x157)]>0x0||marketLists[_0x406930(0x19a)]['length']>0x0||marketLists[_0x406930(0x15d)][_0x406930(0x157)]>0x0;_0x2ceb97?(areMarketsLoaded=!![],self[_0x406930(0x16f)]({'type':_0x406930(0x160),'data':marketLists})):(console[_0x406930(0x1b5)](_0x406930(0x15f)),setTimeout(fetchAllMarkets,0x2710));}catch(_0x136812){console[_0x406930(0x1b5)]('Fetch\x20Markets\x20Error:',_0x136812),setTimeout(fetchAllMarkets,0x2710);}}async function fetchCandles(_0x53f286,_0x239a14,_0x3a920c,_0xd02963){const _0x42feb3=_0x4d4b3a;if(!areMarketsLoaded){setTimeout(()=>fetchCandles(_0x53f286,_0x239a14,_0x3a920c,_0xd02963),0x3e8);return;}const _0x547052=marketLists[_0x239a14],_0x257b0b=_0x547052?_0x547052[_0x42feb3(0x1a5)](_0x41cad6=>_0x41cad6[_0x42feb3(0x16a)]===_0x3a920c):null;if(!_0x257b0b){self[_0x42feb3(0x16f)]({'type':'DATA_ERROR','chartId':_0x53f286,'symbol':_0x3a920c,'reason':'Symbol\x20not\x20found'});return;}activeSubs[_0x53f286]&&activeSubs[_0x53f286][_0x42feb3(0x18d)]&&activeSubs[_0x53f286][_0x42feb3(0x18d)][_0x42feb3(0x174)]();const _0x13006d=new AbortController();activeSubs[_0x53f286]={'market':_0x239a14,'symbol':_0x3a920c,'timeframe':_0xd02963,'precision':_0x257b0b[_0x42feb3(0x191)],'alphaId':_0x257b0b[_0x42feb3(0x192)],'buffer':[],'isLoading':!![],'controller':_0x13006d};const _0x2903da=getKlinesUrl(_0x239a14,_0x3a920c,_0xd02963,0x3e8,_0x257b0b['alphaId']);try{const _0x2a3a94=await fetchWithTimeout(_0x2903da,{'signal':_0x13006d[_0x42feb3(0x195)]},0x2710)[_0x42feb3(0x18f)](_0x5138ba=>_0x5138ba['json']());if(activeSubs[_0x53f286]['symbol']!==_0x3a920c)return;const _0x550483=_0x2a3a94['data']||_0x2a3a94,_0xea0b16=mapCandleData(_0x550483);if(_0xea0b16[_0x42feb3(0x157)]===0x0){if(activeSubs[_0x53f286]['symbol']===_0x3a920c)activeSubs[_0x53f286][_0x42feb3(0x187)]=![];return;}const _0x1fc161=calculateIndicators(_0xea0b16);activeSubs[_0x53f286][_0x42feb3(0x16a)]===_0x3a920c&&(activeSubs[_0x53f286]['buffer']=_0xea0b16,activeSubs[_0x53f286][_0x42feb3(0x187)]=![],self[_0x42feb3(0x16f)]({'type':'CANDLES_DATA','chartId':_0x53f286,'data':_0x1fc161,'precision':_0x257b0b[_0x42feb3(0x191)],'symbol':_0x3a920c,'market':_0x239a14}));}catch(_0x2fe599){if(_0x2fe599['name']==='AbortError')return;else self[_0x42feb3(0x16f)]({'type':'DATA_ERROR','chartId':_0x53f286,'symbol':_0x3a920c,'reason':_0x42feb3(0x1ad)});activeSubs[_0x53f286]&&activeSubs[_0x53f286][_0x42feb3(0x16a)]===_0x3a920c&&(activeSubs[_0x53f286][_0x42feb3(0x187)]=![]);}}function _0x219b(_0x356a89,_0x37e0c4){_0x356a89=_0x356a89-0x14f;const _0x65d005=_0x65d0();let _0x219b5b=_0x65d005[_0x356a89];return _0x219b5b;}const sleep=_0x513958=>new Promise(_0xa1d36=>setTimeout(_0xa1d36,_0x513958));function _0x65d0(){const _0x595103=['indicatorConfig','devL2','5085162OwwCQX','fulfilled','hma80','hma100','FUTURES_INFO','_wmaFull_','length','sort','bbUpper','low','devCloudSize','localeCompare','SPOT','hma35','No\x20markets\x20loaded,\x20retrying\x20in\x2010s...','COINS_LISTS','429','buffer','hma25','?symbol=','market','6316149MLbleu','random','https://www.binance.com/bapi/defi/v1/public/wallet-direct/buw/wallet/cex/alpha/all/token/list','devL8','symbol','map','allSettled','HTTP\x20','&limit=','postMessage','keys','isSpotTradingAllowed','pow','data','abort','max','devL6','3748104UpZoid','1180310aYUkgp','https://api.binance.com/api/v3/klines','addEventListener','EPSILON','offline','https://api.binance.com/api/v3/exchangeInfo','Failed\x20to\x20load\x20FUTURES\x20market:','REALTIME_UPDATE','value','267820yoBKxN','devCloud','baseAsset','ALPHA_KLINES','all','https://fapi.binance.com/fapi/v1/klines','isLoading','Fatal\x20RT\x20Loop\x20Error:','chartIds','time','ema','_wmaHalf_','controller','assign','then','group','precision','alphaId','message','json','signal','https://fapi.binance.com/fapi/v1/exchangeInfo','contractType','&interval=','https://www.binance.com/bapi/defi/v1/public/alpha-trade/klines','FUTURES','hma55','filter','emaLength','128652iApVej','pricePrecision','status','forEach','devL1','tradeDecimal','multiplier','find','threeEma','sma','push','INIT','dispName','high','timeframe','Network\x20Error','abs','3ivdmVQ','symbols','devH6','5JSUGci','sqrt','TRADING','error','now','set','USDT','close','reason','floor','onmessage','devH8','SPOT_INFO','chartCount','bbMiddle','isArray','get','slice','basisMode','ALPHA','CANDLES_DATA','_hmaDiff_','volume','from','Failed\x20to\x20load\x20SPOT\x20market:','includes','indexOf','devH2','tickSize','128734oYyTmP','UPDATE_INDICATOR_CONFIG'];_0x65d0=function(){return _0x595103;};return _0x65d0();}async function runRealtimeLoop(){if(isPolling)return;isPolling=!![];const _0x3af102=async()=>{const _0x25e546=_0x219b;try{const _0x1630b7=[];Object[_0x25e546(0x170)](activeSubs)[_0x25e546(0x1a1)](_0x735320=>{const _0x55e922=_0x25e546,_0xd04f3c=activeSubs[_0x735320];_0xd04f3c&&_0xd04f3c[_0x55e922(0x16a)]&&!_0xd04f3c[_0x55e922(0x187)]&&_0x1630b7['push']({'id':parseInt(_0x735320),..._0xd04f3c});});if(_0x1630b7[_0x25e546(0x157)]===0x0)return;const _0x6c8f5f=new Map();_0x1630b7[_0x25e546(0x1a1)](_0xc24e6a=>{const _0xe06db4=_0x25e546,_0x54b2b6=_0xc24e6a[_0xe06db4(0x165)]+'_'+_0xc24e6a['symbol']+'_'+_0xc24e6a['timeframe'];!_0x6c8f5f['has'](_0x54b2b6)?_0x6c8f5f[_0xe06db4(0x1b7)](_0x54b2b6,{'market':_0xc24e6a[_0xe06db4(0x165)],'symbol':_0xc24e6a[_0xe06db4(0x16a)],'timeframe':_0xc24e6a[_0xe06db4(0x1ac)],'alphaId':_0xc24e6a['alphaId'],'chartIds':[_0xc24e6a['id']]}):_0x6c8f5f[_0xe06db4(0x1c2)](_0x54b2b6)[_0xe06db4(0x189)]['push'](_0xc24e6a['id']);});const _0x15a9a8=Array[_0x25e546(0x1c9)](_0x6c8f5f['values']())[_0x25e546(0x16b)](async _0x3c0fb6=>{const _0x33ade1=_0x25e546;try{await sleep(Math[_0x33ade1(0x167)]()*0x64);const _0x401369=getKlinesUrl(_0x3c0fb6[_0x33ade1(0x165)],_0x3c0fb6[_0x33ade1(0x16a)],_0x3c0fb6[_0x33ade1(0x1ac)],0x5,_0x3c0fb6[_0x33ade1(0x192)]),_0x5f040d=await fetchWithTimeout(_0x401369,{},0xbb8)[_0x33ade1(0x18f)](_0x550e55=>_0x550e55['json']()),_0xfa2dc5=_0x5f040d[_0x33ade1(0x173)]||_0x5f040d,_0xd7568b=mapCandleData(_0xfa2dc5);_0xd7568b[_0x33ade1(0x157)]>0x0&&_0x3c0fb6['chartIds'][_0x33ade1(0x1a1)](_0x9f4f9e=>{const _0x5856a8=_0x33ade1,_0x1b8c4c=activeSubs[_0x9f4f9e];if(!_0x1b8c4c||_0x1b8c4c['symbol']!==_0x3c0fb6[_0x5856a8(0x16a)])return;if(!_0x1b8c4c['buffer']||_0x1b8c4c[_0x5856a8(0x162)][_0x5856a8(0x157)]===0x0)return;let _0x5860b6=![];_0xd7568b[_0x5856a8(0x1a1)](_0x341b74=>{const _0xc7b753=_0x5856a8,_0x2fec39=_0x1b8c4c[_0xc7b753(0x162)][_0x1b8c4c[_0xc7b753(0x162)]['length']-0x1];if(_0x341b74[_0xc7b753(0x18a)]>_0x2fec39[_0xc7b753(0x18a)])_0x1b8c4c[_0xc7b753(0x162)]['push'](_0x341b74),_0x5860b6=!![];else _0x341b74[_0xc7b753(0x18a)]===_0x2fec39[_0xc7b753(0x18a)]&&((Math['abs'](_0x341b74[_0xc7b753(0x1b9)]-_0x2fec39['close'])>Number['EPSILON']||Math[_0xc7b753(0x1ae)](_0x341b74['volume']-_0x2fec39['volume'])>Number[_0xc7b753(0x17b)]||Math[_0xc7b753(0x1ae)](_0x341b74['high']-_0x2fec39[_0xc7b753(0x1ab)])>Number[_0xc7b753(0x17b)]||Math[_0xc7b753(0x1ae)](_0x341b74[_0xc7b753(0x15a)]-_0x2fec39[_0xc7b753(0x15a)])>Number[_0xc7b753(0x17b)])&&(_0x1b8c4c[_0xc7b753(0x162)][_0x1b8c4c[_0xc7b753(0x162)][_0xc7b753(0x157)]-0x1]=_0x341b74,_0x5860b6=!![]));});if(_0x5860b6){_0x1b8c4c[_0x5856a8(0x162)]['length']>MAX_BUFFER_SIZE&&(_0x1b8c4c[_0x5856a8(0x162)]=_0x1b8c4c['buffer'][_0x5856a8(0x1c3)](_0x1b8c4c[_0x5856a8(0x162)][_0x5856a8(0x157)]-MAX_BUFFER_SIZE),incrementalState[_0x9f4f9e]=null);const _0x3e8a26=_0x1b8c4c[_0x5856a8(0x162)],_0x28c105=indicatorConfig,_0x5e3fde=_0x3e8a26[_0x5856a8(0x157)]-0x1,_0x487870=_0x28c105[_0x5856a8(0x1a7)]['length'];if(_0x5e3fde>=_0x487870-0x1){let _0x3e2824=0x0;for(let _0x37165b=0x0;_0x37165b<_0x487870;_0x37165b++)_0x3e2824+=_0x3e8a26[_0x5e3fde-_0x37165b][_0x5856a8(0x1b9)];_0x3e8a26[_0x5e3fde]['sma7']=_0x3e2824/_0x487870;}const _0x59adb3=_0x28c105['bb'][_0x5856a8(0x157)],_0x398216=_0x28c105['bb'][_0x5856a8(0x1a4)];if(_0x5e3fde>=_0x59adb3-0x1){let _0x50bf0e=0x0;for(let _0xca7158=0x0;_0xca7158<_0x59adb3;_0xca7158++)_0x50bf0e+=_0x3e8a26[_0x5e3fde-_0xca7158]['close'];const _0x26a327=_0x50bf0e/_0x59adb3;_0x3e8a26[_0x5e3fde][_0x5856a8(0x1c0)]=_0x26a327;let _0x502002=0x0;for(let _0x3c24ef=0x0;_0x3c24ef<_0x59adb3;_0x3c24ef++)_0x502002+=Math[_0x5856a8(0x172)](_0x3e8a26[_0x5e3fde-_0x3c24ef][_0x5856a8(0x1b9)]-_0x26a327,0x2);const _0x1fb1a3=Math[_0x5856a8(0x1b3)](_0x502002/_0x59adb3);_0x3e8a26[_0x5e3fde][_0x5856a8(0x159)]=_0x26a327+_0x1fb1a3*_0x398216,_0x3e8a26[_0x5e3fde]['bbLower']=_0x26a327-_0x1fb1a3*_0x398216;}const _0x49c21a=Math[_0x5856a8(0x175)](0x0,_0x3e8a26[_0x5856a8(0x157)]-CALC_LOOKBACK),_0x514134=_0x3e8a26[_0x5856a8(0x1c3)](_0x49c21a);applyHMA(_0x514134,_0x28c105[_0x5856a8(0x163)][_0x5856a8(0x157)],'close','hma25'),applyHMA(_0x514134,_0x28c105['hma35'][_0x5856a8(0x157)],'close',_0x5856a8(0x15e)),applyHMA(_0x514134,_0x28c105[_0x5856a8(0x19b)][_0x5856a8(0x157)],'close',_0x5856a8(0x19b)),applyHMA(_0x514134,0x50,_0x5856a8(0x1b9),'hma80'),applyHMA(_0x514134,_0x28c105[_0x5856a8(0x154)]['length'],_0x5856a8(0x1b9),_0x5856a8(0x154)),applyDeviationCloud(_0x514134,_0x28c105['devCloud'][_0x5856a8(0x19d)],_0x28c105[_0x5856a8(0x182)][_0x5856a8(0x1c4)]);const _0x1d9982=[],_0x4cfdf7=new Map();_0x514134[_0x5856a8(0x1a1)](_0xe31937=>_0x4cfdf7[_0x5856a8(0x1b7)](_0xe31937[_0x5856a8(0x18a)],_0xe31937)),_0xd7568b['forEach'](_0x43ecbc=>{const _0x452482=_0x5856a8,_0x4cc83b=_0x4cfdf7[_0x452482(0x1c2)](_0x43ecbc[_0x452482(0x18a)]);if(_0x4cc83b)_0x1d9982['push'](_0x4cc83b);}),_0x1d9982[_0x5856a8(0x157)]>0x0&&self[_0x5856a8(0x16f)]({'type':_0x5856a8(0x17f),'chartId':_0x9f4f9e,'data':_0x1d9982,'symbol':_0x3c0fb6[_0x5856a8(0x16a)],'market':_0x3c0fb6[_0x5856a8(0x165)]});}});}catch(_0x55234e){_0x55234e[_0x33ade1(0x193)]&&_0x55234e['message'][_0x33ade1(0x1cb)](_0x33ade1(0x161))&&await sleep(0x1388);}});await Promise[_0x25e546(0x185)](_0x15a9a8);}catch(_0x1b9062){console[_0x25e546(0x1b5)](_0x25e546(0x188),_0x1b9062);}finally{const _0x44cdf3=0xb54+Math[_0x25e546(0x167)]()*0x12c;setTimeout(_0x3af102,_0x44cdf3);}};_0x3af102();}self[_0x4d4b3a(0x1bc)]=async _0x3b37d9=>{const _0x4df4c7=_0x4d4b3a,{type:_0x1053c1,payload:_0x16c03d}=_0x3b37d9[_0x4df4c7(0x173)];if(_0x1053c1===_0x4df4c7(0x1a9)){const _0x311e49=_0x16c03d&&_0x16c03d[_0x4df4c7(0x1bf)]?_0x16c03d['chartCount']:0x2;initChartSlots(_0x311e49),_0x16c03d&&_0x16c03d[_0x4df4c7(0x14f)]&&Object['assign'](indicatorConfig,_0x16c03d['indicatorConfig']),await fetchAllMarkets(),runRealtimeLoop();}if(_0x1053c1==='LOAD_CHART'){const {chartId:_0x4860eb,market:_0x3e6e13,symbol:_0x2df6af,timeframe:_0x343c77}=_0x16c03d;incrementalState[_0x4860eb]=null,await fetchCandles(_0x4860eb,_0x3e6e13,_0x2df6af,_0x343c77);}_0x1053c1===_0x4df4c7(0x1d0)&&(_0x16c03d&&Object[_0x4df4c7(0x18e)](indicatorConfig,_0x16c03d),Object[_0x4df4c7(0x170)](activeSubs)[_0x4df4c7(0x1a1)](_0x1dbb6f=>{const _0x59e9fb=_0x4df4c7,_0x4d5c4a=parseInt(_0x1dbb6f),_0x8141a7=activeSubs[_0x4d5c4a];if(!_0x8141a7||!_0x8141a7[_0x59e9fb(0x162)]||_0x8141a7[_0x59e9fb(0x162)][_0x59e9fb(0x157)]===0x0)return;incrementalState[_0x4d5c4a]=null;const _0x35aff9=calculateIndicators(_0x8141a7[_0x59e9fb(0x162)]);self[_0x59e9fb(0x16f)]({'type':_0x59e9fb(0x1c6),'chartId':_0x4d5c4a,'data':_0x35aff9,'precision':_0x8141a7[_0x59e9fb(0x191)],'symbol':_0x8141a7[_0x59e9fb(0x16a)],'market':_0x8141a7[_0x59e9fb(0x165)]});}));};
+// [QuickView Worker] v16.1 (Parametric Indicators + VWAP + Incremental + Validation)
+
+// === CONFIGURATION ===
+const NEW_COIN_PERIOD_MS = 8 * 7 * 24 * 60 * 60 * 1000; 
+const MID_COIN_PERIOD_MS = 365 * 24 * 60 * 60 * 1000;   
+const MAX_BUFFER_SIZE = 1500;
+const CALC_LOOKBACK = 270; 
+
+const ENDPOINTS = {
+    ALPHA_LIST: "https://www.binance.com/bapi/defi/v1/public/wallet-direct/buw/wallet/cex/alpha/all/token/list",
+    ALPHA_KLINES: "https://www.binance.com/bapi/defi/v1/public/alpha-trade/klines",
+    FUTURES_INFO: "https://fapi.binance.com/fapi/v1/exchangeInfo",
+    FUTURES_KLINES: "https://fapi.binance.com/fapi/v1/klines",
+    SPOT_INFO: "https://api.binance.com/api/v3/exchangeInfo",
+    SPOT_KLINES: "https://api.binance.com/api/v3/klines"
+};
+
+let marketLists = { ALPHA: [], FUTURES: [], SPOT: [] };
+
+// Динамічна структура для активних завдань (ініціалізується при INIT з chartCount)
+let activeSubs = {}; 
+
+let isPolling = false;
+let areMarketsLoaded = false;
+
+// === INDICATOR CONFIG (Параметри з UI, оновлюються через UPDATE_INDICATOR_CONFIG) ===
+let indicatorConfig = {
+    sma: { length: 7 },
+    bb: { length: 20, multiplier: 2 },
+    hma25: { length: 25 },
+    hma35: { length: 35 },
+    hma55: { length: 55 },
+    hma100: { length: 100 },
+    devCloud: { emaLength: 132, basisMode: 'ema' }
+};
+
+// Динамічний стан для інкрементального оновлення (ініціалізується при INIT)
+let incrementalState = {};
+
+// Кількість графіків (приходить від UI через INIT)
+let chartCount = 2;
+
+// Хелпер: створює порожній запис activeSub для заданого chartId
+function createEmptySub() {
+    return { market: null, symbol: null, timeframe: null, controller: null, isLoading: false, buffer: [], historyMode: false };
+}
+
+// Хелпер: ініціалізує activeSubs та incrementalState для N графіків
+function initChartSlots(count) {
+    chartCount = count;
+    activeSubs = {};
+    incrementalState = {};
+    for (let i = 1; i <= count; i++) {
+        activeSubs[i] = createEmptySub();
+        incrementalState[i] = null;
+    }
+}
+
+// === NETWORK HELPER ===
+// 🔥 FIX: Додана підтримка зовнішнього signal для скасування
+const fetchWithTimeout = async (url, options = {}, timeout = 8000) => {
+    const controller = new AbortController();
+    // Якщо передано зовнішній сигнал, слухаємо його теж
+    if (options.signal) {
+        options.signal.addEventListener('abort', () => controller.abort());
+    }
+    
+    const id = setTimeout(() => controller.abort(), timeout);
+    try {
+        const response = await fetch(url, { ...options, signal: controller.signal });
+        clearTimeout(id);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response;
+    } catch (error) {
+        clearTimeout(id);
+        throw error;
+    }
+};
+
+const getKlinesUrl = (market, symbol, timeframe, limit, alphaId = null, startTime = null, endTime = null) => {
+    let url;
+    if (market === 'ALPHA') {
+        const reqSym = alphaId ? `${alphaId}USDT` : `${symbol}USDT`;
+        url = `${ENDPOINTS.ALPHA_KLINES}?symbol=${reqSym}&interval=${timeframe}&limit=${limit}`;
+    } else if (market === 'SPOT') {
+        url = `${ENDPOINTS.SPOT_KLINES}?symbol=${symbol}&interval=${timeframe}&limit=${limit}`;
+    } else {
+        url = `${ENDPOINTS.FUTURES_KLINES}?symbol=${symbol}&interval=${timeframe}&limit=${limit}`;
+    }
+    if (startTime) url += `&startTime=${startTime}`;
+    if (endTime) url += `&endTime=${endTime}`;
+    return url;
+};
+
+// === MATH HELPERS (Ті самі, без змін) ===
+// 1. Універсальна функція WMA, яка напряму мутує об'єкти (O(1) складність після старту)
+function applyWMA(candles, period, sourceKey, targetKey) {
+    const n = candles.length;
+    if (n < period) return;
+
+    const weightSum = (period * (period + 1)) / 2;
+    let currentTotalSum = 0;
+    let currentWeightedSum = 0;
+
+    // Шукаємо першу свічку, де є базові дані (для HMA це може бути не 0-й індекс)
+    let validStartIndex = -1;
+    for (let i = 0; i < n; i++) {
+        if (candles[i][sourceKey] !== undefined && candles[i][sourceKey] !== null) {
+            validStartIndex = i;
+            break;
+        }
+    }
+
+    if (validStartIndex === -1 || n - validStartIndex < period) return;
+
+    // Розрахунок першого вікна
+    for (let i = 0; i < period; i++) {
+        const val = candles[validStartIndex + i][sourceKey];
+        currentTotalSum += val;
+        currentWeightedSum += val * (i + 1);
+    }
+    candles[validStartIndex + period - 1][targetKey] = currentWeightedSum / weightSum;
+
+    // Швидкий прохід ковзним вікном для решти масиву
+    for (let i = validStartIndex + period; i < n; i++) {
+        const newPrice = candles[i][sourceKey];
+        const oldPrice = candles[i - period][sourceKey];
+        
+        currentWeightedSum = currentWeightedSum - currentTotalSum + (newPrice * period);
+        currentTotalSum = currentTotalSum - oldPrice + newPrice;
+        
+        candles[i][targetKey] = currentWeightedSum / weightSum;
+    }
+}
+
+// 2. Функція HMA, яка генерує унікальні ключі для тимчасових даних
+function applyHMA(candles, period, sourceKey, targetKey) {
+    const nHalf = Math.floor(period / 2);
+    const nSqrt = Math.floor(Math.sqrt(period));
+    
+    // Унікальні ключі, щоб дані HMA25 не затерли дані HMA100
+    const keyHalf = `_wmaHalf_${period}`;
+    const keyFull = `_wmaFull_${period}`;
+    const keyDiff = `_hmaDiff_${period}`;
+
+    // Мутуємо масив, додаючи тимчасові WMA
+    applyWMA(candles, nHalf, sourceKey, keyHalf);
+    applyWMA(candles, period, sourceKey, keyFull);
+
+    // Рахуємо різницю
+    for (let i = 0; i < candles.length; i++) {
+        const valHalf = candles[i][keyHalf];
+        const valFull = candles[i][keyFull];
+        if (valHalf !== undefined && valFull !== undefined) {
+            candles[i][keyDiff] = (2 * valHalf) - valFull;
+        }
+    }
+
+    // Фінальний WMA лягає у targetKey (наприклад, 'hma25')
+    applyWMA(candles, nSqrt, keyDiff, targetKey);
+}
+
+function applyDeviationCloud(candles, emaLength, basisMode) {
+    if (candles.length < emaLength * 2) return;
+
+    const stDevPeriod = emaLength * 2;
+    const R1 = 0.92, R2 = 2.0, L4 = 3.8, L5 = 5.5, L6 = 6.0, L8 = 8.0;
+
+    // 1. Рахуємо центральну лінію (EMA або VWAP)
+    if (basisMode === 'vwap') {
+        // VWAP: Cumulative (Price * Volume) / Cumulative Volume
+        // Використовуємо rolling VWAP з вікном = emaLength для подібної "плавності"
+        let cumPV = 0, cumVol = 0;
+        for (let i = 0; i < candles.length; i++) {
+            const c = candles[i];
+            const typicalPrice = (c.high + c.low + c.close) / 3;
+            const vol = c.volume || 0;
+            cumPV += typicalPrice * vol;
+            cumVol += vol;
+
+            // Rolling window: віднімаємо старий елемент
+            if (i >= emaLength) {
+                const old = candles[i - emaLength];
+                const oldTP = (old.high + old.low + old.close) / 3;
+                cumPV -= oldTP * (old.volume || 0);
+                cumVol -= (old.volume || 0);
+            }
+
+            c.threeEma = (cumVol > 0) ? (cumPV / cumVol) : c.close;
+        }
+    } else {
+        // EMA (default)
+        const k = 2 / (emaLength + 1);
+        let currentEma = null;
+        for (let i = 0; i < candles.length; i++) {
+            const close = candles[i].close;
+            if (currentEma === null) currentEma = close;
+            else currentEma = (close - currentEma) * k + currentEma;
+            candles[i].threeEma = currentEma;
+        }
+    }
+
+    // 2. Рахуємо StDev (Ковзне вікно) та лінії
+    let sum = 0, sumSq = 0;
+    
+    for (let i = 0; i < candles.length; i++) {
+        const c = candles[i];
+        sum += c.close;
+        sumSq += c.close * c.close;
+
+        if (i >= stDevPeriod) {
+            const oldClose = candles[i - stDevPeriod].close;
+            sum -= oldClose;
+            sumSq -= oldClose * oldClose;
+        }
+
+        if (i >= stDevPeriod - 1) {
+            const mean = sum / stDevPeriod;
+            // Захист від похибок IEEE 754 float за допомогою Math.max(0, ...)
+            const variance = Math.max(0, (sumSq / stDevPeriod) - (mean * mean));
+            const stdev = Math.sqrt(variance);
+            const cloudSize = stdev / 4;
+
+            c.devCloudSize = cloudSize;
+
+            if (cloudSize > 0) {
+                const ema = c.threeEma;
+                c.devL1 = ema - cloudSize * R1; c.devH1 = ema + cloudSize * R1;
+                c.devL2 = ema - cloudSize * R2; c.devH2 = ema + cloudSize * R2;
+                c.devL4 = ema - cloudSize * L4; c.devH4 = ema + cloudSize * L4;
+                c.devL5 = ema - cloudSize * L5; c.devH5 = ema + cloudSize * L5;
+                c.devL6 = ema - cloudSize * L6; c.devH6 = ema + cloudSize * L6;
+                c.devL8 = ema - cloudSize * L8; c.devH8 = ema + cloudSize * L8;
+            }
+        }
+    }
+}
+
+// 3. Головна функція індикаторів (Параметризована через indicatorConfig)
+function calculateIndicators(candles) {
+    if (!candles || candles.length === 0) return candles;
+    
+    const cfg = indicatorConfig;
+    const periodSMA = cfg.sma.length;
+    const periodBB = cfg.bb.length;
+    const stdDevMult = cfg.bb.multiplier;
+
+    // 1. Рахуємо прості індикатори за один прохід
+    for (let i = 0; i < candles.length; i++) {
+        // SMA
+        if (i >= periodSMA - 1) {
+            let sum = 0;
+            for (let j = 0; j < periodSMA; j++) sum += candles[i - j].close;
+            candles[i].sma7 = sum / periodSMA;
+        }
+        
+        // Bollinger Bands
+        if (i >= periodBB - 1) {
+            let sum = 0;
+            for (let j = 0; j < periodBB; j++) sum += candles[i - j].close;
+            const mean = sum / periodBB;
+            candles[i].bbMiddle = mean;
+            
+            let sqDiff = 0;
+            for (let j = 0; j < periodBB; j++) {
+                sqDiff += Math.pow(candles[i - j].close - mean, 2);
+            }
+            const stdDev = Math.sqrt(sqDiff / periodBB);
+            candles[i].bbUpper = mean + stdDev * stdDevMult;
+            candles[i].bbLower = mean - stdDev * stdDevMult;
+        }
+    }
+
+    // 2. Рахуємо всі HMA з параметрами з конфігу
+    applyHMA(candles, cfg.hma25.length, 'close', 'hma25');
+    applyHMA(candles, cfg.hma35.length, 'close', 'hma35');
+    applyHMA(candles, cfg.hma55.length, 'close', 'hma55');
+    applyHMA(candles, 80, 'close', 'hma80');
+    applyHMA(candles, cfg.hma100.length, 'close', 'hma100');
+
+    // 3. Deviation Cloud з параметрами з конфігу
+    applyDeviationCloud(candles, cfg.devCloud.emaLength, cfg.devCloud.basisMode);
+
+    return candles; // Повертаємо той самий мутований масив
+}
+
+function mapCandleData(raw) {
+    if (!Array.isArray(raw)) return [];
+    const result = [];
+    for (let i = 0; i < raw.length; i++) {
+        const d = raw[i];
+        if (!Array.isArray(d) || d.length < 6) continue;
+        const time = d[0] / 1000;
+        const open = parseFloat(d[1]);
+        const high = parseFloat(d[2]);
+        const low = parseFloat(d[3]);
+        const close = parseFloat(d[4]);
+        const volume = parseFloat(d[5]);
+        // Валідація: пропускаємо свічки з NaN/Infinity
+        if (!isFinite(time) || !isFinite(open) || !isFinite(high) || !isFinite(low) || !isFinite(close) || !isFinite(volume)) continue;
+        if (time <= 0 || open <= 0 || high <= 0 || low <= 0 || close <= 0) continue;
+        result.push({ time, open, high, low, close, volume });
+    }
+    return result;
+}
+
+// === MARKET LOGIC ===
+
+// Допоміжна: витягти precision з PRICE_FILTER tickSize (для Spot)
+function getPrecisionFromTickSize(filters) {
+    if (!Array.isArray(filters)) return 8;
+    const priceFilter = filters.find(f => f.filterType === 'PRICE_FILTER');
+    if (!priceFilter || !priceFilter.tickSize) return 8;
+    // tickSize: "0.01000000" → precision = 2
+    const tickStr = priceFilter.tickSize;
+    const dotIndex = tickStr.indexOf('.');
+    if (dotIndex === -1) return 0;
+    const decimals = tickStr.slice(dotIndex + 1);
+    // Знаходимо позицію останньої значущої цифри (не '0')
+    let precision = 0;
+    for (let i = 0; i < decimals.length; i++) {
+        if (decimals[i] !== '0') precision = i + 1;
+    }
+    return precision;
+}
+
+// Допоміжна: побудувати coin-об'єкт для Futures/Spot з даних exchangeInfo
+function buildExchangeInfoCoins(symbols, now, options) {
+    const { quoteAsset, filterFn, getSymbol, getDispName, getPrecision, getListingTime } = options;
+    
+    return symbols
+        .filter(s => {
+            if (s.status !== 'TRADING') return false;
+            if (quoteAsset && s.quoteAsset !== quoteAsset) return false;
+            if (filterFn && !filterFn(s)) return false;
+            return true;
+        })
+        .map(s => {
+            const listingTime = getListingTime(s);
+            const age = now - listingTime;
+            let group = 2; // OLD за замовчуванням
+            if (listingTime > 0 && age < NEW_COIN_PERIOD_MS) group = 0;
+            else if (listingTime > 0 && age < MID_COIN_PERIOD_MS) group = 1;
+            return {
+                symbol: getSymbol(s),
+                dispName: getDispName(s),
+                alphaId: null,
+                listingDate: listingTime,
+                precision: getPrecision(s),
+                isNew: group === 0,
+                isMid: group === 1,
+                group: group
+            };
+        })
+        .sort((a, b) => (a.group !== b.group) ? a.group - b.group : a.dispName.localeCompare(b.dispName));
+}
+
+async function fetchAllMarkets() {
+    try {
+        const now = Date.now();
+
+        // === Паралельне завантаження всіх трьох ринків ===
+        const [alphaResult, futuresResult, spotResult] = await Promise.allSettled([
+            // ALPHA
+            fetchWithTimeout(ENDPOINTS.ALPHA_LIST, {}, 12000).then(r => r.json()),
+            // FUTURES
+            fetchWithTimeout(ENDPOINTS.FUTURES_INFO, {}, 12000).then(r => r.json()),
+            // SPOT
+            fetchWithTimeout(ENDPOINTS.SPOT_INFO, {}, 12000).then(r => r.json())
+        ]);
+
+        // --- ALPHA ---
+        if (alphaResult.status === 'fulfilled') {
+            const alphaList = alphaResult.value.data || [];
+            marketLists.ALPHA = alphaList
+                .filter(c => !c.cexOffDisplay && !c.offline)
+                .map(c => {
+                    const listingTime = c.listingTime || 0;
+                    const age = now - listingTime;
+                    let group = 2;
+                    if (age < NEW_COIN_PERIOD_MS) group = 0;
+                    else if (age < MID_COIN_PERIOD_MS) group = 1;
+                    return {
+                        symbol: c.symbol, dispName: c.symbol, alphaId: c.alphaId,
+                        listingDate: listingTime, precision: (c.tradeDecimal !== undefined) ? c.tradeDecimal : 4,
+                        isNew: group === 0, isMid: group === 1, group: group
+                    };
+                })
+                .sort((a, b) => (a.group !== b.group) ? a.group - b.group : a.dispName.localeCompare(b.dispName));
+        } else {
+            console.error('Failed to load ALPHA market:', alphaResult.reason);
+        }
+
+        // --- FUTURES ---
+        if (futuresResult.status === 'fulfilled') {
+            const futuresData = futuresResult.value;
+            marketLists.FUTURES = buildExchangeInfoCoins(futuresData.symbols || [], now, {
+                quoteAsset: 'USDT',
+                filterFn: (s) => s.contractType === 'PERPETUAL',
+                getSymbol: (s) => s.symbol,
+                getDispName: (s) => s.baseAsset,
+                getPrecision: (s) => s.pricePrecision || 4,
+                getListingTime: (s) => s.onboardDate || 0
+            });
+        } else {
+            console.error('Failed to load FUTURES market:', futuresResult.reason);
+        }
+
+        // --- SPOT ---
+        if (spotResult.status === 'fulfilled') {
+            const spotData = spotResult.value;
+            marketLists.SPOT = buildExchangeInfoCoins(spotData.symbols || [], now, {
+                quoteAsset: 'USDT',
+                filterFn: (s) => s.isSpotTradingAllowed === true,
+                getSymbol: (s) => s.symbol,
+                getDispName: (s) => s.baseAsset,
+                getPrecision: (s) => getPrecisionFromTickSize(s.filters),
+                // Spot не має onboardDate — ставимо 0 (усі будуть group=2 "OLD")
+                getListingTime: (s) => 0
+            });
+        } else {
+            console.error('Failed to load SPOT market:', spotResult.reason);
+        }
+
+        // Вважаємо завантаженим, якщо хоча б один ринок завантажився
+        const anyLoaded = marketLists.ALPHA.length > 0 || marketLists.FUTURES.length > 0 || marketLists.SPOT.length > 0;
+        if (anyLoaded) {
+            areMarketsLoaded = true;
+            self.postMessage({ type: 'COINS_LISTS', data: marketLists });
+        } else {
+            // Жоден ринок не завантажився — повторюємо через 10с
+            console.error('No markets loaded, retrying in 10s...');
+            setTimeout(fetchAllMarkets, 10000);
+        }
+    } catch (e) {
+        console.error('Fetch Markets Error:', e);
+        setTimeout(fetchAllMarkets, 10000);
+    }
+}
+
+async function fetchCandles(chartId, market, symbol, timeframe) {
+    if (!areMarketsLoaded) {
+        setTimeout(() => fetchCandles(chartId, market, symbol, timeframe), 1000);
+        return;
+    }
+
+    const coinList = marketLists[market];
+    const coin = coinList ? coinList.find(c => c.symbol === symbol) : null;
+    
+    if (!coin) {
+        self.postMessage({ type: 'DATA_ERROR', chartId, symbol, reason: 'Symbol not found' });
+        return;
+    }
+
+    // Скасування попереднього запиту (з безпечним доступом)
+    if (activeSubs[chartId] && activeSubs[chartId].controller) {
+        activeSubs[chartId].controller.abort();
+    }
+    const controller = new AbortController(); // Створюємо новий контролер
+
+    // Оновлюємо стан підписки ОДРАЗУ
+    activeSubs[chartId] = { 
+        market,
+        symbol, 
+        timeframe, 
+        precision: coin.precision, 
+        alphaId: coin.alphaId, 
+        buffer: [],
+        isLoading: true,
+        controller: controller // Зберігаємо контролер
+    };
+
+    const url = getKlinesUrl(market, symbol, timeframe, 1000, coin.alphaId);
+
+    try {
+        // 🔥 Передаємо signal у fetchWithTimeout
+        const res = await fetchWithTimeout(url, { signal: controller.signal }, 10000).then(r => r.json());
+        
+        // 🔥 FIX: Якщо після fetch символ змінився (користувач клацнув інший), виходимо
+        if (activeSubs[chartId].symbol !== symbol) return;
+
+        const raw = (res.data || res); 
+        const data = mapCandleData(raw);
+
+        if (data.length === 0) {
+            if(activeSubs[chartId].symbol === symbol) activeSubs[chartId].isLoading = false; 
+            return;
+        }
+
+        const enriched = calculateIndicators(data);
+        
+        // 🔥 FIX: Фінальна перевірка перед відправкою (чи актуальна ще монета)
+        if (activeSubs[chartId].symbol === symbol) {
+            activeSubs[chartId].buffer = data; 
+            activeSubs[chartId].isLoading = false;
+            
+            self.postMessage({ 
+                type: 'CANDLES_DATA', 
+                chartId, 
+                data: enriched, 
+                precision: coin.precision, 
+                symbol,
+                market
+            });
+        }
+
+    } catch (e) {
+        if (e.name === 'AbortError') {
+            // Тихо ігноруємо, це штатна поведінка
+            return;
+        } else {
+            self.postMessage({ type: 'DATA_ERROR', chartId, symbol, reason: 'Network Error' });
+        }
+        // Скидаємо прапорець, тільки якщо це поточна монета
+        if(activeSubs[chartId] && activeSubs[chartId].symbol === symbol) {
+            activeSubs[chartId].isLoading = false;
+        }
+    }
+}
+
+// Допоміжна функція для мікро-затримок (Jitter)
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+async function runRealtimeLoop() {
+    if (isPolling) return;
+    isPolling = true;
+
+    const loop = async () => {
+        try {
+            const targets = [];
+            // Беремо тільки активні, не завантажувані (динамічно по всіх графіках)
+            Object.keys(activeSubs).forEach(id => {
+                const sub = activeSubs[id];
+                if (sub && sub.symbol && !sub.isLoading && !sub.historyMode) {
+                    targets.push({ id: parseInt(id), ...sub });
+                }
+            });
+
+            if (targets.length === 0) return;
+
+            const uniqueRequests = new Map();
+            targets.forEach(t => {
+                const key = `${t.market}_${t.symbol}_${t.timeframe}`; 
+                if (!uniqueRequests.has(key)) {
+                    uniqueRequests.set(key, { 
+                        market: t.market, symbol: t.symbol, timeframe: t.timeframe, alphaId: t.alphaId, chartIds: [t.id] 
+                    });
+                } else {
+                    uniqueRequests.get(key).chartIds.push(t.id);
+                }
+            });
+
+            const promises = Array.from(uniqueRequests.values()).map(async (req) => {
+                try {
+                    // НАДІЙНІСТЬ: Додаємо мікро-затримку 0...100 мс перед кожним паралельним запитом
+                    await sleep(Math.random() * 100);
+
+                    const url = getKlinesUrl(req.market, req.symbol, req.timeframe, 5, req.alphaId);
+                    // Короткий таймаут для ріалтайму
+                    const res = await fetchWithTimeout(url, {}, 3000).then(r => r.json());
+                    const raw = (res.data || res);
+                    const newCandles = mapCandleData(raw);
+
+                    if (newCandles.length > 0) {
+                        req.chartIds.forEach(id => {
+                            const sub = activeSubs[id];
+                            if (!sub || sub.symbol !== req.symbol) return;
+                            if (!sub.buffer || sub.buffer.length === 0) return;
+                            // Подвійна перевірка: historyMode міг увімкнутись після формування targets
+                            if (sub.historyMode) return;
+
+                            let updated = false;
+                            newCandles.forEach(nc => {
+                                const lastCandle = sub.buffer[sub.buffer.length - 1];
+                                if (nc.time > lastCandle.time) {
+                                    sub.buffer.push(nc);
+                                    updated = true;
+                                } else if (nc.time === lastCandle.time) {
+                                    // СТАЛО (Додаємо перевірку high та low):
+                                    if (
+                                        Math.abs(nc.close - lastCandle.close) > Number.EPSILON || 
+                                        Math.abs(nc.volume - lastCandle.volume) > Number.EPSILON ||
+                                        Math.abs(nc.high - lastCandle.high) > Number.EPSILON ||
+                                        Math.abs(nc.low - lastCandle.low) > Number.EPSILON
+                                    ) {
+                                        sub.buffer[sub.buffer.length - 1] = nc;
+                                        updated = true;
+                                    }
+                                }
+                            });
+
+                            if (updated) {
+                                if (sub.buffer.length > MAX_BUFFER_SIZE) {
+                                    sub.buffer = sub.buffer.slice(sub.buffer.length - MAX_BUFFER_SIZE);
+                                    incrementalState[id] = null; // Скидаємо стейт після trim
+                                }
+                                
+                                // === ІНКРЕМЕНТАЛЬНЕ ОНОВЛЕННЯ ===
+                                const buf = sub.buffer;
+                                const cfg = indicatorConfig;
+                                const lastIdx = buf.length - 1;
+                                
+                                // Інкрементальний SMA для останніх свічок
+                                const pSMA = cfg.sma.length;
+                                if (lastIdx >= pSMA - 1) {
+                                    let smaSum = 0;
+                                    for (let si = 0; si < pSMA; si++) smaSum += buf[lastIdx - si].close;
+                                    buf[lastIdx].sma7 = smaSum / pSMA;
+                                }
+                                
+                                // Інкрементальний BB
+                                const pBB = cfg.bb.length;
+                                const bbMult = cfg.bb.multiplier;
+                                if (lastIdx >= pBB - 1) {
+                                    let bbSum = 0;
+                                    for (let si = 0; si < pBB; si++) bbSum += buf[lastIdx - si].close;
+                                    const bbMean = bbSum / pBB;
+                                    buf[lastIdx].bbMiddle = bbMean;
+                                    let bbSqDiff = 0;
+                                    for (let si = 0; si < pBB; si++) bbSqDiff += Math.pow(buf[lastIdx - si].close - bbMean, 2);
+                                    const bbStd = Math.sqrt(bbSqDiff / pBB);
+                                    buf[lastIdx].bbUpper = bbMean + bbStd * bbMult;
+                                    buf[lastIdx].bbLower = bbMean - bbStd * bbMult;
+                                }
+                                
+                                // HMA та DevCloud потребують глибшого lookback
+                                const startIndex = Math.max(0, buf.length - CALC_LOOKBACK);
+                                const sliceData = buf.slice(startIndex);
+                                
+                                // HMA (потребує WMA chains)
+                                applyHMA(sliceData, cfg.hma25.length, 'close', 'hma25');
+                                applyHMA(sliceData, cfg.hma35.length, 'close', 'hma35');
+                                applyHMA(sliceData, cfg.hma55.length, 'close', 'hma55');
+                                applyHMA(sliceData, 80, 'close', 'hma80');
+                                applyHMA(sliceData, cfg.hma100.length, 'close', 'hma100');
+                                
+                                // DevCloud (потребує EMA/VWAP chain + StDev window)
+                                applyDeviationCloud(sliceData, cfg.devCloud.emaLength, cfg.devCloud.basisMode);
+                                
+                                const updates = [];
+                                const calculatedMap = new Map();
+                                sliceData.forEach(c => calculatedMap.set(c.time, c));
+                                
+                                newCandles.forEach(nc => {
+                                    const enriched = calculatedMap.get(nc.time);
+                                    if (enriched) updates.push(enriched);
+                                });
+
+                                if (updates.length > 0) {
+                                    self.postMessage({
+                                        type: 'REALTIME_UPDATE',
+                                        chartId: id,
+                                        data: updates,
+                                        symbol: req.symbol,
+                                        market: req.market
+                                    });
+                                }
+                            }
+                        });
+                    }
+                } catch (e) { 
+                    if (e.message && e.message.includes('429')) {
+                        await sleep(5000);
+                    }
+                }
+            });
+            await Promise.all(promises);
+        } catch (fatalError) {
+            console.error('Fatal RT Loop Error:', fatalError);
+        } finally {
+            // НАДІЙНІСТЬ: Базові 2900 мс + випадкові 0...300 мс
+            const nextLoopDelay = 2900 + (Math.random() * 300);
+            setTimeout(loop, nextLoopDelay);
+        }
+    };
+    loop();
+}
+
+// === HISTORY WINDOW LOADING ===
+async function fetchHistoryWindow(chartId, market, symbol, timeframe, startTimeMs, endTimeMs) {
+    const coinList = marketLists[market];
+    const coin = coinList ? coinList.find(c => c.symbol === symbol) : null;
+    
+    if (!coin) {
+        self.postMessage({ type: 'DATA_ERROR', chartId, symbol, reason: 'Symbol not found for history' });
+        return;
+    }
+
+    // Перевірка лістингу: якщо startTime < listingDate — обрізаємо
+    const listingMs = coin.listingDate || 0;
+    let effectiveStart = startTimeMs;
+    if (listingMs > 0 && effectiveStart < listingMs) {
+        effectiveStart = listingMs;
+    }
+
+    // Якщо після обрізки startTime >= endTime — нічого не вантажимо
+    if (effectiveStart >= endTimeMs) {
+        self.postMessage({ type: 'HISTORY_WINDOW_DATA', chartId, data: [], symbol, market, precision: coin.precision });
+        return;
+    }
+
+    const sub = activeSubs[chartId];
+    if (!sub || sub.symbol !== symbol) return;
+
+    const url = getKlinesUrl(market, symbol, timeframe, 1000, coin.alphaId, effectiveStart, endTimeMs);
+
+    try {
+        const res = await fetchWithTimeout(url, {}, 12000).then(r => r.json());
+        
+        // Перевірка актуальності (чи не змінив користувач монету поки чекали)
+        if (!activeSubs[chartId] || activeSubs[chartId].symbol !== symbol) return;
+
+        const raw = (res.data || res);
+        const data = mapCandleData(raw);
+
+        if (data.length === 0) {
+            self.postMessage({ type: 'HISTORY_WINDOW_DATA', chartId, data: [], symbol, market, precision: coin.precision });
+            return;
+        }
+
+        const enriched = calculateIndicators(data);
+
+        // Оновлюємо буфер воркера новими даними (заміна, не append)
+        activeSubs[chartId].buffer = data;
+        incrementalState[chartId] = null;
+
+        self.postMessage({
+            type: 'HISTORY_WINDOW_DATA',
+            chartId,
+            data: enriched,
+            precision: coin.precision,
+            symbol,
+            market
+        });
+
+    } catch (e) {
+        if (e.name !== 'AbortError') {
+            self.postMessage({ type: 'DATA_ERROR', chartId, symbol, reason: 'History load error' });
+        }
+    }
+}
+
+self.onmessage = async (e) => {
+    const { type, payload } = e.data;
+    if (type === 'INIT') {
+        const count = (payload && payload.chartCount) ? payload.chartCount : 2;
+        initChartSlots(count);
+        if (payload && payload.indicatorConfig) {
+            Object.assign(indicatorConfig, payload.indicatorConfig);
+        }
+        await fetchAllMarkets();
+        runRealtimeLoop(); 
+    }
+    if (type === 'LOAD_CHART') {
+        const { chartId, market, symbol, timeframe } = payload;
+        incrementalState[chartId] = null;
+        // Скидаємо historyMode при завантаженні нової монети/таймфрейму
+        if (activeSubs[chartId]) activeSubs[chartId].historyMode = false;
+        await fetchCandles(chartId, market, symbol, timeframe);
+    }
+    if (type === 'SET_HISTORY_MODE') {
+        const { chartId, enabled } = payload;
+        if (activeSubs[chartId]) {
+            activeSubs[chartId].historyMode = enabled;
+        }
+    }
+    if (type === 'LOAD_HISTORY_WINDOW') {
+        const { chartId, market, symbol, timeframe, startTime, endTime } = payload;
+        await fetchHistoryWindow(chartId, market, symbol, timeframe, startTime, endTime);
+    }
+    if (type === 'UPDATE_INDICATOR_CONFIG') {
+        if (payload) {
+            Object.assign(indicatorConfig, payload);
+        }
+        Object.keys(activeSubs).forEach(idStr => {
+            const id = parseInt(idStr);
+            const sub = activeSubs[id];
+            if (!sub || !sub.buffer || sub.buffer.length === 0) return;
+            incrementalState[id] = null;
+            const enriched = calculateIndicators(sub.buffer);
+            self.postMessage({
+                type: 'CANDLES_DATA',
+                chartId: id,
+                data: enriched,
+                precision: sub.precision,
+                symbol: sub.symbol,
+                market: sub.market
+            });
+        });
+    }
+};
