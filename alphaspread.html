@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="color-scheme" content="light">
+    <title>Alpha Spread & Volume Monitor</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --panel-color: #f1f3f6;
+            --card-color: #ffffff;
+            --text-color: #131722;
+            --muted-color: #6a7180;
+            --accent-color: #2962ff;
+            --selected-bg: #e0e3eb;
+            --border-color: #d1d4dc;
+            --danger-color: #ef5350;
+            --warning-color: #f6b100;
+            --success-color: #26a69a;
+            --success-bg: rgba(38, 166, 154, 0.12);
+            --warning-bg: rgba(246, 177, 0, 0.16);
+            --danger-bg: rgba(239, 83, 80, 0.13);
+            --new-coin-color: #26a69a;
+            --new-coin-bg: rgba(38, 166, 154, 0.15);
+            --mid-coin-color: #fb8c00;
+            --mid-coin-bg: rgba(251, 140, 0, 0.15);
+            --shadow: 0 8px 26px rgba(19, 23, 34, 0.08);
+            --radius: 14px;
+            --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+            --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            margin: 0;
+            min-height: 100%;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--sans);
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
+
+        body {
+            min-height: 100dvh;
+            overflow-x: hidden;
+        }
+
+        button, input { font: inherit; }
+
+        #app {
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            background:
+                radial-gradient(circle at top left, rgba(41, 98, 255, 0.08), transparent 38vw),
+                linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%);
+        }
+
+        #header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            min-height: 64px;
+            background: rgba(241, 243, 246, 0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px max(12px, env(safe-area-inset-right)) 10px max(12px, env(safe-area-inset-left));
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .brand-logo {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #f3ba2f, #f7d774);
+            color: #1e2329;
+            font-size: 18px;
+            font-weight: 900;
+            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+            flex: 0 0 auto;
+        }
+
+        .brand-text { min-width: 0; }
+
+        .brand-title {
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.1;
+            white-space: nowrap;
+        }
+
+        .brand-subtitle {
+            margin-top: 3px;
+            font-size: 11px;
+            color: var(--muted-color);
+            white-space: nowrap;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .market-badge {
+            background: #ffffff;
+            border: 2px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 7px 10px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 13px;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+
+        .custom-dropdown-wrapper {
+            position: relative;
+            width: min(320px, 38vw);
+            min-width: 180px;
+            font-size: 13px;
+        }
+
+        .custom-dropdown-trigger {
+            height: 36px;
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 30px 8px 10px;
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: 700;
+            user-select: none;
+            position: relative;
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
+        }
+
+        .custom-dropdown-trigger::after {
+            content: "▼";
+            font-size: 8px;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        .custom-dropdown-trigger:hover,
+        .custom-dropdown-trigger:focus-visible {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .custom-dropdown-menu {
+            display: none;
+            position: absolute;
+            top: calc(100% + 5px);
+            left: 0;
+            width: min(360px, calc(100vw - 24px));
+            max-height: min(460px, calc(100dvh - 92px));
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            box-shadow: 0 10px 34px rgba(0, 0, 0, 0.17);
+            z-index: 1000;
+            flex-direction: column;
+            opacity: 0;
+            pointer-events: none;
+            overflow: hidden;
+            transition: opacity 0.1s ease, transform 0.1s ease;
+            transform: translateY(-2px);
+        }
+
+        .custom-dropdown-menu.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .custom-dropdown-search-box {
+            padding: 8px;
+            border-bottom: 1px solid var(--border-color);
+            background: #f9f9f9;
+        }
+
+        .custom-dropdown-search-input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 7px;
+            outline: none;
+            font-size: 13px;
+            box-sizing: border-box;
+            text-transform: uppercase;
+            background: #ffffff;
+        }
+
+        .custom-dropdown-search-input:focus { border-color: var(--accent-color); }
+
+        .custom-dropdown-options {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            overflow-y: auto;
+            flex: 1;
+            content-visibility: auto;
+            contain-intrinsic-size: 340px;
+            overscroll-behavior: contain;
+        }
+
+        .custom-option {
+            min-height: 38px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 13px;
+            border-bottom: 1px solid #f5f5f5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            user-select: none;
+        }
+
+        .custom-option:hover,
+        .custom-option.keyboard-active { background-color: var(--selected-bg); }
+        .custom-option.selected { background-color: var(--accent-color); color: white; }
+        .custom-option.is-new { background: linear-gradient(90deg, var(--new-coin-bg), transparent 58%); }
+        .custom-option.is-mid { background: linear-gradient(90deg, var(--mid-coin-bg), transparent 58%); }
+        .custom-option.is-new.selected,
+        .custom-option.is-mid.selected { background: var(--accent-color); }
+
+        .option-main { min-width: 0; display: flex; align-items: center; gap: 6px; }
+        .option-symbol { font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .option-name { color: var(--muted-color); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 160px; }
+        .custom-option.selected .option-name { color: rgba(255, 255, 255, 0.78); }
+
+        .dropdown-divider {
+            padding: 5px 12px;
+            background: #f0f0f0;
+            font-size: 11px;
+            font-weight: 800;
+            color: #666;
+            border-bottom: 1px solid var(--border-color);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .badge {
+            flex: 0 0 auto;
+            font-size: 10px;
+            font-weight: 900;
+            border-radius: 999px;
+            padding: 2px 6px;
+            letter-spacing: 0.3px;
+        }
+        .badge-new { color: var(--new-coin-color); background: var(--new-coin-bg); }
+        .badge-mid { color: var(--mid-coin-color); background: var(--mid-coin-bg); }
+        .custom-option.selected .badge-new,
+        .custom-option.selected .badge-mid { color: white; background: rgba(255,255,255,0.18); }
+
+        .icon-btn {
+            height: 36px;
+            min-width: 36px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: #fff;
+            color: var(--text-color);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+        }
+        .icon-btn:hover { background-color: var(--selected-bg); }
+        .icon-btn:active { transform: scale(0.96); }
+        .icon-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .status-pill {
+            margin-left: auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--border-color);
+            background: #fff;
+            color: var(--muted-color);
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #a0a7b4;
+            box-shadow: 0 0 0 4px rgba(160, 167, 180, 0.15);
+        }
+
+        .status-pill.connected .status-dot { background: var(--success-color); box-shadow: 0 0 0 4px rgba(38, 166, 154, 0.15); }
+        .status-pill.connecting .status-dot { background: var(--warning-color); box-shadow: 0 0 0 4px rgba(246, 177, 0, 0.17); }
+        .status-pill.error .status-dot { background: var(--danger-color); box-shadow: 0 0 0 4px rgba(239, 83, 80, 0.14); }
+
+        main {
+            width: min(1320px, 100%);
+            margin: 0 auto;
+            padding: 18px 14px calc(24px + env(safe-area-inset-bottom));
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+            gap: 16px;
+            align-items: stretch;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid rgba(209, 212, 220, 0.85);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .token-card {
+            padding: 18px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 14px;
+            align-items: start;
+        }
+
+        .token-title-row { display: flex; align-items: center; gap: 10px; min-width: 0; flex-wrap: wrap; }
+        .token-symbol { font-size: clamp(28px, 4vw, 44px); font-weight: 900; line-height: 1; letter-spacing: -1px; }
+        .token-alpha-id { font-family: var(--mono); font-size: 12px; color: var(--muted-color); border: 1px solid var(--border-color); border-radius: 999px; padding: 5px 8px; background: #fff; }
+        .token-name { margin-top: 8px; font-size: 14px; color: var(--muted-color); }
+
+        .connection-details {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            margin-top: 18px;
+        }
+
+        .small-stat {
+            background: #f8fafc;
+            border: 1px solid #e5e9f0;
+            border-radius: 10px;
+            padding: 10px;
+            min-width: 0;
+        }
+        .small-stat-label { font-size: 11px; color: var(--muted-color); font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; }
+        .small-stat-value { margin-top: 6px; font-family: var(--mono); font-size: 13px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .latency-box {
+            justify-self: end;
+            text-align: right;
+            min-width: 126px;
+        }
+        .latency-label { font-size: 11px; color: var(--muted-color); font-weight: 800; text-transform: uppercase; }
+        .latency-value { margin-top: 6px; font-family: var(--mono); font-size: 20px; font-weight: 900; }
+        .latency-note { margin-top: 4px; color: var(--muted-color); font-size: 11px; }
+
+        .settings-card { padding: 16px; }
+        .section-title { margin: 0 0 12px; font-size: 14px; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+        .settings-grid { display: grid; gap: 12px; }
+        .setting-row { display: grid; grid-template-columns: 1fr 116px; gap: 10px; align-items: center; }
+        .setting-row label { font-size: 13px; font-weight: 800; }
+        .setting-row .hint { display: block; margin-top: 3px; font-size: 11px; color: var(--muted-color); font-weight: 500; line-height: 1.35; }
+        .setting-row input {
+            width: 100%;
+            height: 36px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 7px 9px;
+            text-align: right;
+            outline: none;
+            font-family: var(--mono);
+            font-weight: 800;
+            background: #fff;
+        }
+        .setting-row input:focus { border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(41, 98, 255, 0.09); }
+
+        .threshold-summary {
+            margin-top: 12px;
+            padding: 10px;
+            background: #f8fafc;
+            border: 1px solid #e5e9f0;
+            border-radius: 10px;
+            font-size: 12px;
+            color: var(--muted-color);
+            line-height: 1.45;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .metric-card { padding: 16px; min-height: 158px; display: flex; flex-direction: column; gap: 12px; }
+        .metric-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .metric-title { font-size: 12px; font-weight: 900; color: var(--muted-color); text-transform: uppercase; letter-spacing: 0.5px; }
+        .indicator-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 999px;
+            padding: 5px 8px;
+            font-size: 11px;
+            font-weight: 900;
+            border: 1px solid var(--border-color);
+            color: var(--muted-color);
+            background: #f8fafc;
+            white-space: nowrap;
+        }
+        .indicator-chip::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #a0a7b4;
+        }
+        .indicator-chip.good { color: var(--success-color); background: var(--success-bg); border-color: rgba(38, 166, 154, 0.35); }
+        .indicator-chip.good::before { background: var(--success-color); }
+        .indicator-chip.warn { color: #a56f00; background: var(--warning-bg); border-color: rgba(246, 177, 0, 0.4); }
+        .indicator-chip.warn::before { background: var(--warning-color); }
+        .indicator-chip.bad { color: #c33935; background: var(--danger-bg); border-color: rgba(239, 83, 80, 0.35); }
+        .indicator-chip.bad::before { background: var(--danger-color); }
+
+        .metric-value { font-family: var(--mono); font-size: clamp(24px, 3.2vw, 34px); font-weight: 950; letter-spacing: -1px; line-height: 1; }
+        .metric-subvalue { font-family: var(--mono); font-size: 13px; color: var(--muted-color); font-weight: 800; }
+        .metric-details { margin-top: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .detail-cell { border-top: 1px solid #edf0f5; padding-top: 9px; min-width: 0; }
+        .detail-label { font-size: 10px; color: var(--muted-color); font-weight: 900; text-transform: uppercase; letter-spacing: 0.4px; }
+        .detail-value { margin-top: 4px; font-family: var(--mono); font-weight: 900; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        .book-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .table-card { padding: 0; overflow: hidden; }
+        .table-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 13px 14px; border-bottom: 1px solid var(--border-color); background: #f8fafc; }
+        .table-title { font-size: 13px; font-weight: 900; }
+        .table-subtitle { font-size: 11px; color: var(--muted-color); font-weight: 700; }
+
+        table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 12px; table-layout: fixed; }
+        th, td { padding: 8px 10px; border-bottom: 1px solid #f0f2f6; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        th { color: var(--muted-color); font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; background: #fbfcfe; }
+        th:first-child, td:first-child { text-align: left; }
+        .bid-color { color: var(--success-color); }
+        .ask-color { color: var(--danger-color); }
+        .empty-row { color: var(--muted-color); text-align: center !important; font-family: var(--sans); padding: 18px; }
+
+        .log-card { padding: 14px; }
+        .log-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: grid;
+            gap: 7px;
+            max-height: 138px;
+            overflow: auto;
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--muted-color);
+        }
+        .log-list li { display: flex; gap: 8px; align-items: baseline; }
+        .log-time { color: #8a92a3; flex: 0 0 auto; }
+        .log-message { min-width: 0; overflow-wrap: anywhere; }
+
+        .diagnostics-panel {
+            margin-top: 14px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 12px;
+        }
+        .diagnostics-title {
+            margin-bottom: 8px;
+            font-size: 12px;
+            font-weight: 900;
+            color: var(--muted-color);
+            text-transform: uppercase;
+            letter-spacing: 0.45px;
+        }
+        .debug-stats {
+            margin: 0;
+            padding: 10px;
+            border: 1px solid #e5e9f0;
+            border-radius: 10px;
+            background: #f8fafc;
+            color: #3c4452;
+            overflow: auto;
+            max-height: 180px;
+            font-family: var(--mono);
+            font-size: 11px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .toast {
+            position: fixed;
+            right: 14px;
+            bottom: 14px;
+            z-index: 2000;
+            max-width: min(420px, calc(100vw - 28px));
+            background: #1e2329;
+            color: white;
+            border-radius: 12px;
+            padding: 12px 14px;
+            box-shadow: 0 14px 38px rgba(0,0,0,0.24);
+            font-size: 13px;
+            transform: translateY(20px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 1020px) {
+            .metrics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .hero { grid-template-columns: 1fr; }
+            .latency-box { justify-self: start; text-align: left; }
+        }
+
+        @media (max-width: 720px) {
+            #header {
+                align-items: stretch;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .brand { width: 100%; }
+            .header-controls { width: 100%; flex-wrap: wrap; }
+            .custom-dropdown-wrapper { width: calc(100% - 68px); min-width: 0; flex: 1; }
+            .custom-dropdown-menu {
+                position: fixed;
+                left: 12px;
+                right: 12px;
+                top: auto;
+                bottom: calc(12px + env(safe-area-inset-bottom));
+                width: auto;
+                max-height: min(74dvh, 560px);
+                border-radius: 16px;
+            }
+            .status-pill { margin-left: 0; width: 100%; justify-content: center; }
+            main { padding: 12px 10px calc(18px + env(safe-area-inset-bottom)); gap: 12px; }
+            .token-card { grid-template-columns: 1fr; padding: 15px; }
+            .connection-details { grid-template-columns: 1fr; }
+            .settings-card { padding: 14px; }
+            .setting-row { grid-template-columns: 1fr; }
+            .setting-row input { text-align: left; }
+            .metrics-grid { grid-template-columns: 1fr; gap: 12px; }
+            .metric-card { min-height: auto; }
+            .book-section { grid-template-columns: 1fr; gap: 12px; }
+            th, td { padding: 8px 8px; font-size: 11px; }
+        }
+
+        @media (max-width: 390px) {
+            .brand-title { font-size: 13px; }
+            .brand-subtitle { font-size: 10px; }
+            .market-badge { padding-inline: 8px; }
+            .metric-details { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <header id="header">
+        <div class="brand" aria-label="Назва програми">
+            <div class="brand-logo">α</div>
+            <div class="brand-text">
+                <div class="brand-title">Alpha Spread & Volume</div>
+                <div class="brand-subtitle">Binance Alpha · real-time order book</div>
+            </div>
+        </div>
+
+        <div class="header-controls">
+            <div class="market-badge" title="Програма працює тільки з Alpha">ALPHA</div>
+
+            <div class="custom-dropdown-wrapper" id="dropdown-coin">
+                <div class="custom-dropdown-trigger" id="trigger-coin" role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false">Завантаження...</div>
+                <div class="custom-dropdown-menu" id="menu-coin" role="listbox" aria-label="Список Alpha токенів">
+                    <div class="custom-dropdown-search-box">
+                        <input type="text" class="custom-dropdown-search-input" id="search-coin" placeholder="Search token..." autocomplete="off" spellcheck="false">
+                    </div>
+                    <ul class="custom-dropdown-options" id="list-coin"></ul>
+                </div>
+            </div>
+
+            <button class="icon-btn" id="refresh-btn" title="Перезавантажити список і потоки" aria-label="Refresh">⟳</button>
+            <button class="icon-btn" id="pause-btn" title="Пауза / відновити WebSocket" aria-label="Pause">Ⅱ</button>
+        </div>
+
+        <div class="status-pill connecting" id="status-pill" aria-live="polite">
+            <span class="status-dot"></span>
+            <span id="status-text">Підготовка...</span>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <article class="card token-card">
+                <div>
+                    <div class="token-title-row">
+                        <div class="token-symbol" id="selected-symbol">—</div>
+                        <div class="token-alpha-id" id="selected-alpha-id">ALPHA_—USDT</div>
+                    </div>
+                    <div class="token-name" id="selected-name">Виберіть Alpha токен зі списку.</div>
+                    <div class="connection-details">
+                        <div class="small-stat">
+                            <div class="small-stat-label">Stream symbol</div>
+                            <div class="small-stat-value" id="stream-symbol">—</div>
+                        </div>
+                        <div class="small-stat">
+                            <div class="small-stat-label">Depth update</div>
+                            <div class="small-stat-value" id="depth-update">—</div>
+                        </div>
+                        <div class="small-stat">
+                            <div class="small-stat-label">Остання угода</div>
+                            <div class="small-stat-value" id="last-trade">—</div>
+                        </div>
+                        <div class="small-stat">
+                            <div class="small-stat-label">Стан книги</div>
+                            <div class="small-stat-value" id="book-health">—</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="latency-box">
+                    <div class="latency-label">Data age</div>
+                    <div class="latency-value" id="data-age">—</div>
+                    <div class="latency-note" id="data-age-note">за event time</div>
+                </div>
+            </article>
+
+            <aside class="card settings-card">
+                <h2 class="section-title">⚙️ Налаштування індикаторів</h2>
+                <div class="settings-grid">
+                    <div class="setting-row">
+                        <label for="spread-threshold-input">
+                            Spread threshold, %
+                            <span class="hint">Зелений: поточний spread ≤ це значення. Жовтий: до 2×. Червоний: вище.</span>
+                        </label>
+                        <input id="spread-threshold-input" type="number" min="0" max="100" step="0.01" inputmode="decimal" value="0.20">
+                    </div>
+                    <div class="setting-row">
+                        <label for="volume-threshold-input">
+                            Volume threshold, $k / 1s
+                            <span class="hint">Зелений: торговий обсяг за rolling 1s ≥ поріг. Жовтий: від 50% порогу.</span>
+                        </label>
+                        <input id="volume-threshold-input" type="number" min="0" max="100000" step="0.1" inputmode="decimal" value="5">
+                    </div>
+                </div>
+                <div class="threshold-summary" id="threshold-summary">—</div>
+            </aside>
+        </section>
+
+        <section class="metrics-grid" aria-label="Основні метрики">
+            <article class="card metric-card">
+                <div class="metric-header">
+                    <div class="metric-title">Spread</div>
+                    <div class="indicator-chip" id="spread-indicator">WAIT</div>
+                </div>
+                <div class="metric-value" id="spread-percent">—</div>
+                <div class="metric-subvalue" id="spread-absolute">—</div>
+                <div class="metric-details">
+                    <div class="detail-cell"><div class="detail-label">Best bid</div><div class="detail-value bid-color" id="best-bid">—</div></div>
+                    <div class="detail-cell"><div class="detail-label">Best ask</div><div class="detail-value ask-color" id="best-ask">—</div></div>
+                </div>
+            </article>
+
+            <article class="card metric-card">
+                <div class="metric-header">
+                    <div class="metric-title">Trade volume / 1s</div>
+                    <div class="indicator-chip" id="volume-indicator">WAIT</div>
+                </div>
+                <div class="metric-value" id="volume-1s">—</div>
+                <div class="metric-subvalue" id="volume-1s-count">—</div>
+                <div class="metric-details">
+                    <div class="detail-cell"><div class="detail-label">Buy $/1s</div><div class="detail-value bid-color" id="buy-volume-1s">—</div></div>
+                    <div class="detail-cell"><div class="detail-label">Sell $/1s</div><div class="detail-value ask-color" id="sell-volume-1s">—</div></div>
+                </div>
+            </article>
+
+            <article class="card metric-card">
+                <div class="metric-header">
+                    <div class="metric-title">Order book liquidity</div>
+                    <div class="indicator-chip" id="liquidity-indicator">TOP 20</div>
+                </div>
+                <div class="metric-value" id="liquidity-total">—</div>
+                <div class="metric-subvalue" id="liquidity-imbalance">—</div>
+                <div class="metric-details">
+                    <div class="detail-cell"><div class="detail-label">Bid notional</div><div class="detail-value bid-color" id="bid-notional-top">—</div></div>
+                    <div class="detail-cell"><div class="detail-label">Ask notional</div><div class="detail-value ask-color" id="ask-notional-top">—</div></div>
+                </div>
+            </article>
+
+            <article class="card metric-card">
+                <div class="metric-header">
+                    <div class="metric-title">Top size</div>
+                    <div class="indicator-chip" id="top-indicator">B/A</div>
+                </div>
+                <div class="metric-value" id="top-size-ratio">—</div>
+                <div class="metric-subvalue" id="top-size-summary">—</div>
+                <div class="metric-details">
+                    <div class="detail-cell"><div class="detail-label">Bid qty</div><div class="detail-value bid-color" id="best-bid-qty">—</div></div>
+                    <div class="detail-cell"><div class="detail-label">Ask qty</div><div class="detail-value ask-color" id="best-ask-qty">—</div></div>
+                </div>
+            </article>
+        </section>
+
+        <section class="book-section">
+            <article class="card table-card">
+                <div class="table-header">
+                    <div>
+                        <div class="table-title bid-color">Bids</div>
+                        <div class="table-subtitle">найближчі 10 рівнів</div>
+                    </div>
+                    <div class="table-subtitle" id="bids-count">—</div>
+                </div>
+                <table aria-label="Bid levels">
+                    <thead><tr><th>Price</th><th>Qty</th><th>Notional</th></tr></thead>
+                    <tbody id="bids-table"><tr><td class="empty-row" colspan="3">Немає даних</td></tr></tbody>
+                </table>
+            </article>
+
+            <article class="card table-card">
+                <div class="table-header">
+                    <div>
+                        <div class="table-title ask-color">Asks</div>
+                        <div class="table-subtitle">найближчі 10 рівнів</div>
+                    </div>
+                    <div class="table-subtitle" id="asks-count">—</div>
+                </div>
+                <table aria-label="Ask levels">
+                    <thead><tr><th>Price</th><th>Qty</th><th>Notional</th></tr></thead>
+                    <tbody id="asks-table"><tr><td class="empty-row" colspan="3">Немає даних</td></tr></tbody>
+                </table>
+            </article>
+        </section>
+
+        <section class="card log-card">
+            <h2 class="section-title">🧾 Події</h2>
+            <ul class="log-list" id="log-list"></ul>
+            <div class="diagnostics-panel" aria-label="Live diagnostics">
+                <div class="diagnostics-title">Diagnostics · агреговано, без spam-логів по кожному tick</div>
+                <pre class="debug-stats" id="debug-stats">Очікування запуску...</pre>
+            </div>
+        </section>
+    </main>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+
+    function _0x507d(){const _0x47e4e0=['toUpperCase','createElement','firstUpdateId','liquidity-total','11024145ohTuQq','abort','%.\x20Volume:\x20green\x20≥\x20$','k/1s,\x20yellow\x20≥\x20$','bidNotionalTop','bids','visible','lastRejectedAt','YELLOW','stopped','asks','bidsTable','statusPill','windowMs','quote\x20source=','disabled','WebSocket\x20error\x20event','229299IejAbH','ws_message_handler','textContent','%,\x20yellow\x20≤\x20','500ms','handleMessage','byKey','ageTimer','fullName','storageKey','freeze','\x20snapshotUpdateId=','@aggTrade','searchCoin','tokenSymbol','append','updateId','buffered','\x20subscription=','websocketUrl','floor','29NBYVJz','Unknown\x20error','false','\x20·\x20','random','subscriptionId','loadSnapshot','depth\x20U/pu/u=','keyboard-active','\x20req=','inline-flex','token\x20changed','tokenListUrl','volumeIndicator','Помилка','liquidity-imbalance','isArray','dataAgeNote','trim','setItem','8yjRlWA','option','resyncs','setAttribute','sellQuote','toLocaleString','status-text','signal','liquidity-indicator','quoteReceivedAt','option-name','stale_quote','\x20token','Немає\x20даних','compact','querySelector','loadDepthSnapshot','replaceChildren','CONNECTING','empty-row','baseAsset','previousUpdateId','set','GREEN','role','buyVolume1s','tableLevels','shift','depth\x20recv/applied/rej/err=','bidQty','\x20id=','?symbol=','map','snapshotUpdateId','ask-color','onclose','div','justifyContent','title','volume1sCount','log-time','connected','sort','bid-color','\x20stream=','WebSocket\x20помилка','is-mid','show','Resumed\x20by\x20user','@fulldepth@','snapshotAbort','topLevelsForStats','asksCount','openedAt','\x20bids\x20/\x20','USDT','Не\x20вдалося\x20завантажити\x20Alpha\x20список:\x20','fullDepthUrl','prune','Escape','\x20·\x20Ask\x20','executed','askQty','closed:','hasAppliedLiveDelta','onopen','\x20buffered/replayed=','startedAt','sortedBids','selected','[Alpha\x20diagnostics]\x20','reconnectTimer','spreadAbsolute','lastTradeQty','safeSend','applied','start','Завантаження\x20fullDepth...','ALL\x20ALPHA','isBuyerMaker','input','lastLoggedAt','raw','lastResetAt','log-list','debugStats','entries','badge-new','lastTradePrice','className','valid','Resync\x20depth...','lastReceivedAt','\x20USDT','classList','appendChild','remove','msg','lastUpdateId','settings','spreadPct','replayBufferedDepth','\x20token=','\x20asks','#999','finalUpdateId','10PEdLjY','count','subscriptionStatus','scheduleReconnect','depthLimit','39407203yEhRAc','activeStreams','\x20|\x20depth\x20','filter','tradeDecimal','Alpha\x20token\x20list\x20is\x20empty','none','lastExecutedAt',';\x20suppressed\x20same=','spread','center','bids-count','no_current_quote','spread-percent','find','depth','name','ws_error','lastTradeTime','https://www.binance.com/bapi/defi/v1/public/alpha-trade/fullDepth','[STATS]\x20ws=','nearest','SUBSCRIBE','lastDeltaU','bid-notional-top','visibilityState','bestBid','replace','uk-UA','останній\x20пакет\x20','preventDefault','now','getItem','116044pTNOMk','\x20|\x20book\x20','triggerCoin','crossed_quote','CLOSED','total','Startup\x20failed:\x20','invalid_price','menuCoin','logList','aggTrade','ack\x20recv=','bad','quoteSource','alignItems','accepted','Buffered\x20depth\x20','reconnectMaxMs','bids-table','Snapshot\x20failed\x20after\x20retries','alpha_spread_volume_monitor_v1','render','reconnectAttempt','ws_send_not_open','.selected','toFixed','localeCompare','streams','onmessage','loadDepthSnapshotWithRetry','paused','ALPHA_','hasOwnProperty','selectedToken','keyboardIndex','old_update','eventTime','lastTrade','wsError','diagnosticsSummaryIntervalMs','pauseBtn','volumeThresholdInput','stale_quote_event_time','object','sequenceRejects','sessionId','slice','Imbalance\x20','threshold-summary','source','push','data-age','\x20|\x20renders\x20','code','Snapshot\x20symbol\x20mismatch','call','ALPHA_—USDT','tradeWindowMs','snapshotLoaded','gap','volume-indicator','alphaId','lastRejectedQuoteAt','connect','volume-1s-count','errors\x20total/suppressed=','spreadIndicator','diagnosticsMaxPayloadChars','true','realtime','bestAsk','handleAggTrade','getElementById','rejectedQuoteCount','wss://nbstream.binance.com/w3w/wsa/stream','readyState','volumeThresholdKUsd','trigger-coin','bid','3459256LEasIL','thresholdSummary','228MShcVZ','flex','pending','NEW','notional','stringify','volume-1s','list-coin','best-ask','items','debug-stats',',\x20old\x20','lastRejectAt','quantityPrecision','invalid_trade','aria-expanded','OPEN','depthInterval','requestSymbol',';\x20reloading\x20snapshot','unexpected_ack','closedByUser','Spread:\x20green\x20≤\x20','imbalance','lastRenderAt','status-pill','reason','topSizeSummary','NumberFormat','renderScheduled','volume1s','orderBook','\x20last=','refreshBtn','lastChild','offline','lastEventTime','size','Depth\x20','span','resync','render\x20requested/forced/executed/errors=','snapshotReady','isNew','WS\x20ACK\x20result:\x20','toLocaleTimeString','parse','Binance\x20Alpha\x20token','selected-name','Snapshot\x20loaded:\x20updateId\x20','forEach','aggTrade\x20recv/applied/rej/err=','children','fresh_quote','aria-selected','\x20sub=','startsWith','lastSummaryAt','status','\x20|\x20trades\x20','handleDepthUpdate','click','bookHealth','symbol_mismatch','depthUpdate','focus','subscribedStreams','badge\x20','Пауза\x20WebSocket','bidNotional','Відновити\x20WebSocket','top-indicator','bookTicker','&limit=','spread-threshold-input','top-size-summary','good','prototype','scrollIntoView','за\x20event\x20time','ack','lastRejectedQuoteReason','liquidityTotal','selectedRequestSymbol','uiRenderMinIntervalMs','WebSocket\x20підключення...','forced','tokens','tokenId','lastDeltaPu','RED','received','confirmed','log-message','diagnosticsTimer','Snapshot\x20failed\x20','Select','close','trades','toast','max','spread-indicator','listCoin','min','Enter','addEventListener','ws_json_parse','\x20reject=','spreadThresholdInput','SUBSCRIBE\x20sent:\x20','934239FOZhZh','asksTable','\x20(applied\x20','quoteEventTime','token','stopPropagation','ArrowUp','removeChild','Онлайн','last-trade','toLowerCase','book-health','spreadPercent','lastError','lastErrorAt','stream-symbol','keydown','SUBSCRIBE\x20confirmed:\x20','connecting','lastAppliedAt','warn','ask','WebSocket\x20is\x20not\x20open','no-store','bestBidQty','display','possible_gap','starting','liquidityImbalance','sortedAsks','add','length','spreadThresholdPct','snapshotRetryMax','visibleTokens','\x20levels','lastRequestedAt','WebSocket\x20closed\x20','askNotionalTop','Refresh\x20failed:\x20','symbol','open','Reconnect...','stats','bookTicker\x20best\x20ask\x20is\x20not\x20above\x20best\x20bid','custom-option','reset','Invalid\x20fullDepth\x20response','realtimeQuoteEventTimeToleranceMs','3589220ODRscj','handleBookTicker','[ERR]\x20','message','Виберіть\x20Alpha\x20токен\x20зі\x20списку.','refresh-btn','\x20×\x20','price','idle','pricePrecision','streamSymbol','key','wsState','\x20@\x20','.keyboard-active','dataAge','selectedSymbol','snapshotLoads','\x20lastReject=','midCoinMs','subscribeId','string','color','no_snapshot','\x20unknown=','success','en-US','qty','reduce','MID','data-age-note','Помилка\x20Alpha\x20API','snapshot#=','handleMessageSafely','ws=','resyncing','result','bookTicker\x20recv/applied/rej/err=','diagnosticsPanelIntervalMs','delete','https://www.binance.com/bapi/defi/v1/public/wallet-direct/buw/wallet/cex/alpha/all/token/list','\x20trades\x20·\x20','suppressed','bufferedReplayed','pow','error','bestAskQty','applyDelta','Storage\x20save\x20failed:\x20','silent','newCoinMs','buy-volume-1s','requested','isFinite','value','CLOSING','bookticker_crossed_quote','diagnostics','\x20staleRejects=','lastRejectReason','style','@bookTicker','reconnectBaseMs','session=','group','ws_close','Завантаження\x20токенів...','search-coin','rejected','includes','bidsCount','best-bid','Завантаження...','topSizeRatio','cexOffDisplay','errors','depthBuffer','%,\x20red\x20>\x20','selectedName','lastDeltaFinal','ws_send','data','quote','abs','selectedAlphaId','sequence_gap','unknown','join'];_0x507d=function(){return _0x47e4e0;};return _0x507d();}function _0x4962(_0x47a7a9,_0x140a04){_0x47a7a9=_0x47a7a9-0xf5;const _0x507da6=_0x507d();let _0x496282=_0x507da6[_0x47a7a9];return _0x496282;}(function(_0x1137e4,_0x2cc03c){const _0x2c564f=_0x4962,_0x11e082=_0x1137e4();while(!![]){try{const _0x12f862=-parseInt(_0x2c564f(0x25e))/0x1*(-parseInt(_0x2c564f(0x302))/0x2)+parseInt(_0x2c564f(0x1ab))/0x3*(parseInt(_0x2c564f(0x272))/0x4)+-parseInt(_0x2c564f(0x1dc))/0x5+-parseInt(_0x2c564f(0x13d))/0x6*(-parseInt(_0x2c564f(0x249))/0x7)+parseInt(_0x2c564f(0x13b))/0x8+parseInt(_0x2c564f(0x238))/0x9*(parseInt(_0x2c564f(0x2dc))/0xa)+-parseInt(_0x2c564f(0x2e1))/0xb;if(_0x12f862===_0x2cc03c)break;else _0x11e082['push'](_0x11e082['shift']());}catch(_0x3c366c){_0x11e082['push'](_0x11e082['shift']());}}}(_0x507d,0xdd7d9),((()=>{'use strict';const _0x211539=_0x4962;const _0x56852b=Object[_0x211539(0x253)]({'tokenListUrl':_0x211539(0x204),'fullDepthUrl':_0x211539(0x2f4),'websocketUrl':_0x211539(0x136),'depthLimit':0x3e8,'depthInterval':_0x211539(0x24d),'topLevelsForStats':0x14,'tableLevels':0xa,'newCoinMs':0x8*0x7*0x18*0x3c*0x3c*0x3e8,'midCoinMs':0x16d*0x18*0x3c*0x3c*0x3e8,'storageKey':_0x211539(0x100),'uiRenderMinIntervalMs':0x5a,'realtimeQuoteEventTimeToleranceMs':0x3e8,'tradeWindowMs':0x3e8,'reconnectBaseMs':0x384,'reconnectMaxMs':0x7530,'snapshotRetryMax':0x3,'diagnosticsPanelIntervalMs':0x3e8,'diagnosticsSummaryIntervalMs':0x1388,'diagnosticsErrorRepeatMs':0x2710,'diagnosticsMaxPayloadChars':0x384}),_0x566d04=Object[_0x211539(0x253)]({'spreadThresholdPct':0.2,'volumeThresholdKUsd':0x5,'selectedRequestSymbol':''}),_0x21f8ec={'triggerCoin':document[_0x211539(0x134)](_0x211539(0x139)),'menuCoin':document[_0x211539(0x134)]('menu-coin'),'searchCoin':document[_0x211539(0x134)](_0x211539(0x21f)),'listCoin':document[_0x211539(0x134)](_0x211539(0x144)),'refreshBtn':document['getElementById'](_0x211539(0x1e1)),'pauseBtn':document['getElementById']('pause-btn'),'statusPill':document[_0x211539(0x134)](_0x211539(0x156)),'statusText':document[_0x211539(0x134)](_0x211539(0x278)),'selectedSymbol':document[_0x211539(0x134)]('selected-symbol'),'selectedAlphaId':document[_0x211539(0x134)]('selected-alpha-id'),'selectedName':document['getElementById'](_0x211539(0x16d)),'streamSymbol':document[_0x211539(0x134)](_0x211539(0x1ba)),'depthUpdate':document['getElementById']('depth-update'),'lastTrade':document[_0x211539(0x134)](_0x211539(0x1b4)),'bookHealth':document['getElementById'](_0x211539(0x1b6)),'dataAge':document[_0x211539(0x134)](_0x211539(0x11f)),'dataAgeNote':document[_0x211539(0x134)](_0x211539(0x1fa)),'spreadThresholdInput':document[_0x211539(0x134)](_0x211539(0x187)),'volumeThresholdInput':document['getElementById']('volume-threshold-input'),'thresholdSummary':document[_0x211539(0x134)](_0x211539(0x11c)),'spreadIndicator':document[_0x211539(0x134)](_0x211539(0x1a2)),'volumeIndicator':document[_0x211539(0x134)](_0x211539(0x128)),'liquidityIndicator':document[_0x211539(0x134)](_0x211539(0x27a)),'topIndicator':document[_0x211539(0x134)](_0x211539(0x184)),'spreadPercent':document[_0x211539(0x134)](_0x211539(0x2ee)),'spreadAbsolute':document['getElementById']('spread-absolute'),'bestBid':document['getElementById'](_0x211539(0x223)),'bestAsk':document[_0x211539(0x134)](_0x211539(0x145)),'volume1s':document[_0x211539(0x134)](_0x211539(0x143)),'volume1sCount':document[_0x211539(0x134)](_0x211539(0x12c)),'buyVolume1s':document[_0x211539(0x134)](_0x211539(0x20f)),'sellVolume1s':document['getElementById']('sell-volume-1s'),'liquidityTotal':document[_0x211539(0x134)](_0x211539(0x237)),'liquidityImbalance':document[_0x211539(0x134)](_0x211539(0x26d)),'bidNotionalTop':document[_0x211539(0x134)](_0x211539(0x2f9)),'askNotionalTop':document['getElementById']('ask-notional-top'),'topSizeRatio':document[_0x211539(0x134)]('top-size-ratio'),'topSizeSummary':document[_0x211539(0x134)](_0x211539(0x188)),'bestBidQty':document[_0x211539(0x134)]('best-bid-qty'),'bestAskQty':document['getElementById']('best-ask-qty'),'bidsTable':document[_0x211539(0x134)](_0x211539(0xfe)),'asksTable':document[_0x211539(0x134)]('asks-table'),'bidsCount':document[_0x211539(0x134)](_0x211539(0x2ec)),'asksCount':document[_0x211539(0x134)]('asks-count'),'logList':document[_0x211539(0x134)](_0x211539(0x2c6)),'debugStats':document[_0x211539(0x134)](_0x211539(0x147)),'toast':document[_0x211539(0x134)](_0x211539(0x1a0))},_0x536626={'tokens':[],'selectedToken':null,'settings':_0x16f018(),'orderBook':null,'trades':null,'realtime':{'bid':null,'bidQty':null,'ask':null,'askQty':null,'spread':null,'spreadPct':null,'updateId':null,'quoteEventTime':null,'quoteReceivedAt':null,'quoteSource':null,'lastRejectedQuoteReason':'','lastRejectedQuoteAt':null,'rejectedQuoteCount':0x0,'lastEventTime':null,'lastTradeTime':null,'lastTradePrice':null,'lastTradeQty':null},'ui':{'keyboardIndex':-0x1,'visibleTokens':[],'paused':![],'renderScheduled':![],'lastRenderAt':0x0,'ageTimer':null,'diagnosticsTimer':null},'diagnostics':_0x48fd7f()};let _0x491fe1=null;function _0x16f018(){const _0x184253=_0x211539;try{const _0x46c50e=localStorage[_0x184253(0x301)](_0x56852b[_0x184253(0x252)]);if(!_0x46c50e)return{..._0x566d04};const _0x1378ae=JSON['parse'](_0x46c50e);return{..._0x566d04,..._0x1378ae,'spreadThresholdPct':_0x5f140a(_0x1378ae['spreadThresholdPct'],0x0,0x64,_0x566d04[_0x184253(0x1cb)]),'volumeThresholdKUsd':_0x5f140a(_0x1378ae[_0x184253(0x138)],0x0,0x186a0,_0x566d04[_0x184253(0x138)]),'selectedRequestSymbol':typeof _0x1378ae[_0x184253(0x190)]===_0x184253(0x1f1)?_0x1378ae['selectedRequestSymbol']:''};}catch{return{..._0x566d04};}}function _0x1a6283(){const _0x343307=_0x211539;try{localStorage[_0x343307(0x271)](_0x56852b[_0x343307(0x252)],JSON['stringify'](_0x536626[_0x343307(0x2d5)]));}catch(_0x52ba9f){_0x5ce003(_0x343307(0x20c)+_0x52ba9f[_0x343307(0x1df)]);}}function _0x5f140a(_0x3f71b1,_0x3a3d00,_0x58ee13,_0x5e830d){const _0x2488c6=_0x211539,_0x27e3e8=Number(_0x3f71b1);if(!Number[_0x2488c6(0x211)](_0x27e3e8))return _0x5e830d;return Math[_0x2488c6(0x1a4)](_0x58ee13,Math[_0x2488c6(0x1a1)](_0x3a3d00,_0x27e3e8));}function _0x17a8b1(){const _0x478bd0=_0x211539;return Date[_0x478bd0(0x300)]();}function _0x2c4648(_0x44591d){const _0x4c4bc7=_0x211539,_0x4a6e5e=Number(_0x44591d);return Number[_0x4c4bc7(0x211)](_0x4a6e5e)?_0x4a6e5e:null;}function _0x17eeef(_0x3ce3ee){return new Promise(_0x51a644=>setTimeout(_0x51a644,_0x3ce3ee));}function _0x32e144(){return{'received':0x0,'applied':0x0,'rejected':0x0,'errors':0x0,'lastReceivedAt':null,'lastAppliedAt':null,'lastRejectedAt':null,'lastRejectReason':''};}function _0x48fd7f(){const _0x5ae96a=_0x211539;return{'sessionId':0x0,'token':'—','requestSymbol':'—','streamSymbol':'—','wsState':_0x5ae96a(0x1e4),'subscriptionStatus':'idle','subscriptionId':null,'activeStreams':[],'startedAt':null,'lastSummaryAt':0x0,'streams':{'bookTicker':_0x32e144(),'depthUpdate':_0x32e144(),'aggTrade':_0x32e144(),'ack':_0x32e144(),'wsError':_0x32e144(),'unknown':_0x32e144()},'depth':{'snapshotLoads':0x0,'snapshotUpdateId':null,'buffered':0x0,'bufferedReplayed':0x0,'oldUpdates':0x0,'sequenceRejects':0x0,'resyncs':0x0,'lastDeltaU':null,'lastDeltaPu':null,'lastDeltaFinal':null,'lastRejectReason':'','lastRejectAt':null},'render':{'requested':0x0,'forced':0x0,'executed':0x0,'errors':0x0,'lastRequestedAt':null,'lastExecutedAt':null,'lastError':''},'errors':{'total':0x0,'suppressed':0x0,'lastErrorAt':null,'lastError':'','byKey':Object['create'](null)}};}function _0x2867f5(_0x3b6d54){const _0x4b9031=_0x211539,_0x20f92d=_0x48fd7f();_0x20f92d[_0x4b9031(0x119)]=(_0x536626[_0x4b9031(0x215)]?.['sessionId']||0x0)+0x1,_0x20f92d['token']=_0x3b6d54?.[_0x4b9031(0x1d3)]||'—',_0x20f92d['requestSymbol']=_0xdd29f(_0x3b6d54)||'—',_0x20f92d[_0x4b9031(0x1e6)]=_0x3552c4(_0x3b6d54)||'—',_0x20f92d[_0x4b9031(0x2b5)]=_0x17a8b1(),_0x536626[_0x4b9031(0x215)]=_0x20f92d,_0x3ac059();}function _0x435632(_0x30db42){const _0x1f4f56=_0x211539,_0x1e9561=_0x536626[_0x1f4f56(0x215)];if(!_0x1e9561['streams'][_0x30db42])_0x1e9561[_0x1f4f56(0x107)][_0x30db42]=_0x32e144();return _0x1e9561[_0x1f4f56(0x107)][_0x30db42];}function _0x387c32(_0x4b8578){const _0x158c09=_0x211539,_0x27e60e=_0x435632(_0x4b8578);_0x27e60e[_0x158c09(0x198)]+=0x1,_0x27e60e[_0x158c09(0x2ce)]=_0x17a8b1();}function _0x534ad5(_0x11596f){const _0x2b187a=_0x211539,_0x9c1aec=_0x435632(_0x11596f);_0x9c1aec['applied']+=0x1,_0x9c1aec[_0x2b187a(0x1be)]=_0x17a8b1();}function _0x596738(_0x4a5bc8,_0x574428,_0x95dd71={}){const _0x3c3d0d=_0x211539,_0x1b0bd8=_0x435632(_0x4a5bc8);_0x1b0bd8[_0x3c3d0d(0x220)]+=0x1,_0x1b0bd8[_0x3c3d0d(0x23f)]=_0x17a8b1(),_0x1b0bd8['lastRejectReason']=_0x574428||_0x3c3d0d(0x232);if(_0x4a5bc8===_0x3c3d0d(0x17d)){_0x536626[_0x3c3d0d(0x215)][_0x3c3d0d(0x2f0)][_0x3c3d0d(0x118)]+=_0x574428==='sequence_gap'||_0x574428===_0x3c3d0d(0x1c5)?0x1:0x0,_0x536626[_0x3c3d0d(0x215)][_0x3c3d0d(0x2f0)]['lastRejectReason']=_0x574428||_0x3c3d0d(0x232),_0x536626['diagnostics'][_0x3c3d0d(0x2f0)][_0x3c3d0d(0x149)]=_0x17a8b1();if(_0x95dd71['previousUpdateId']!==undefined)_0x536626['diagnostics'][_0x3c3d0d(0x2f0)][_0x3c3d0d(0x196)]=_0x95dd71[_0x3c3d0d(0x287)];if(_0x95dd71[_0x3c3d0d(0x236)]!==undefined)_0x536626[_0x3c3d0d(0x215)][_0x3c3d0d(0x2f0)][_0x3c3d0d(0x2f8)]=_0x95dd71[_0x3c3d0d(0x236)];if(_0x95dd71['finalUpdateId']!==undefined)_0x536626[_0x3c3d0d(0x215)]['depth']['lastDeltaFinal']=_0x95dd71[_0x3c3d0d(0x2db)];}}function _0x40e7b0(_0x4a3384){const _0x5464cb=_0x211539;_0x536626[_0x5464cb(0x215)][_0x5464cb(0x2f0)][_0x5464cb(0x2f8)]=Number(_0x4a3384?.['U'])||null,_0x536626[_0x5464cb(0x215)][_0x5464cb(0x2f0)]['lastDeltaPu']=Number(_0x4a3384?.['pu'])||null,_0x536626[_0x5464cb(0x215)][_0x5464cb(0x2f0)][_0x5464cb(0x22b)]=Number(_0x4a3384?.['u'])||null;}function _0x3bfbbe(_0x268cdc){const _0x22402a=_0x211539;try{const _0x4a5572=typeof _0x268cdc==='string'?_0x268cdc:JSON[_0x22402a(0x142)](_0x268cdc);if(!_0x4a5572)return'';return _0x4a5572['length']>_0x56852b[_0x22402a(0x12f)]?_0x4a5572['slice'](0x0,_0x56852b['diagnosticsMaxPayloadChars'])+'…':_0x4a5572;}catch{return'[unserializable\x20payload]';}}function _0x451f73(_0x127bba,_0x490323,_0x275faf=null){const _0x506711=_0x211539,_0x220ac0=_0x536626[_0x506711(0x215)],_0x4f9345=_0x17a8b1(),_0x306b2e=_0x490323?.['stack']||_0x490323?.['message']||String(_0x490323||'Unknown\x20error'),_0x24e166=String(_0x490323?.[_0x506711(0x1df)]||_0x490323||_0x506711(0x25f)),_0x112d4b=_0x220ac0[_0x506711(0x227)][_0x506711(0x24f)][_0x127bba]||{'count':0x0,'lastLoggedAt':0x0,'suppressed':0x0};_0x112d4b[_0x506711(0x2dd)]+=0x1,_0x220ac0[_0x506711(0x227)]['total']+=0x1,_0x220ac0[_0x506711(0x227)][_0x506711(0x1b9)]=_0x4f9345,_0x220ac0['errors'][_0x506711(0x1b8)]=_0x127bba+':\x20'+_0x24e166;const _0x3fe5c9=_0x112d4b[_0x506711(0x2dd)]===0x1||_0x4f9345-_0x112d4b['lastLoggedAt']>=_0x56852b['diagnosticsErrorRepeatMs'];if(_0x3fe5c9){const _0x1c1c33=_0x112d4b[_0x506711(0x206)]>0x0?_0x506711(0x2e9)+_0x112d4b[_0x506711(0x206)]:'';_0x5ce003(_0x506711(0x1de)+_0x127bba+':\x20'+_0x24e166+_0x1c1c33),console[_0x506711(0x209)](_0x506711(0x2b8)+_0x127bba,{'error':_0x306b2e,'payload':_0x3bfbbe(_0x275faf),'suppressed':_0x112d4b['suppressed']}),_0x112d4b[_0x506711(0x2c3)]=_0x4f9345,_0x112d4b['suppressed']=0x0;}else _0x112d4b[_0x506711(0x206)]+=0x1,_0x220ac0['errors'][_0x506711(0x206)]+=0x1;_0x220ac0[_0x506711(0x227)][_0x506711(0x24f)][_0x127bba]=_0x112d4b;}function _0x1c89b0(_0x4fe124){const _0x4a8bb1=_0x211539;_0x536626['diagnostics'][_0x4a8bb1(0x1e8)]=_0x4fe124,_0x3ac059();}function _0x165674(_0x339bcb,_0x5f4429={}){const _0x15d8ce=_0x211539;_0x536626[_0x15d8ce(0x215)][_0x15d8ce(0x2de)]=_0x339bcb;if(_0x5f4429['id']!==undefined)_0x536626[_0x15d8ce(0x215)]['subscriptionId']=_0x5f4429['id'];if(Array[_0x15d8ce(0x26e)](_0x5f4429[_0x15d8ce(0x107)]))_0x536626[_0x15d8ce(0x215)][_0x15d8ce(0x2e2)]=_0x5f4429[_0x15d8ce(0x107)][_0x15d8ce(0x11a)]();_0x3ac059();}function _0x2132b0(_0x123ae1){const _0x8221cf=_0x211539;if(!_0x123ae1)return _0x8221cf(0x2e7);switch(_0x123ae1[_0x8221cf(0x137)]){case WebSocket[_0x8221cf(0x284)]:return _0x8221cf(0x284);case WebSocket[_0x8221cf(0x14d)]:return _0x8221cf(0x14d);case WebSocket[_0x8221cf(0x213)]:return _0x8221cf(0x213);case WebSocket[_0x8221cf(0x306)]:return _0x8221cf(0x306);default:return String(_0x123ae1[_0x8221cf(0x137)]);}}function _0x21abc5(_0x1fad8c){const _0x4fc18c=_0x211539;if(!Number[_0x4fc18c(0x211)](_0x1fad8c)||_0x1fad8c<=0x0)return'—';const _0x185efe=Math[_0x4fc18c(0x1a1)](0x0,_0x17a8b1()-_0x1fad8c);return _0x185efe<0x3e8?Math['round'](_0x185efe)+'ms':(_0x185efe/0x3e8)['toFixed'](0x1)+'s';}function _0x3ac059(){const _0x14c60c=_0x211539;if(!_0x21f8ec[_0x14c60c(0x2c7)])return;const _0x4f8a20=_0x536626[_0x14c60c(0x215)],_0x20f29e=_0x4f8a20[_0x14c60c(0x107)][_0x14c60c(0x185)],_0x4666f5=_0x4f8a20['streams'][_0x14c60c(0x17d)],_0x9782b7=_0x4f8a20[_0x14c60c(0x107)]['aggTrade'],_0x29d583=_0x4f8a20['streams'][_0x14c60c(0x18d)],_0x8e59c1=_0x4f8a20[_0x14c60c(0x107)][_0x14c60c(0x232)],_0x262950=_0x491fe1?.['ws']?_0x2132b0(_0x491fe1['ws']):_0x4f8a20[_0x14c60c(0x1e8)];_0x21f8ec[_0x14c60c(0x2c7)][_0x14c60c(0x24b)]=[_0x14c60c(0x21b)+_0x4f8a20[_0x14c60c(0x119)]+_0x14c60c(0x2d8)+_0x4f8a20[_0x14c60c(0x1af)]+_0x14c60c(0x267)+_0x4f8a20[_0x14c60c(0x14f)]+_0x14c60c(0x29e)+_0x4f8a20[_0x14c60c(0x1e6)],_0x14c60c(0x1fe)+_0x262950+_0x14c60c(0x25b)+_0x4f8a20[_0x14c60c(0x2de)]+_0x14c60c(0x290)+(_0x4f8a20[_0x14c60c(0x263)]??'—'),'streams='+(_0x4f8a20[_0x14c60c(0x2e2)][_0x14c60c(0x1ca)]?_0x4f8a20[_0x14c60c(0x2e2)][_0x14c60c(0x233)](',\x20'):'—'),_0x14c60c(0x201)+_0x20f29e[_0x14c60c(0x198)]+'/'+_0x20f29e['applied']+'/'+_0x20f29e['rejected']+'/'+_0x20f29e['errors']+_0x14c60c(0x15d)+_0x21abc5(_0x20f29e[_0x14c60c(0x2ce)]),_0x14c60c(0x28e)+_0x4666f5['received']+'/'+_0x4666f5[_0x14c60c(0x2bd)]+'/'+_0x4666f5['rejected']+'/'+_0x4666f5['errors']+_0x14c60c(0x15d)+_0x21abc5(_0x4666f5[_0x14c60c(0x2ce)]),_0x14c60c(0x170)+_0x9782b7['received']+'/'+_0x9782b7[_0x14c60c(0x2bd)]+'/'+_0x9782b7[_0x14c60c(0x220)]+'/'+_0x9782b7['errors']+'\x20last='+_0x21abc5(_0x9782b7[_0x14c60c(0x2ce)]),_0x14c60c(0x246)+(_0x536626[_0x14c60c(0x131)][_0x14c60c(0xf9)]||'—')+'\x20updateId='+(_0x536626[_0x14c60c(0x131)][_0x14c60c(0x259)]??'—')+'\x20quoteAge='+_0x21abc5(_0x536626[_0x14c60c(0x131)]['quoteEventTime'])+'\x20recvAge='+_0x21abc5(_0x536626[_0x14c60c(0x131)][_0x14c60c(0x27b)])+_0x14c60c(0x216)+_0x536626[_0x14c60c(0x131)][_0x14c60c(0x135)]+_0x14c60c(0x1ee)+(_0x536626[_0x14c60c(0x131)][_0x14c60c(0x18e)]||'—'),_0x14c60c(0xf7)+_0x29d583[_0x14c60c(0x198)]+_0x14c60c(0x1f4)+_0x8e59c1['received'],_0x14c60c(0x1fc)+_0x4f8a20['depth']['snapshotLoads']+_0x14c60c(0x254)+(_0x4f8a20[_0x14c60c(0x2f0)][_0x14c60c(0x293)]??'—')+_0x14c60c(0x2b4)+_0x4f8a20[_0x14c60c(0x2f0)][_0x14c60c(0x25a)]+'/'+_0x4f8a20[_0x14c60c(0x2f0)][_0x14c60c(0x207)],_0x14c60c(0x265)+(_0x4f8a20[_0x14c60c(0x2f0)]['lastDeltaU']??'—')+'/'+(_0x4f8a20[_0x14c60c(0x2f0)]['lastDeltaPu']??'—')+'/'+(_0x4f8a20[_0x14c60c(0x2f0)][_0x14c60c(0x22b)]??'—')+_0x14c60c(0x1a8)+(_0x4f8a20[_0x14c60c(0x2f0)][_0x14c60c(0x217)]||'—'),_0x14c60c(0x166)+_0x4f8a20[_0x14c60c(0x101)][_0x14c60c(0x210)]+'/'+_0x4f8a20[_0x14c60c(0x101)][_0x14c60c(0x193)]+'/'+_0x4f8a20['render'][_0x14c60c(0x2af)]+'/'+_0x4f8a20[_0x14c60c(0x101)][_0x14c60c(0x227)]+_0x14c60c(0x15d)+_0x21abc5(_0x4f8a20[_0x14c60c(0x101)][_0x14c60c(0x2e8)]),_0x14c60c(0x12d)+_0x4f8a20['errors']['total']+'/'+_0x4f8a20['errors']['suppressed']+_0x14c60c(0x15d)+(_0x4f8a20['errors'][_0x14c60c(0x1b8)]||'—')][_0x14c60c(0x233)]('\x0a');}function _0x106039(_0x4f5172=![]){const _0x2bfc23=_0x211539,_0x567939=_0x536626[_0x2bfc23(0x215)],_0x358cf3=_0x17a8b1();if(!_0x4f5172&&_0x358cf3-_0x567939[_0x2bfc23(0x176)]<_0x56852b[_0x2bfc23(0x113)])return;_0x567939[_0x2bfc23(0x176)]=_0x358cf3;const _0x3402b1=_0x567939[_0x2bfc23(0x107)][_0x2bfc23(0x185)],_0x4930d2=_0x567939[_0x2bfc23(0x107)][_0x2bfc23(0x17d)],_0x17f67e=_0x567939[_0x2bfc23(0x107)][_0x2bfc23(0xf6)],_0xa7bdc5=_0x3402b1[_0x2bfc23(0x198)]||_0x4930d2[_0x2bfc23(0x198)]||_0x17f67e[_0x2bfc23(0x198)]||_0x567939[_0x2bfc23(0x227)][_0x2bfc23(0x307)]||_0x567939[_0x2bfc23(0x101)][_0x2bfc23(0x2af)];if(!_0x4f5172&&!_0xa7bdc5)return;_0x5ce003(_0x2bfc23(0x2f5)+(_0x491fe1?.['ws']?_0x2132b0(_0x491fe1['ws']):_0x567939[_0x2bfc23(0x1e8)])+_0x2bfc23(0x174)+_0x567939['subscriptionStatus']+_0x2bfc23(0x303)+_0x3402b1[_0x2bfc23(0x198)]+'/'+_0x3402b1[_0x2bfc23(0x2bd)]+'/'+_0x3402b1[_0x2bfc23(0x227)]+_0x2bfc23(0x2e3)+_0x4930d2[_0x2bfc23(0x198)]+'/'+_0x4930d2[_0x2bfc23(0x2bd)]+'/'+_0x4930d2[_0x2bfc23(0x220)]+'/'+_0x4930d2[_0x2bfc23(0x227)]+_0x2bfc23(0x178)+_0x17f67e[_0x2bfc23(0x198)]+'/'+_0x17f67e[_0x2bfc23(0x2bd)]+'/'+_0x17f67e[_0x2bfc23(0x227)]+_0x2bfc23(0x120)+_0x567939['render'][_0x2bfc23(0x2af)]);}async function _0x335f03(_0x141943,_0x4c9b5f={},_0x545750=0x2710){const _0x5422fe=_0x211539,_0x3a7909=new AbortController(),_0x2f63bd=setTimeout(()=>_0x3a7909[_0x5422fe(0x239)](),_0x545750);_0x4c9b5f[_0x5422fe(0x279)]&&_0x4c9b5f['signal'][_0x5422fe(0x1a6)](_0x5422fe(0x239),()=>_0x3a7909[_0x5422fe(0x239)](),{'once':!![]});try{const _0x329bfd=await fetch(_0x141943,{..._0x4c9b5f,'signal':_0x3a7909[_0x5422fe(0x279)],'cache':_0x5422fe(0x1c2)});if(!_0x329bfd['ok'])throw new Error('HTTP\x20'+_0x329bfd[_0x5422fe(0x177)]);return await _0x329bfd['json']();}finally{clearTimeout(_0x2f63bd);}}function _0x141bbd(_0x1d237d){const _0xb9bdbb=_0x211539;if(!Number[_0xb9bdbb(0x211)](_0x1d237d))return'—';const _0x1ed07b=Math[_0xb9bdbb(0x22f)](_0x1d237d);if(_0x1ed07b>=0x3e8)return _0x1d237d[_0xb9bdbb(0x277)](_0xb9bdbb(0x1f6),{'maximumFractionDigits':0x2});if(_0x1ed07b>=0x1)return _0x1d237d['toLocaleString']('en-US',{'minimumFractionDigits':0x2,'maximumFractionDigits':0x8});if(_0x1ed07b>=0.01)return _0x1d237d[_0xb9bdbb(0x277)](_0xb9bdbb(0x1f6),{'minimumFractionDigits':0x4,'maximumFractionDigits':0xa});return _0x1d237d['toLocaleString'](_0xb9bdbb(0x1f6),{'minimumFractionDigits':0x8,'maximumFractionDigits':0xe});}function _0x37ffd4(_0x20f6f8){const _0x56f17c=_0x211539;if(!Number['isFinite'](_0x20f6f8))return'—';if(Math[_0x56f17c(0x22f)](_0x20f6f8)>=0xf4240)return _0x275367(_0x20f6f8,0x2);if(Math[_0x56f17c(0x22f)](_0x20f6f8)>=0x3e8)return _0x20f6f8[_0x56f17c(0x277)](_0x56f17c(0x1f6),{'maximumFractionDigits':0x2});if(Math[_0x56f17c(0x22f)](_0x20f6f8)>=0x1)return _0x20f6f8['toLocaleString'](_0x56f17c(0x1f6),{'maximumFractionDigits':0x6});return _0x20f6f8['toLocaleString']('en-US',{'maximumFractionDigits':0xa});}function _0x275367(_0x37d142,_0x895711=0x2){const _0x8c669f=_0x211539;if(!Number[_0x8c669f(0x211)](_0x37d142))return'—';return Intl[_0x8c669f(0x159)](_0x8c669f(0x1f6),{'notation':_0x8c669f(0x280),'maximumFractionDigits':_0x895711})['format'](_0x37d142);}function _0x203e7e(_0x43c47f){const _0x3cec4a=_0x211539;if(!Number[_0x3cec4a(0x211)](_0x43c47f))return'—';const _0xfe15ff=Math[_0x3cec4a(0x22f)](_0x43c47f);if(_0xfe15ff>=0x3e8)return'$'+_0x275367(_0x43c47f,0x2);return'$'+_0x43c47f[_0x3cec4a(0x277)]('en-US',{'maximumFractionDigits':0x2});}function _0x482b68(_0x5eff59){const _0x1d4dd6=_0x211539;if(!Number['isFinite'](_0x5eff59))return'—';return _0x5eff59[_0x1d4dd6(0x277)]('en-US',{'minimumFractionDigits':0x3,'maximumFractionDigits':0x3})+'%';}function _0x5eae88(_0x245a6f){const _0x21ecfe=_0x211539;if(!Number[_0x21ecfe(0x211)](_0x245a6f)||_0x245a6f<=0x0)return'—';return new Date(_0x245a6f)[_0x21ecfe(0x16a)](_0x21ecfe(0x2fd),{'hour12':![]});}function _0x293562(_0x1bf047){const _0x41b3b0=_0x211539;if(_0x1bf047===null||_0x1bf047===undefined)return'';const _0x3566df=String(_0x1bf047)[_0x41b3b0(0x270)]();if(!_0x3566df)return'';return _0x3566df[_0x41b3b0(0x175)]('ALPHA_')?_0x3566df:_0x41b3b0(0x10b)+_0x3566df[_0x41b3b0(0x2fc)](/^ALPHA[_-]?/i,'');}function _0xdd29f(_0x230bf2){const _0x250698=_0x211539;return _0x230bf2?_0x230bf2[_0x250698(0x14f)]:'';}function _0x3552c4(_0x268aba){const _0x1ea43b=_0x211539;return _0xdd29f(_0x268aba)[_0x1ea43b(0x1b5)]();}function _0x9651aa(_0x35de2e){const _0x5c8808=_0x211539;return String(_0x35de2e??'')[_0x5c8808(0x2fc)](/[\u0000-\u001f\u007f]/g,'')[_0x5c8808(0x270)]();}function _0x88814e(_0x5e2d57,_0x2d6a9a){const _0x597a76=_0x211539,_0x2be446=_0x9651aa(_0x5e2d57[_0x597a76(0x1d3)]||_0x5e2d57[_0x597a76(0x286)]||_0x5e2d57[_0x597a76(0x257)]||'')['toUpperCase'](),_0x1c88d7=_0x9651aa(_0x5e2d57[_0x597a76(0x2f1)]||_0x5e2d57[_0x597a76(0x251)]||_0x2be446),_0x397065=_0x293562(_0x5e2d57[_0x597a76(0x129)]??_0x5e2d57[_0x597a76(0x195)]??_0x5e2d57['id']??_0x5e2d57['alphaTokenId']);if(!_0x2be446||!_0x397065)return null;const _0x3336d4=Number(_0x5e2d57['listingTime']||_0x5e2d57['onboardDate']||_0x5e2d57['openTime']||0x0)||0x0,_0x3a9d73=_0x3336d4>0x0?_0x17a8b1()-_0x3336d4:Infinity,_0x56c971=_0x3a9d73<_0x56852b[_0x597a76(0x20e)]?0x0:_0x3a9d73<_0x56852b[_0x597a76(0x1ef)]?0x1:0x2,_0xead9ca=Number(_0x5e2d57[_0x597a76(0x2e5)]??_0x5e2d57[_0x597a76(0x14a)]??_0x5e2d57[_0x597a76(0x1e5)]??0x8);return{'symbol':_0x2be446,'name':_0x1c88d7,'alphaId':_0x397065,'requestSymbol':_0x397065+_0x597a76(0x2a9),'listingTime':_0x3336d4,'tradeDecimal':Number[_0x597a76(0x211)](_0xead9ca)?_0xead9ca:0x8,'group':_0x56c971,'isNew':_0x56c971===0x0,'isMid':_0x56c971===0x1,'sourceIndex':_0x2d6a9a};}async function _0x5cbf8e(){const _0x176348=_0x211539;_0x11a0cc(_0x176348(0x1bd),_0x176348(0x21e)),_0x21f8ec[_0x176348(0x304)][_0x176348(0x24b)]=_0x176348(0x224);const _0x342890=await _0x335f03(_0x56852b[_0x176348(0x26a)],{},0x2ee0),_0x127b75=Array[_0x176348(0x26e)](_0x342890?.[_0x176348(0x22d)])?_0x342890[_0x176348(0x22d)]:[],_0x5440af=_0x127b75[_0x176348(0x2e4)](_0x17901c=>!_0x17901c[_0x176348(0x226)]&&!_0x17901c[_0x176348(0x160)])[_0x176348(0x292)](_0x88814e)[_0x176348(0x2e4)](Boolean)[_0x176348(0x29c)]((_0x23f7e4,_0x179bc5)=>{const _0x5dae2d=_0x176348;if(_0x23f7e4[_0x5dae2d(0x21c)]!==_0x179bc5['group'])return _0x23f7e4[_0x5dae2d(0x21c)]-_0x179bc5['group'];return _0x23f7e4[_0x5dae2d(0x1d3)][_0x5dae2d(0x106)](_0x179bc5['symbol']);});if(_0x5440af[_0x176348(0x1ca)]===0x0)throw new Error(_0x176348(0x2e6));_0x536626['tokens']=_0x5440af,_0x5ce003('Loaded\x20Alpha\x20tokens:\x20'+_0x5440af[_0x176348(0x1ca)]);const _0x5bdf41=_0x536626[_0x176348(0x2d5)][_0x176348(0x190)],_0xcb4991=_0x5440af[_0x176348(0x2ef)](_0x2c25d4=>_0x2c25d4['requestSymbol']===_0x5bdf41)||_0x5440af[0x0];await _0xdf5aa0(_0xcb4991,{'silent':!![]});}class _0x4de61a{constructor(){const _0x1a698b=_0x211539;this[_0x1a698b(0x1d9)]();}['reset'](){const _0x1da31f=_0x211539;this['bids']=new Map(),this[_0x1da31f(0x242)]=new Map(),this[_0x1da31f(0x2d4)]=0x0,this[_0x1da31f(0x161)]=null,this[_0x1da31f(0x126)]=![],this['resyncing']=![],this[_0x1da31f(0x2b2)]=![],this[_0x1da31f(0x2c5)]=_0x17a8b1();}[_0x211539(0x264)](_0x148382){const _0x46e8c2=_0x211539;this[_0x46e8c2(0x23d)]=_0x14cf18(_0x148382?.[_0x46e8c2(0x23d)]),this[_0x46e8c2(0x242)]=_0x14cf18(_0x148382?.[_0x46e8c2(0x242)]),this[_0x46e8c2(0x2d4)]=Number(_0x148382?.[_0x46e8c2(0x2d4)])||0x0,this[_0x46e8c2(0x161)]=Number(_0x148382?.['E'])||null,this[_0x46e8c2(0x126)]=!![],this[_0x46e8c2(0x1ff)]=![],this[_0x46e8c2(0x2b2)]=![],this[_0x46e8c2(0x2c5)]=_0x17a8b1();}[_0x211539(0x20b)](_0x5ec2ec){const _0xc78f57=_0x211539;if(!this[_0xc78f57(0x126)])return{'applied':![],'reason':_0xc78f57(0x1f3)};const _0x3e8bae=Number(_0x5ec2ec['U'])||null,_0x4f1ded=Number(_0x5ec2ec['u'])||null,_0x26049e=Number(_0x5ec2ec['pu'])||null;if(!_0x4f1ded)return{'applied':![],'reason':'invalid_update_id','firstUpdateId':_0x3e8bae,'finalUpdateId':_0x4f1ded,'previousUpdateId':_0x26049e};if(_0x4f1ded<=this[_0xc78f57(0x2d4)])return{'applied':![],'reason':_0xc78f57(0x10f),'firstUpdateId':_0x3e8bae,'finalUpdateId':_0x4f1ded,'previousUpdateId':_0x26049e};const _0x547612=this['lastUpdateId']+0x1;if(!this['hasAppliedLiveDelta']){const _0x19c010=_0x3e8bae&&_0x3e8bae<=_0x547612&&_0x4f1ded>=_0x547612,_0x710ca6=_0x26049e&&_0x26049e===this[_0xc78f57(0x2d4)];if(!_0x19c010&&!_0x710ca6)return{'applied':![],'reason':'sequence_gap','firstUpdateId':_0x3e8bae,'finalUpdateId':_0x4f1ded,'previousUpdateId':_0x26049e,'expected':this[_0xc78f57(0x2d4)],'bootstrap':!![]};}else{if(_0x26049e&&_0x26049e!==this['lastUpdateId'])return{'applied':![],'reason':'sequence_gap','firstUpdateId':_0x3e8bae,'finalUpdateId':_0x4f1ded,'previousUpdateId':_0x26049e,'expected':this[_0xc78f57(0x2d4)]};if(!_0x26049e&&_0x3e8bae&&_0x3e8bae>_0x547612)return{'applied':![],'reason':_0xc78f57(0x1c5),'firstUpdateId':_0x3e8bae,'finalUpdateId':_0x4f1ded,'previousUpdateId':_0x26049e,'expected':_0x547612};}return _0x3fa5fe(this[_0xc78f57(0x23d)],_0x5ec2ec['b']),_0x3fa5fe(this[_0xc78f57(0x242)],_0x5ec2ec['a']),this[_0xc78f57(0x2d4)]=_0x4f1ded,this[_0xc78f57(0x161)]=Number(_0x5ec2ec['E'])||this[_0xc78f57(0x161)],this[_0xc78f57(0x2b2)]=!![],{'applied':!![],'firstUpdateId':_0x3e8bae,'finalUpdateId':_0x4f1ded,'previousUpdateId':_0x26049e};}[_0x211539(0x1d6)](_0x44744d){const _0x12705d=_0x211539,_0x3f989e=this[_0x12705d(0x2b6)](),_0x570724=this[_0x12705d(0x1c8)](),_0x267371=_0x3f989e[0x0]||null,_0x3373a4=_0x570724[0x0]||null,_0x16ec5d=_0x3f989e[_0x12705d(0x11a)](0x0,_0x44744d),_0x1bbcc8=_0x570724['slice'](0x0,_0x44744d),_0x447f0d=_0x773057(_0x16ec5d),_0x580d79=_0x773057(_0x1bbcc8),_0x5b08f3=_0x447f0d+_0x580d79,_0x5759b6=_0x5b08f3>0x0?(_0x447f0d-_0x580d79)/_0x5b08f3:null;return{'bids':_0x3f989e,'asks':_0x570724,'bestBid':_0x267371,'bestAsk':_0x3373a4,'bidTop':_0x16ec5d,'askTop':_0x1bbcc8,'bidNotional':_0x447f0d,'askNotional':_0x580d79,'total':_0x5b08f3,'imbalance':_0x5759b6};}[_0x211539(0x2b6)](){const _0x16e497=_0x211539;return[...this[_0x16e497(0x23d)][_0x16e497(0x2c8)]()][_0x16e497(0x292)](([_0x2cb5d1,_0x44fe35])=>({'price':Number(_0x2cb5d1),'qty':Number(_0x44fe35),'notional':Number(_0x2cb5d1)*Number(_0x44fe35)}))[_0x16e497(0x2e4)](_0x21936d=>Number['isFinite'](_0x21936d[_0x16e497(0x1e3)])&&Number[_0x16e497(0x211)](_0x21936d['qty'])&&_0x21936d[_0x16e497(0x1f7)]>0x0)[_0x16e497(0x29c)]((_0x2dd651,_0xb4599)=>_0xb4599[_0x16e497(0x1e3)]-_0x2dd651[_0x16e497(0x1e3)]);}['sortedAsks'](){const _0x3bb3e2=_0x211539;return[...this['asks'][_0x3bb3e2(0x2c8)]()][_0x3bb3e2(0x292)](([_0xe7b3e6,_0x3d4a77])=>({'price':Number(_0xe7b3e6),'qty':Number(_0x3d4a77),'notional':Number(_0xe7b3e6)*Number(_0x3d4a77)}))[_0x3bb3e2(0x2e4)](_0x5cadcb=>Number[_0x3bb3e2(0x211)](_0x5cadcb[_0x3bb3e2(0x1e3)])&&Number['isFinite'](_0x5cadcb[_0x3bb3e2(0x1f7)])&&_0x5cadcb[_0x3bb3e2(0x1f7)]>0x0)['sort']((_0x2e418b,_0x15bf17)=>_0x2e418b[_0x3bb3e2(0x1e3)]-_0x15bf17[_0x3bb3e2(0x1e3)]);}}function _0x14cf18(_0x303167){const _0x2038cc=_0x211539,_0x5cf7b7=new Map();if(!Array[_0x2038cc(0x26e)](_0x303167))return _0x5cf7b7;for(const _0x1c963d of _0x303167){if(!Array['isArray'](_0x1c963d)||_0x1c963d[_0x2038cc(0x1ca)]<0x2)continue;const _0x1fd11c=String(_0x1c963d[0x0]),_0x3caaa4=String(_0x1c963d[0x1]),_0x3b0ce7=Number(_0x1fd11c),_0x4a80a3=Number(_0x3caaa4);Number[_0x2038cc(0x211)](_0x3b0ce7)&&_0x3b0ce7>0x0&&Number[_0x2038cc(0x211)](_0x4a80a3)&&_0x4a80a3>0x0&&_0x5cf7b7['set'](_0x1fd11c,_0x3caaa4);}return _0x5cf7b7;}function _0x3fa5fe(_0x28d527,_0x59dc2e){const _0x5db498=_0x211539;if(!Array['isArray'](_0x59dc2e))return;for(const _0x552e54 of _0x59dc2e){if(!Array[_0x5db498(0x26e)](_0x552e54)||_0x552e54[_0x5db498(0x1ca)]<0x2)continue;const _0x3ece5d=String(_0x552e54[0x0]),_0x219116=String(_0x552e54[0x1]),_0xb7987a=Number(_0x3ece5d),_0x2e65c9=Number(_0x219116);if(!Number[_0x5db498(0x211)](_0xb7987a)||_0xb7987a<=0x0||!Number[_0x5db498(0x211)](_0x2e65c9))continue;if(_0x2e65c9<=0x0)_0x28d527[_0x5db498(0x203)](_0x3ece5d);else _0x28d527[_0x5db498(0x288)](_0x3ece5d,_0x219116);}}function _0x773057(_0x5c22d0){const _0x5e015e=_0x211539;return _0x5c22d0[_0x5e015e(0x1f8)]((_0x7d9525,_0x57d0a4)=>_0x7d9525+_0x57d0a4[_0x5e015e(0x141)],0x0);}function _0x2aadfa(_0x5f0c7b,_0x133f76,_0x58d413,_0x16484f,_0x4c0bd4,_0x409008=null,_0x41443e=null){const _0x5072aa=_0x211539,_0x4c948c=Number(_0x133f76),_0x3ca421=Number(_0x16484f),_0xbad3ab=Number(_0x58d413),_0x3f731a=Number(_0x4c0bd4),_0x2b14d2=Number(_0x409008),_0x3414d7=Number(_0x41443e);if(!Number[_0x5072aa(0x211)](_0x4c948c)||!Number[_0x5072aa(0x211)](_0x3ca421)||_0x4c948c<=0x0||_0x3ca421<=0x0)return{'valid':![],'reason':_0x5072aa(0x309),'source':_0x5f0c7b,'raw':{'bid':_0x133f76,'ask':_0x16484f}};if(_0x3ca421<=_0x4c948c)return{'valid':![],'reason':'crossed_quote','source':_0x5f0c7b,'raw':{'bid':_0x4c948c,'bidQty':_0xbad3ab,'ask':_0x3ca421,'askQty':_0x3f731a,'updateId':_0x409008,'eventTime':_0x41443e}};const _0x7bf126=(_0x4c948c+_0x3ca421)/0x2,_0x222535=_0x3ca421-_0x4c948c,_0x314825=_0x7bf126>0x0?_0x222535/_0x7bf126*0x64:null;if(!Number[_0x5072aa(0x211)](_0x314825)||_0x314825<0x0)return{'valid':![],'reason':'invalid_spread','source':_0x5f0c7b,'raw':{'bid':_0x4c948c,'ask':_0x3ca421,'spreadPct':_0x314825}};return{'valid':!![],'source':_0x5f0c7b,'bid':_0x4c948c,'bidQty':Number[_0x5072aa(0x211)](_0xbad3ab)?_0xbad3ab:null,'ask':_0x3ca421,'askQty':Number['isFinite'](_0x3f731a)?_0x3f731a:null,'spread':_0x222535,'spreadPct':_0x314825,'updateId':Number[_0x5072aa(0x211)](_0x2b14d2)&&_0x2b14d2>0x0?_0x2b14d2:null,'eventTime':Number['isFinite'](_0x3414d7)&&_0x3414d7>0x0?_0x3414d7:null};}function _0x53ea9a(_0x1fd75e){const _0x26f2d1=_0x211539,_0x24483f=Number(_0x1fd75e);return Number[_0x26f2d1(0x211)](_0x24483f)&&_0x24483f>0x0?_0x24483f:null;}function _0x8d14e6(_0x2ade92){const _0x188913=_0x211539,_0x3915b6=_0x53ea9a(_0x2ade92);if(!_0x3915b6)return![];const _0x316ee4=_0x53ea9a(_0x536626[_0x188913(0x131)][_0x188913(0x161)])||0x0;return _0x536626[_0x188913(0x131)]['lastEventTime']=Math[_0x188913(0x1a1)](_0x316ee4,_0x3915b6),!![];}function _0x3e7bfb(_0x267812){const _0xa490c3=_0x211539;if(!_0x267812||_0x267812[_0xa490c3(0x2cc)]!==!![])return{'accepted':![],'reason':'invalid_quote'};const _0x508b1d=_0x2aadfa('currentRealtime',_0x536626[_0xa490c3(0x131)][_0xa490c3(0x13a)],_0x536626[_0xa490c3(0x131)][_0xa490c3(0x28f)],_0x536626['realtime'][_0xa490c3(0x1c0)],_0x536626[_0xa490c3(0x131)][_0xa490c3(0x2b0)],_0x536626[_0xa490c3(0x131)][_0xa490c3(0x259)],_0x536626['realtime']['quoteEventTime']);if(!_0x508b1d[_0xa490c3(0x2cc)])return{'accepted':!![],'reason':_0xa490c3(0x2ed)};const _0x520346=_0x53ea9a(_0x267812['eventTime']),_0x2b5552=_0x53ea9a(_0x536626[_0xa490c3(0x131)][_0xa490c3(0x1ae)]);if(_0x520346&&_0x2b5552){const _0x5dfc68=_0x56852b[_0xa490c3(0x1db)];if(_0x520346+_0x5dfc68<_0x2b5552)return{'accepted':![],'reason':_0xa490c3(0x116),'nextEventTime':_0x520346,'currentEventTime':_0x2b5552,'allowedSkewMs':_0x5dfc68};}const _0x3ee837=_0x53ea9a(_0x267812[_0xa490c3(0x259)]),_0x531a46=_0x53ea9a(_0x536626[_0xa490c3(0x131)][_0xa490c3(0x259)]);if(_0x3ee837&&_0x531a46&&_0x3ee837<_0x531a46){const _0x2e4d37=_0x520346&&_0x2b5552?_0x520346>_0x2b5552+_0x56852b[_0xa490c3(0x1db)]:![];if(!_0x2e4d37)return{'accepted':![],'reason':'stale_quote_update_id','nextUpdateId':_0x3ee837,'currentUpdateId':_0x531a46};}return{'accepted':!![],'reason':_0xa490c3(0x172)};}function _0x5821da(_0x13dd1b){const _0x1ca1c6=_0x211539;_0x536626[_0x1ca1c6(0x131)][_0x1ca1c6(0x135)]+=0x1,_0x536626[_0x1ca1c6(0x131)]['lastRejectedQuoteReason']=_0x13dd1b||'stale_quote',_0x536626[_0x1ca1c6(0x131)]['lastRejectedQuoteAt']=_0x17a8b1();}function _0x46d68d(){const _0x55ea22=_0x211539;if(!_0x536626[_0x55ea22(0x15c)]||!_0x536626[_0x55ea22(0x15c)]['snapshotLoaded'])return null;const _0xe7692f=_0x536626[_0x55ea22(0x15c)][_0x55ea22(0x1d6)](0x1);if(!_0xe7692f['bestBid']||!_0xe7692f[_0x55ea22(0x132)])return null;const _0xeb698d=_0x2aadfa(_0x55ea22(0x15c),_0xe7692f[_0x55ea22(0x2fb)]['price'],_0xe7692f[_0x55ea22(0x2fb)][_0x55ea22(0x1f7)],_0xe7692f['bestAsk'][_0x55ea22(0x1e3)],_0xe7692f['bestAsk'][_0x55ea22(0x1f7)],_0x536626[_0x55ea22(0x15c)]['lastUpdateId'],_0x536626[_0x55ea22(0x15c)][_0x55ea22(0x161)]);return _0xeb698d[_0x55ea22(0x2cc)]?_0xeb698d:null;}function _0x33fd25(_0x3fe882){const _0x13820e=_0x211539;if(!_0x3fe882||_0x3fe882[_0x13820e(0x2cc)]!==!![])return![];const _0x2d8f60=_0x3e7bfb(_0x3fe882);if(!_0x2d8f60[_0x13820e(0xfb)])return _0x5821da(_0x2d8f60[_0x13820e(0x157)]),![];const _0x44900d=_0x17a8b1(),_0x16e1b0=_0x53ea9a(_0x3fe882[_0x13820e(0x110)])||_0x44900d;return _0x536626[_0x13820e(0x131)][_0x13820e(0x13a)]=_0x3fe882[_0x13820e(0x13a)],_0x536626[_0x13820e(0x131)]['bidQty']=_0x3fe882[_0x13820e(0x28f)],_0x536626['realtime'][_0x13820e(0x1c0)]=_0x3fe882[_0x13820e(0x1c0)],_0x536626['realtime'][_0x13820e(0x2b0)]=_0x3fe882['askQty'],_0x536626[_0x13820e(0x131)][_0x13820e(0x2ea)]=_0x3fe882[_0x13820e(0x2ea)],_0x536626[_0x13820e(0x131)][_0x13820e(0x2d6)]=_0x3fe882[_0x13820e(0x2d6)],_0x536626[_0x13820e(0x131)][_0x13820e(0x259)]=_0x3fe882[_0x13820e(0x259)],_0x536626[_0x13820e(0x131)][_0x13820e(0x1ae)]=_0x16e1b0,_0x536626[_0x13820e(0x131)]['quoteReceivedAt']=_0x44900d,_0x536626[_0x13820e(0x131)][_0x13820e(0xf9)]=_0x3fe882[_0x13820e(0x11d)]||'unknown',_0x8d14e6(_0x16e1b0),!![];}function _0x532df5(){const _0x395111=_0x46d68d();return _0x395111?_0x33fd25(_0x395111):![];}function _0x2ab46c(){const _0x4daa80=_0x211539,_0x42da6a=_0x2aadfa(_0x4daa80(0x131),_0x536626[_0x4daa80(0x131)][_0x4daa80(0x13a)],_0x536626['realtime'][_0x4daa80(0x28f)],_0x536626[_0x4daa80(0x131)]['ask'],_0x536626[_0x4daa80(0x131)][_0x4daa80(0x2b0)],_0x536626[_0x4daa80(0x131)][_0x4daa80(0x259)],_0x536626[_0x4daa80(0x131)][_0x4daa80(0x1ae)]);if(_0x42da6a['valid'])return _0x42da6a;return _0x46d68d();}class _0x1d8d0e{constructor(_0x2d019b){const _0x3b2d57=_0x211539;this[_0x3b2d57(0x245)]=_0x2d019b,this[_0x3b2d57(0x146)]=[];}['reset'](){const _0x562392=_0x211539;this[_0x562392(0x146)]=[];}[_0x211539(0x1c9)](_0x542171){const _0x4c0223=_0x211539,_0x3f50e9=Number(_0x542171['T']||_0x542171['E']||_0x17a8b1()),_0xe4e185=Number(_0x542171['p']),_0x46849c=Number(_0x542171['q']);if(!Number[_0x4c0223(0x211)](_0x3f50e9)||!Number[_0x4c0223(0x211)](_0xe4e185)||!Number['isFinite'](_0x46849c)||_0xe4e185<=0x0||_0x46849c<=0x0)return;const _0x24f699=_0xe4e185*_0x46849c;this['items'][_0x4c0223(0x11e)]({'timestamp':_0x3f50e9,'price':_0xe4e185,'qty':_0x46849c,'quote':_0x24f699,'isBuyerMaker':Boolean(_0x542171['m'])}),this[_0x4c0223(0x2ac)](_0x17a8b1());}[_0x211539(0x2ac)](_0x3a662a){const _0x41b6d1=_0x211539,_0x6c3bb4=_0x3a662a-this[_0x41b6d1(0x245)];while(this[_0x41b6d1(0x146)][_0x41b6d1(0x1ca)]>0x0&&this[_0x41b6d1(0x146)][0x0]['timestamp']<_0x6c3bb4)this[_0x41b6d1(0x146)]['shift']();}[_0x211539(0x1d6)](){const _0x54e8ee=_0x211539;this[_0x54e8ee(0x2ac)](_0x17a8b1());let _0x1e3aa5=0x0,_0x500643=0x0,_0x5648ea=0x0;for(const _0x57bf4c of this['items']){_0x5648ea+=_0x57bf4c[_0x54e8ee(0x1f7)];if(_0x57bf4c[_0x54e8ee(0x2c1)])_0x500643+=_0x57bf4c[_0x54e8ee(0x22e)];else _0x1e3aa5+=_0x57bf4c[_0x54e8ee(0x22e)];}return{'quote':_0x1e3aa5+_0x500643,'buyQuote':_0x1e3aa5,'sellQuote':_0x500643,'qty':_0x5648ea,'count':this[_0x54e8ee(0x146)]['length']};}}function _0x37803a(){const _0xe54d46=_0x211539;!(_0x536626[_0xe54d46(0x15c)]instanceof _0x4de61a)&&(_0x536626[_0xe54d46(0x15c)]=new _0x4de61a()),!(_0x536626[_0xe54d46(0x19f)]instanceof _0x1d8d0e)&&(_0x536626[_0xe54d46(0x19f)]=new _0x1d8d0e(_0x56852b[_0xe54d46(0x125)]));}class _0x489a51{constructor(_0x15bba6){const _0xc0aea8=_0x211539;this[_0xc0aea8(0x1af)]=_0x15bba6,this['ws']=null,this[_0xc0aea8(0x152)]=![],this[_0xc0aea8(0x102)]=0x0,this[_0xc0aea8(0x2b9)]=null,this[_0xc0aea8(0x2a4)]=null,this[_0xc0aea8(0x228)]=[],this['snapshotReady']=![],this[_0xc0aea8(0x2a7)]=0x0,this['subscribeId']=null,this['subscribedStreams']=[];}[_0x211539(0x2be)](){const _0x44e6d8=_0x211539;this[_0x44e6d8(0x152)]=![],this[_0x44e6d8(0x102)]=0x0,_0x1c89b0(_0x44e6d8(0x1c6)),this[_0x44e6d8(0x12b)]();}['stop'](){const _0x14e24a=_0x211539;this[_0x14e24a(0x152)]=!![];if(this[_0x14e24a(0x2b9)])clearTimeout(this['reconnectTimer']);this[_0x14e24a(0x2b9)]=null;if(this['snapshotAbort'])this[_0x14e24a(0x2a4)][_0x14e24a(0x239)]();this[_0x14e24a(0x2a4)]=null;if(this['ws'])try{this['ws'][_0x14e24a(0x19e)](0x3e8,_0x14e24a(0x269));}catch(_0x58a6f4){_0x451f73(_0x14e24a(0x21d),_0x58a6f4);}this['ws']=null,_0x1c89b0(_0x14e24a(0x241)),_0x165674(_0x14e24a(0x241));}[_0x211539(0x12b)](){const _0x4b41f8=_0x211539;if(this['closedByUser']||_0x536626['ui']['paused'])return;_0x11a0cc(_0x4b41f8(0x1bd),_0x4b41f8(0x192));const _0x200f4f=_0x3552c4(this['token']),_0x1f35c5=_0xdd29f(this[_0x4b41f8(0x1af)]);this[_0x4b41f8(0x167)]=![],this[_0x4b41f8(0x228)]=[];try{this['ws']=new WebSocket(_0x56852b[_0x4b41f8(0x25c)]);}catch(_0x2b198f){this[_0x4b41f8(0x2df)]('WebSocket\x20init\x20error:\x20'+_0x2b198f[_0x4b41f8(0x1df)]);return;}this['ws'][_0x4b41f8(0x2b3)]=()=>{const _0x196490=_0x4b41f8;this[_0x196490(0x2a7)]=_0x17a8b1(),this['reconnectAttempt']=0x0,_0x1c89b0(_0x196490(0x1d4));const _0x463536=[_0x200f4f+_0x196490(0x219),_0x200f4f+_0x196490(0x2a3)+_0x56852b[_0x196490(0x14e)],_0x200f4f+_0x196490(0x255)];this[_0x196490(0x17f)]=_0x463536,this['subscribeId']=Date['now'](),_0x165674(_0x196490(0x13f),{'id':this[_0x196490(0x1f0)],'streams':_0x463536}),this['safeSend']({'method':_0x196490(0x2f7),'params':_0x463536,'id':this[_0x196490(0x1f0)]}),_0x5ce003(_0x196490(0x1aa)+_0x463536['join'](',\x20')),this[_0x196490(0x109)](_0x1f35c5);},this['ws'][_0x4b41f8(0x108)]=_0x573935=>this[_0x4b41f8(0x1fd)](_0x573935),this['ws']['onerror']=_0x4ba775=>{const _0x1ce103=_0x4b41f8;_0x11a0cc(_0x1ce103(0x209),_0x1ce103(0x29f)),_0x1c89b0(_0x1ce103(0x209)),_0x387c32(_0x1ce103(0x112)),_0x451f73(_0x1ce103(0x2f2),new Error(_0x1ce103(0x248)),_0x4ba775?.[_0x1ce103(0x1df)]||null);},this['ws'][_0x4b41f8(0x295)]=_0x32b427=>{const _0x3b8b50=_0x4b41f8;_0x1c89b0(_0x3b8b50(0x2b1)+_0x32b427['code']);if(this[_0x3b8b50(0x152)]||_0x536626['ui']['paused'])return;const _0xbe1188=_0x32b427[_0x3b8b50(0x157)]?'\x20('+_0x32b427[_0x3b8b50(0x157)]+')':'';this['scheduleReconnect'](_0x3b8b50(0x1d0)+_0x32b427[_0x3b8b50(0x121)]+_0xbe1188);};}[_0x211539(0x2bc)](_0x1bb2e3){const _0x5db8ef=_0x211539;if(!this['ws']||this['ws'][_0x5db8ef(0x137)]!==WebSocket['OPEN']){_0x451f73(_0x5db8ef(0x103),new Error(_0x5db8ef(0x1c1)),{'readyState':this['ws']?.['readyState'],'payload':_0x1bb2e3});return;}try{this['ws']['send'](JSON[_0x5db8ef(0x142)](_0x1bb2e3));}catch(_0xda1f73){_0x451f73(_0x5db8ef(0x22c),_0xda1f73,_0x1bb2e3);}}async[_0x211539(0x109)](_0x583686){const _0x25f93c=_0x211539;for(let _0x505124=0x1;_0x505124<=_0x56852b[_0x25f93c(0x1cc)];_0x505124++){if(this['closedByUser']||_0x536626['ui'][_0x25f93c(0x10a)])return;try{await this[_0x25f93c(0x282)](_0x583686);return;}catch(_0x3334bc){_0x5ce003(_0x25f93c(0x19c)+_0x505124+'/'+_0x56852b[_0x25f93c(0x1cc)]+':\x20'+_0x3334bc[_0x25f93c(0x1df)]);if(_0x505124===_0x56852b[_0x25f93c(0x1cc)]){this['scheduleReconnect'](_0x25f93c(0xff));return;}await _0x17eeef(0x190*_0x505124);}}}async[_0x211539(0x282)](_0x544691){const _0xb5c50f=_0x211539;_0x11a0cc('connecting',_0xb5c50f(0x2bf)),this[_0xb5c50f(0x2a4)]=new AbortController();const _0x3412e4=_0x56852b[_0xb5c50f(0x2ab)]+_0xb5c50f(0x291)+encodeURIComponent(_0x544691)+_0xb5c50f(0x186)+_0x56852b[_0xb5c50f(0x2e0)],_0x1b1575=await _0x335f03(_0x3412e4,{'signal':this[_0xb5c50f(0x2a4)][_0xb5c50f(0x279)]},0x2ee0);if(!_0x1b1575?.[_0xb5c50f(0x1f5)]||!_0x1b1575?.[_0xb5c50f(0x22d)])throw new Error(_0x1b1575?.[_0xb5c50f(0x1df)]||_0xb5c50f(0x1da));if(_0x1b1575[_0xb5c50f(0x22d)][_0xb5c50f(0x1d3)]&&_0x1b1575['data'][_0xb5c50f(0x1d3)]!==_0x544691)throw new Error(_0xb5c50f(0x122));_0x536626[_0xb5c50f(0x15c)][_0xb5c50f(0x264)](_0x1b1575[_0xb5c50f(0x22d)]),_0x532df5(),_0x536626['diagnostics'][_0xb5c50f(0x2f0)][_0xb5c50f(0x1ed)]+=0x1,_0x536626[_0xb5c50f(0x215)][_0xb5c50f(0x2f0)][_0xb5c50f(0x293)]=_0x536626[_0xb5c50f(0x15c)][_0xb5c50f(0x2d4)],this[_0xb5c50f(0x167)]=!![],this[_0xb5c50f(0x2d7)](),_0x11a0cc(_0xb5c50f(0x29b),_0xb5c50f(0x1b3)),_0x5ce003(_0xb5c50f(0x16e)+_0x536626[_0xb5c50f(0x15c)]['lastUpdateId']),_0x4c4943(!![]);}['replayBufferedDepth'](){const _0x4acdb0=_0x211539;if(!this[_0x4acdb0(0x228)][_0x4acdb0(0x1ca)])return;this[_0x4acdb0(0x228)][_0x4acdb0(0x29c)]((_0x400f7e,_0x5ecae)=>(Number(_0x400f7e['U']||_0x400f7e['u'])||0x0)-(Number(_0x5ecae['U']||_0x5ecae['u'])||0x0));const _0x3826d6=this['depthBuffer']['splice'](0x0);let _0x1daf22=0x0,_0x14a61b=0x0;for(const _0x1e84d9 of _0x3826d6){_0x40e7b0(_0x1e84d9);const _0x9e70=_0x536626[_0x4acdb0(0x15c)][_0x4acdb0(0x20b)](_0x1e84d9);if(_0x9e70[_0x4acdb0(0x2bd)])_0x1daf22+=0x1,_0x534ad5(_0x4acdb0(0x17d));else{if(_0x9e70[_0x4acdb0(0x157)]===_0x4acdb0(0x10f))_0x14a61b+=0x1,_0x536626[_0x4acdb0(0x215)][_0x4acdb0(0x2f0)]['oldUpdates']+=0x1;else{if(_0x9e70[_0x4acdb0(0x157)]===_0x4acdb0(0x231)||_0x9e70[_0x4acdb0(0x157)]===_0x4acdb0(0x1c5)){_0x596738(_0x4acdb0(0x17d),_0x9e70[_0x4acdb0(0x157)],_0x9e70),this[_0x4acdb0(0x165)](_0x4acdb0(0xfc)+_0x9e70[_0x4acdb0(0x157)]);return;}else _0x596738(_0x4acdb0(0x17d),_0x9e70[_0x4acdb0(0x157)],_0x9e70);}}}_0x536626[_0x4acdb0(0x215)][_0x4acdb0(0x2f0)][_0x4acdb0(0x207)]+=_0x3826d6[_0x4acdb0(0x1ca)];if(_0x1daf22>0x0)_0x532df5();_0x5ce003('Buffered\x20depth\x20replayed:\x20'+_0x3826d6['length']+_0x4acdb0(0x1ad)+_0x1daf22+_0x4acdb0(0x148)+_0x14a61b+')');}[_0x211539(0x1fd)](_0x48aed0){const _0x53d9e5=_0x211539;try{this[_0x53d9e5(0x24e)](_0x48aed0);}catch(_0x272b67){_0x451f73(_0x53d9e5(0x24a),_0x272b67,_0x48aed0?.[_0x53d9e5(0x22d)]);}}['handleMessage'](_0x1f68a2){const _0x2eff9c=_0x211539;let _0x2a8345;try{_0x2a8345=JSON[_0x2eff9c(0x16b)](_0x1f68a2[_0x2eff9c(0x22d)]);}catch(_0x596e9a){_0x451f73(_0x2eff9c(0x1a7),_0x596e9a,_0x1f68a2?.['data']);return;}if(_0x2a8345&&typeof _0x2a8345===_0x2eff9c(0x117)&&Object['prototype'][_0x2eff9c(0x10c)][_0x2eff9c(0x123)](_0x2a8345,'code')){_0x387c32(_0x2eff9c(0x18d)),_0x165674(_0x2eff9c(0x220),{'id':_0x2a8345['id']??this[_0x2eff9c(0x1f0)],'streams':this[_0x2eff9c(0x17f)]}),_0x451f73('ws_subscribe_rejected',new Error(_0x2a8345[_0x2eff9c(0x2d3)]||'WebSocket\x20request\x20rejected'),_0x2a8345);return;}if(Object[_0x2eff9c(0x18a)][_0x2eff9c(0x10c)][_0x2eff9c(0x123)](_0x2a8345,_0x2eff9c(0x200))){_0x387c32(_0x2eff9c(0x18d));const _0x5a6b5c=_0x2a8345['id']===this[_0x2eff9c(0x1f0)];if(_0x2a8345[_0x2eff9c(0x200)]===null&&_0x5a6b5c)_0x165674(_0x2eff9c(0x199),{'id':_0x2a8345['id'],'streams':this['subscribedStreams']}),_0x5ce003(_0x2eff9c(0x1bc)+this['subscribedStreams'][_0x2eff9c(0x233)](',\x20'));else _0x2a8345[_0x2eff9c(0x200)]!==null&&(_0x165674(_0x2eff9c(0x151),{'id':_0x2a8345['id']??this[_0x2eff9c(0x1f0)],'streams':this[_0x2eff9c(0x17f)]}),_0x5ce003(_0x2eff9c(0x169)+_0x3bfbbe(_0x2a8345)));return;}const _0x515ddc=_0x2a8345[_0x2eff9c(0x22d)]||_0x2a8345;if(!_0x515ddc||typeof _0x515ddc!==_0x2eff9c(0x117)){_0x387c32(_0x2eff9c(0x232));return;}const _0x45b0f4=_0xdd29f(this[_0x2eff9c(0x1af)]);if(_0x515ddc['s']&&_0x515ddc['s']!==_0x45b0f4){_0x596738(_0x515ddc['e']||_0x2eff9c(0x232),_0x2eff9c(0x17c),{'got':_0x515ddc['s'],'expected':_0x45b0f4});return;}if(_0x515ddc['e']===_0x2eff9c(0x185))_0x387c32(_0x2eff9c(0x185)),this[_0x2eff9c(0x1dd)](_0x515ddc);else{if(_0x515ddc['e']==='depthUpdate')_0x387c32(_0x2eff9c(0x17d)),_0x40e7b0(_0x515ddc),this[_0x2eff9c(0x179)](_0x515ddc);else _0x515ddc['e']===_0x2eff9c(0xf6)?(_0x387c32(_0x2eff9c(0xf6)),this[_0x2eff9c(0x133)](_0x515ddc)):_0x387c32(_0x2eff9c(0x232));}}[_0x211539(0x1dd)](_0x3479eb){const _0x3c0e48=_0x211539,_0x5a0925=_0x2aadfa('bookTicker',_0x3479eb['b'],_0x3479eb['B'],_0x3479eb['a'],_0x3479eb['A'],_0x3479eb['u'],_0x3479eb['E']||_0x3479eb['T']);if(!_0x5a0925[_0x3c0e48(0x2cc)]){_0x596738(_0x3c0e48(0x185),_0x5a0925[_0x3c0e48(0x157)],_0x5a0925[_0x3c0e48(0x2c4)]||{'bid':_0x3479eb['b'],'ask':_0x3479eb['a']});_0x5a0925[_0x3c0e48(0x157)]===_0x3c0e48(0x305)&&_0x451f73(_0x3c0e48(0x214),new Error(_0x3c0e48(0x1d7)),_0x5a0925[_0x3c0e48(0x2c4)]);_0x532df5()&&_0x4c4943();return;}if(!_0x33fd25(_0x5a0925)){_0x596738(_0x3c0e48(0x185),_0x536626[_0x3c0e48(0x131)][_0x3c0e48(0x18e)]||_0x3c0e48(0x27d),{'source':_0x5a0925[_0x3c0e48(0x11d)],'updateId':_0x5a0925[_0x3c0e48(0x259)],'eventTime':_0x5a0925['eventTime']});return;}_0x534ad5(_0x3c0e48(0x185)),_0x4c4943();}[_0x211539(0x179)](_0x25797d){const _0x11ea45=_0x211539;if(!this[_0x11ea45(0x167)]){this[_0x11ea45(0x228)]['push'](_0x25797d),_0x536626[_0x11ea45(0x215)][_0x11ea45(0x2f0)]['buffered']=this['depthBuffer'][_0x11ea45(0x1ca)];if(this[_0x11ea45(0x228)][_0x11ea45(0x1ca)]>0x3e8)this[_0x11ea45(0x228)][_0x11ea45(0x28d)]();return;}const _0x1f660a=_0x536626[_0x11ea45(0x15c)]['applyDelta'](_0x25797d);if(!_0x1f660a[_0x11ea45(0x2bd)]){_0x1f660a[_0x11ea45(0x157)]===_0x11ea45(0x10f)?_0x536626[_0x11ea45(0x215)][_0x11ea45(0x2f0)]['oldUpdates']+=0x1:_0x596738(_0x11ea45(0x17d),_0x1f660a[_0x11ea45(0x157)],_0x1f660a);(_0x1f660a[_0x11ea45(0x157)]===_0x11ea45(0x231)||_0x1f660a['reason']===_0x11ea45(0x1c5))&&this[_0x11ea45(0x165)](_0x11ea45(0x163)+_0x1f660a[_0x11ea45(0x157)]);return;}_0x534ad5('depthUpdate'),_0x532df5(),_0x8d14e6(_0x25797d['E']),_0x4c4943();}[_0x211539(0x133)](_0x274bbb){const _0x28d442=_0x211539,_0x4d4901=_0x536626[_0x28d442(0x19f)][_0x28d442(0x146)]['length'];_0x536626[_0x28d442(0x19f)][_0x28d442(0x1c9)](_0x274bbb);const _0x43e20e=_0x536626[_0x28d442(0x19f)][_0x28d442(0x146)][_0x28d442(0x1ca)];if(_0x43e20e===_0x4d4901){_0x596738('aggTrade',_0x28d442(0x14b),_0x274bbb);return;}const _0x2bd317=Number(_0x274bbb['p']),_0x126c03=Number(_0x274bbb['q']);_0x536626[_0x28d442(0x131)]['lastTradeTime']=Number(_0x274bbb['T']||_0x274bbb['E'])||_0x17a8b1(),_0x536626['realtime'][_0x28d442(0x2ca)]=Number['isFinite'](_0x2bd317)?_0x2bd317:_0x536626[_0x28d442(0x131)][_0x28d442(0x2ca)],_0x536626[_0x28d442(0x131)][_0x28d442(0x2bb)]=Number['isFinite'](_0x126c03)?_0x126c03:_0x536626['realtime'][_0x28d442(0x2bb)],_0x8d14e6(_0x274bbb['E']||_0x274bbb['T']),_0x534ad5(_0x28d442(0xf6)),_0x4c4943();}['resync'](_0x391755){const _0x606fb5=_0x211539;if(_0x536626[_0x606fb5(0x15c)]['resyncing'])return;_0x536626['orderBook'][_0x606fb5(0x1ff)]=!![],_0x536626[_0x606fb5(0x215)][_0x606fb5(0x2f0)][_0x606fb5(0x274)]+=0x1,_0x11a0cc(_0x606fb5(0x1bd),_0x606fb5(0x2cd)),_0x5ce003(_0x391755+_0x606fb5(0x150)),this[_0x606fb5(0x109)](_0xdd29f(this[_0x606fb5(0x1af)]));}['scheduleReconnect'](_0x2af44b){const _0x586d20=_0x211539;if(this[_0x586d20(0x152)]||_0x536626['ui']['paused'])return;_0x5ce003(_0x2af44b),_0x11a0cc(_0x586d20(0x1bd),_0x586d20(0x1d5));const _0x538b37=Math[_0x586d20(0x25d)](Math[_0x586d20(0x262)]()*0x15e),_0x438f62=Math[_0x586d20(0x1a4)](_0x56852b[_0x586d20(0xfd)],_0x56852b[_0x586d20(0x21a)]*Math[_0x586d20(0x208)](1.7,this['reconnectAttempt']))+_0x538b37;this['reconnectAttempt']+=0x1;if(this[_0x586d20(0x2b9)])clearTimeout(this['reconnectTimer']);this[_0x586d20(0x2b9)]=setTimeout(()=>this[_0x586d20(0x12b)](),_0x438f62);}}async function _0xdf5aa0(_0x4911c2,_0x279f5c={}){const _0x25a628=_0x211539;if(!_0x4911c2)return;_0x536626[_0x25a628(0x10d)]=_0x4911c2,_0x2867f5(_0x4911c2),_0x536626[_0x25a628(0x2d5)][_0x25a628(0x190)]=_0x4911c2[_0x25a628(0x14f)],_0x1a6283(),_0x25fa93(),_0x534fbc(),_0x5c6282(),_0x2ed4a8(_0x21f8ec[_0x25a628(0x256)][_0x25a628(0x212)]||'');if(_0x491fe1)_0x491fe1['stop']();_0x491fe1=new _0x489a51(_0x4911c2);if(!_0x536626['ui'][_0x25a628(0x10a)])_0x491fe1[_0x25a628(0x2be)]();if(!_0x279f5c[_0x25a628(0x20d)])_0x351a8d('Вибрано\x20'+_0x4911c2[_0x25a628(0x1d3)]+_0x25a628(0x261)+_0x4911c2['requestSymbol']);_0x4c4943(!![]);}function _0x25fa93(){const _0x2a5623=_0x211539;_0x536626['orderBook'][_0x2a5623(0x1d9)](),_0x536626[_0x2a5623(0x19f)][_0x2a5623(0x1d9)](),_0x536626['realtime']['bid']=null,_0x536626[_0x2a5623(0x131)][_0x2a5623(0x28f)]=null,_0x536626[_0x2a5623(0x131)][_0x2a5623(0x1c0)]=null,_0x536626[_0x2a5623(0x131)]['askQty']=null,_0x536626['realtime'][_0x2a5623(0x2ea)]=null,_0x536626['realtime'][_0x2a5623(0x2d6)]=null,_0x536626['realtime'][_0x2a5623(0x259)]=null,_0x536626[_0x2a5623(0x131)][_0x2a5623(0x1ae)]=null,_0x536626[_0x2a5623(0x131)]['quoteReceivedAt']=null,_0x536626[_0x2a5623(0x131)][_0x2a5623(0xf9)]=null,_0x536626[_0x2a5623(0x131)][_0x2a5623(0x18e)]='',_0x536626['realtime'][_0x2a5623(0x12a)]=null,_0x536626[_0x2a5623(0x131)][_0x2a5623(0x135)]=0x0,_0x536626['realtime']['lastEventTime']=null,_0x536626['realtime']['lastTradeTime']=null,_0x536626[_0x2a5623(0x131)][_0x2a5623(0x2ca)]=null,_0x536626[_0x2a5623(0x131)][_0x2a5623(0x2bb)]=null;}function _0x534fbc(){const _0x4178ae=_0x211539,_0x2bd839=_0x536626[_0x4178ae(0x10d)];if(!_0x2bd839){_0x21f8ec[_0x4178ae(0x1ec)]['textContent']='—',_0x21f8ec[_0x4178ae(0x230)][_0x4178ae(0x24b)]=_0x4178ae(0x124),_0x21f8ec['selectedName'][_0x4178ae(0x24b)]=_0x4178ae(0x1e0),_0x21f8ec['streamSymbol']['textContent']='—',_0x21f8ec[_0x4178ae(0x304)][_0x4178ae(0x24b)]=_0x4178ae(0x19d);return;}_0x21f8ec['selectedSymbol'][_0x4178ae(0x24b)]=_0x2bd839['symbol'],_0x21f8ec[_0x4178ae(0x230)][_0x4178ae(0x24b)]=_0x2bd839['requestSymbol'],_0x21f8ec[_0x4178ae(0x22a)][_0x4178ae(0x24b)]=_0x2bd839['name']&&_0x2bd839[_0x4178ae(0x2f1)]!==_0x2bd839[_0x4178ae(0x1d3)]?_0x2bd839[_0x4178ae(0x2f1)]:_0x4178ae(0x16c),_0x21f8ec[_0x4178ae(0x1e6)][_0x4178ae(0x24b)]=_0x3552c4(_0x2bd839),_0x21f8ec[_0x4178ae(0x304)][_0x4178ae(0x24b)]=_0x2bd839[_0x4178ae(0x1d3)],_0x21f8ec['triggerCoin'][_0x4178ae(0x298)]=_0x2bd839[_0x4178ae(0x14f)];}function _0x2ed4a8(_0x3513ca){const _0x4fb0b1=_0x211539,_0x5472f6=String(_0x3513ca||'')[_0x4fb0b1(0x270)]()['toUpperCase'](),_0x244c2d=_0x536626[_0x4fb0b1(0x194)][_0x4fb0b1(0x2e4)](_0x28d090=>{const _0x2c4c37=_0x4fb0b1;if(!_0x5472f6)return!![];return _0x28d090['symbol'][_0x2c4c37(0x221)](_0x5472f6)||_0x28d090[_0x2c4c37(0x2f1)][_0x2c4c37(0x234)]()[_0x2c4c37(0x221)](_0x5472f6)||_0x28d090[_0x2c4c37(0x14f)]['includes'](_0x5472f6);});_0x536626['ui']['visibleTokens']=_0x244c2d,_0x536626['ui'][_0x4fb0b1(0x10e)]=_0x244c2d['length']?Math[_0x4fb0b1(0x1a1)](0x0,Math[_0x4fb0b1(0x1a4)](_0x536626['ui']['keyboardIndex'],_0x244c2d['length']-0x1)):-0x1,_0x21f8ec[_0x4fb0b1(0x1a3)][_0x4fb0b1(0x283)]();if(_0x536626[_0x4fb0b1(0x194)]['length']===0x0){_0x354984(_0x4fb0b1(0x224));return;}if(_0x244c2d[_0x4fb0b1(0x1ca)]===0x0){_0x354984('No\x20results');return;}let _0x532975=null;_0x244c2d[_0x4fb0b1(0x16f)]((_0x487807,_0x4ead70)=>{const _0x54ba4d=_0x4fb0b1,_0x38af63=_0x487807['group']===0x0?_0x54ba4d(0x140):_0x487807['group']===0x1?_0x54ba4d(0x1f9):_0x54ba4d(0x2c0);if(_0x38af63!==_0x532975){_0x532975=_0x38af63;const _0x4f48a3=document[_0x54ba4d(0x235)](_0x54ba4d(0x296));_0x4f48a3[_0x54ba4d(0x2cb)]='dropdown-divider',_0x4f48a3['textContent']=_0x38af63,_0x21f8ec[_0x54ba4d(0x1a3)][_0x54ba4d(0x2d1)](_0x4f48a3);}_0x21f8ec[_0x54ba4d(0x1a3)][_0x54ba4d(0x2d1)](_0x2d45e6(_0x487807,_0x4ead70));});}function _0x2d45e6(_0x1fb2cc,_0x34c795){const _0xd3e147=_0x211539,_0x54a734=document[_0xd3e147(0x235)]('li'),_0xc8554f=[_0xd3e147(0x1d8)];if(_0x1fb2cc[_0xd3e147(0x168)])_0xc8554f['push']('is-new');if(_0x1fb2cc['isMid'])_0xc8554f[_0xd3e147(0x11e)](_0xd3e147(0x2a0));if(_0x536626['selectedToken']?.['requestSymbol']===_0x1fb2cc[_0xd3e147(0x14f)])_0xc8554f[_0xd3e147(0x11e)](_0xd3e147(0x2b7));if(_0x34c795===_0x536626['ui'][_0xd3e147(0x10e)])_0xc8554f[_0xd3e147(0x11e)](_0xd3e147(0x266));_0x54a734[_0xd3e147(0x2cb)]=_0xc8554f['join']('\x20'),_0x54a734['setAttribute'](_0xd3e147(0x28a),_0xd3e147(0x273)),_0x54a734[_0xd3e147(0x275)](_0xd3e147(0x173),_0x536626[_0xd3e147(0x10d)]?.['requestSymbol']===_0x1fb2cc[_0xd3e147(0x14f)]?_0xd3e147(0x130):'false');const _0x5a9e90=document[_0xd3e147(0x235)](_0xd3e147(0x164));_0x5a9e90[_0xd3e147(0x2cb)]='option-main';const _0x77a254=document[_0xd3e147(0x235)](_0xd3e147(0x164));_0x77a254[_0xd3e147(0x2cb)]='option-symbol',_0x77a254['textContent']=_0x1fb2cc['symbol'],_0x5a9e90[_0xd3e147(0x2d1)](_0x77a254);if(_0x1fb2cc[_0xd3e147(0x2f1)]&&_0x1fb2cc[_0xd3e147(0x2f1)]!==_0x1fb2cc[_0xd3e147(0x1d3)]){const _0x41d88c=document[_0xd3e147(0x235)](_0xd3e147(0x164));_0x41d88c['className']=_0xd3e147(0x27c),_0x41d88c['textContent']=_0x1fb2cc[_0xd3e147(0x2f1)],_0x5a9e90[_0xd3e147(0x2d1)](_0x41d88c);}_0x54a734[_0xd3e147(0x2d1)](_0x5a9e90);const _0x45f64c=document[_0xd3e147(0x235)](_0xd3e147(0x164));_0x45f64c[_0xd3e147(0x218)][_0xd3e147(0x1c4)]=_0xd3e147(0x268),_0x45f64c['style'][_0xd3e147(0xfa)]=_0xd3e147(0x2eb),_0x45f64c[_0xd3e147(0x218)][_0xd3e147(0x127)]='6px';const _0x3e885c=document[_0xd3e147(0x235)](_0xd3e147(0x164));_0x3e885c[_0xd3e147(0x2cb)]=_0xd3e147(0x27c),_0x3e885c[_0xd3e147(0x24b)]=_0x1fb2cc['alphaId'][_0xd3e147(0x2fc)](_0xd3e147(0x10b),'#'),_0x45f64c[_0xd3e147(0x2d1)](_0x3e885c);if(_0x1fb2cc[_0xd3e147(0x168)]||_0x1fb2cc['isMid']){const _0x4c7fa8=document[_0xd3e147(0x235)](_0xd3e147(0x164));_0x4c7fa8[_0xd3e147(0x2cb)]=_0xd3e147(0x180)+(_0x1fb2cc[_0xd3e147(0x168)]?_0xd3e147(0x2c9):'badge-mid'),_0x4c7fa8[_0xd3e147(0x24b)]=_0x1fb2cc[_0xd3e147(0x168)]?_0xd3e147(0x140):_0xd3e147(0x1f9),_0x45f64c[_0xd3e147(0x2d1)](_0x4c7fa8);}return _0x54a734[_0xd3e147(0x2d1)](_0x45f64c),_0x54a734[_0xd3e147(0x1a6)](_0xd3e147(0x17a),_0x5d0a7d=>{const _0x53adb3=_0xd3e147;_0x5d0a7d[_0x53adb3(0x1b0)](),_0xdf5aa0(_0x1fb2cc);}),_0x54a734;}function _0x354984(_0x5768c6){const _0x9977bf=_0x211539,_0x44a073=document['createElement']('li');_0x44a073['className']=_0x9977bf(0x1d8),_0x44a073[_0x9977bf(0x218)][_0x9977bf(0x297)]='center',_0x44a073[_0x9977bf(0x218)][_0x9977bf(0x1f2)]=_0x9977bf(0x2da),_0x44a073[_0x9977bf(0x24b)]=_0x5768c6,_0x21f8ec['listCoin']['appendChild'](_0x44a073);}function _0x47d871(){const _0x5c76d9=_0x211539;_0x21f8ec[_0x5c76d9(0x30a)][_0x5c76d9(0x218)][_0x5c76d9(0x1c4)]=_0x5c76d9(0x13e),_0x21f8ec[_0x5c76d9(0x304)][_0x5c76d9(0x275)](_0x5c76d9(0x14c),_0x5c76d9(0x130)),_0x21f8ec['searchCoin'][_0x5c76d9(0x212)]='',_0x536626['ui'][_0x5c76d9(0x10e)]=-0x1,_0x2ed4a8(''),requestAnimationFrame(()=>{const _0xfe0c1e=_0x5c76d9;_0x21f8ec['menuCoin'][_0xfe0c1e(0x2d0)]['add'](_0xfe0c1e(0x2a1)),_0x21f8ec['searchCoin'][_0xfe0c1e(0x17e)]({'preventScroll':!![]});const _0x38b7a6=_0x21f8ec[_0xfe0c1e(0x1a3)][_0xfe0c1e(0x281)](_0xfe0c1e(0x104));if(_0x38b7a6)_0x38b7a6[_0xfe0c1e(0x18b)]({'block':_0xfe0c1e(0x2eb)});});}function _0x5c6282(){const _0x362d29=_0x211539;_0x21f8ec['menuCoin'][_0x362d29(0x2d0)][_0x362d29(0x2d2)](_0x362d29(0x2a1)),_0x21f8ec[_0x362d29(0x304)]['setAttribute'](_0x362d29(0x14c),_0x362d29(0x260)),setTimeout(()=>{const _0x144e9f=_0x362d29;if(!_0x21f8ec['menuCoin'][_0x144e9f(0x2d0)]['contains'](_0x144e9f(0x2a1)))_0x21f8ec[_0x144e9f(0x30a)][_0x144e9f(0x218)]['display']=_0x144e9f(0x2e7);},0x64);}function _0x571645(){const _0x346646=_0x211539;return _0x21f8ec[_0x346646(0x30a)]['classList']['contains'](_0x346646(0x2a1));}function _0x11a0cc(_0x1d0fcf,_0x5db4fd){const _0x4b507e=_0x211539;_0x21f8ec[_0x4b507e(0x244)][_0x4b507e(0x2d0)]['remove']('connected',_0x4b507e(0x1bd),_0x4b507e(0x209)),_0x21f8ec['statusPill'][_0x4b507e(0x2d0)][_0x4b507e(0x1c9)](_0x1d0fcf),_0x21f8ec['statusText'][_0x4b507e(0x24b)]=_0x5db4fd;}function _0x525440(_0x10e07b,_0x4344cd,_0x33200a){const _0x34c424=_0x211539;_0x10e07b[_0x34c424(0x2d0)][_0x34c424(0x2d2)]('good',_0x34c424(0x1bf),_0x34c424(0xf8));if(_0x4344cd)_0x10e07b[_0x34c424(0x2d0)][_0x34c424(0x1c9)](_0x4344cd);_0x10e07b[_0x34c424(0x24b)]=_0x33200a;}function _0x4c4943(_0x14689=![]){const _0x354065=_0x211539;_0x536626[_0x354065(0x215)]['render'][_0x354065(0x210)]+=0x1,_0x536626[_0x354065(0x215)]['render'][_0x354065(0x1cf)]=_0x17a8b1();if(_0x14689){_0x536626[_0x354065(0x215)][_0x354065(0x101)][_0x354065(0x193)]+=0x1,_0x1ff39e();return;}if(_0x536626['ui'][_0x354065(0x15a)])return;_0x536626['ui'][_0x354065(0x15a)]=!![],requestAnimationFrame(()=>{const _0x4577b1=_0x354065;_0x536626['ui'][_0x4577b1(0x15a)]=![];const _0x4b6451=performance['now']()-_0x536626['ui'][_0x4577b1(0x155)];_0x4b6451<_0x56852b[_0x4577b1(0x191)]?setTimeout(_0x1ff39e,_0x56852b['uiRenderMinIntervalMs']-_0x4b6451):_0x1ff39e();});}function _0x1ff39e(){const _0x500eb6=_0x211539;try{_0x94b858();}catch(_0x51f402){_0x536626['diagnostics'][_0x500eb6(0x101)][_0x500eb6(0x227)]+=0x1,_0x536626[_0x500eb6(0x215)][_0x500eb6(0x101)]['lastError']=_0x51f402?.[_0x500eb6(0x1df)]||String(_0x51f402),_0x451f73('render',_0x51f402);}}function _0x94b858(){const _0xafe57f=_0x211539;_0x536626['ui'][_0xafe57f(0x155)]=performance[_0xafe57f(0x300)](),_0x536626[_0xafe57f(0x215)][_0xafe57f(0x101)][_0xafe57f(0x2af)]+=0x1,_0x536626[_0xafe57f(0x215)][_0xafe57f(0x101)][_0xafe57f(0x2e8)]=_0x17a8b1(),_0x534fbc(),_0x45b9cd(),_0x56626d(),_0x5be9b8(),_0x55c2c4(),_0x3a06e6(),_0x3ac059();}function _0x45b9cd(){const _0x3eae66=_0x211539,_0x39bddd=_0x536626['settings']['spreadThresholdPct'],_0x2ccda9=_0x536626[_0x3eae66(0x2d5)]['volumeThresholdKUsd'];_0x21f8ec[_0x3eae66(0x13c)][_0x3eae66(0x24b)]=_0x3eae66(0x153)+_0x39bddd[_0x3eae66(0x105)](0x2)+_0x3eae66(0x24c)+(_0x39bddd*0x2)[_0x3eae66(0x105)](0x2)+_0x3eae66(0x229)+(_0x39bddd*0x2)[_0x3eae66(0x105)](0x2)+_0x3eae66(0x23a)+_0x2ccda9[_0x3eae66(0x277)](_0x3eae66(0x1f6))+_0x3eae66(0x23b)+(_0x2ccda9/0x2)[_0x3eae66(0x277)]('en-US')+'k/1s.';}function _0x56626d(){const _0x3512d8=_0x211539,_0x2ae8f6=_0x2ab46c(),_0x5ebe81=_0x536626[_0x3512d8(0x2d5)][_0x3512d8(0x1cb)];if(!_0x2ae8f6||!Number[_0x3512d8(0x211)](_0x2ae8f6['spreadPct'])){_0x21f8ec['spreadPercent'][_0x3512d8(0x24b)]='—',_0x21f8ec[_0x3512d8(0x2ba)]['textContent']='—',_0x21f8ec[_0x3512d8(0x2fb)][_0x3512d8(0x24b)]='—',_0x21f8ec['bestAsk']['textContent']='—',_0x21f8ec['bestBidQty'][_0x3512d8(0x24b)]='—',_0x21f8ec[_0x3512d8(0x20a)][_0x3512d8(0x24b)]='—',_0x525440(_0x21f8ec[_0x3512d8(0x12e)],null,'WAIT');return;}_0x21f8ec[_0x3512d8(0x1b7)]['textContent']=_0x482b68(_0x2ae8f6[_0x3512d8(0x2d6)]),_0x21f8ec[_0x3512d8(0x2ba)][_0x3512d8(0x24b)]=_0x141bbd(_0x2ae8f6[_0x3512d8(0x2ea)])+_0x3512d8(0x2cf),_0x21f8ec[_0x3512d8(0x2fb)][_0x3512d8(0x24b)]=_0x141bbd(_0x2ae8f6['bid']),_0x21f8ec[_0x3512d8(0x132)][_0x3512d8(0x24b)]=_0x141bbd(_0x2ae8f6[_0x3512d8(0x1c0)]),_0x21f8ec[_0x3512d8(0x1c3)]['textContent']=_0x37ffd4(_0x2ae8f6[_0x3512d8(0x28f)]),_0x21f8ec[_0x3512d8(0x20a)][_0x3512d8(0x24b)]=_0x37ffd4(_0x2ae8f6[_0x3512d8(0x2b0)]);if(_0x5ebe81<=0x0)_0x525440(_0x21f8ec['spreadIndicator'],_0x3512d8(0x189),'ON');else{if(_0x2ae8f6['spreadPct']<=_0x5ebe81)_0x525440(_0x21f8ec[_0x3512d8(0x12e)],'good',_0x3512d8(0x289));else{if(_0x2ae8f6[_0x3512d8(0x2d6)]<=_0x5ebe81*0x2)_0x525440(_0x21f8ec[_0x3512d8(0x12e)],_0x3512d8(0x1bf),_0x3512d8(0x240));else _0x525440(_0x21f8ec[_0x3512d8(0x12e)],'bad','RED');}}}function _0x5be9b8(){const _0x1b3331=_0x211539,_0x5d2d5c=_0x536626['trades']['stats'](),_0x11c2a3=_0x536626['settings'][_0x1b3331(0x138)]*0x3e8;_0x21f8ec[_0x1b3331(0x15b)][_0x1b3331(0x24b)]=_0x203e7e(_0x5d2d5c[_0x1b3331(0x22e)])+'/s',_0x21f8ec[_0x1b3331(0x299)]['textContent']=_0x5d2d5c['count']+_0x1b3331(0x205)+_0x37ffd4(_0x5d2d5c[_0x1b3331(0x1f7)])+_0x1b3331(0x27e),_0x21f8ec[_0x1b3331(0x28b)][_0x1b3331(0x24b)]=_0x203e7e(_0x5d2d5c['buyQuote']),_0x21f8ec['sellVolume1s'][_0x1b3331(0x24b)]=_0x203e7e(_0x5d2d5c[_0x1b3331(0x276)]);if(_0x11c2a3<=0x0)_0x525440(_0x21f8ec[_0x1b3331(0x26b)],'good','ON');else{if(_0x5d2d5c[_0x1b3331(0x22e)]>=_0x11c2a3)_0x525440(_0x21f8ec['volumeIndicator'],_0x1b3331(0x189),_0x1b3331(0x289));else{if(_0x5d2d5c[_0x1b3331(0x22e)]>=_0x11c2a3*0.5)_0x525440(_0x21f8ec[_0x1b3331(0x26b)],_0x1b3331(0x1bf),_0x1b3331(0x240));else _0x525440(_0x21f8ec[_0x1b3331(0x26b)],_0x1b3331(0xf8),_0x1b3331(0x197));}}Number[_0x1b3331(0x211)](_0x536626['realtime'][_0x1b3331(0x2ca)])?_0x21f8ec[_0x1b3331(0x111)][_0x1b3331(0x24b)]=_0x141bbd(_0x536626[_0x1b3331(0x131)]['lastTradePrice'])+_0x1b3331(0x1e2)+_0x37ffd4(_0x536626[_0x1b3331(0x131)]['lastTradeQty'])+'\x20@\x20'+_0x5eae88(_0x536626[_0x1b3331(0x131)][_0x1b3331(0x2f3)]):_0x21f8ec['lastTrade']['textContent']='—';}function _0x55c2c4(){const _0x3518fe=_0x211539,_0x1e7f8e=_0x536626[_0x3518fe(0x15c)];if(!_0x1e7f8e['snapshotLoaded']){_0x21f8ec['liquidityTotal'][_0x3518fe(0x24b)]='—',_0x21f8ec[_0x3518fe(0x1c7)][_0x3518fe(0x24b)]='—',_0x21f8ec[_0x3518fe(0x23c)]['textContent']='—',_0x21f8ec[_0x3518fe(0x1d1)][_0x3518fe(0x24b)]='—',_0x21f8ec['topSizeRatio'][_0x3518fe(0x24b)]='—',_0x21f8ec['topSizeSummary'][_0x3518fe(0x24b)]='—',_0x21f8ec[_0x3518fe(0x17b)][_0x3518fe(0x24b)]='snapshot\x20pending',_0x21f8ec['depthUpdate']['textContent']='—',_0x13b707(_0x21f8ec[_0x3518fe(0x243)],[],'bid'),_0x13b707(_0x21f8ec[_0x3518fe(0x1ac)],[],_0x3518fe(0x1c0)),_0x21f8ec[_0x3518fe(0x222)][_0x3518fe(0x24b)]='—',_0x21f8ec[_0x3518fe(0x2a6)][_0x3518fe(0x24b)]='—';return;}const _0x53a30f=_0x1e7f8e['stats'](_0x56852b[_0x3518fe(0x2a5)]);_0x21f8ec[_0x3518fe(0x18f)][_0x3518fe(0x24b)]=_0x203e7e(_0x53a30f[_0x3518fe(0x307)]),_0x21f8ec['bidNotionalTop'][_0x3518fe(0x24b)]=_0x203e7e(_0x53a30f[_0x3518fe(0x182)]),_0x21f8ec[_0x3518fe(0x1d1)][_0x3518fe(0x24b)]=_0x203e7e(_0x53a30f['askNotional']),_0x21f8ec[_0x3518fe(0x1c7)][_0x3518fe(0x24b)]=Number[_0x3518fe(0x211)](_0x53a30f['imbalance'])?_0x3518fe(0x11b)+(_0x53a30f['imbalance']>=0x0?'+':'')+(_0x53a30f[_0x3518fe(0x154)]*0x64)[_0x3518fe(0x105)](0x1)+'%':'—';if(_0x53a30f[_0x3518fe(0x2fb)]&&_0x53a30f[_0x3518fe(0x132)]){const _0xd372b8=_0x53a30f[_0x3518fe(0x132)][_0x3518fe(0x1f7)]>0x0?_0x53a30f['bestBid']['qty']/_0x53a30f[_0x3518fe(0x132)][_0x3518fe(0x1f7)]:null;_0x21f8ec[_0x3518fe(0x225)][_0x3518fe(0x24b)]=Number[_0x3518fe(0x211)](_0xd372b8)?_0xd372b8[_0x3518fe(0x105)](0x2)+'×':'—',_0x21f8ec[_0x3518fe(0x158)][_0x3518fe(0x24b)]='Bid\x20'+_0x203e7e(_0x53a30f[_0x3518fe(0x2fb)][_0x3518fe(0x141)])+_0x3518fe(0x2ae)+_0x203e7e(_0x53a30f[_0x3518fe(0x132)][_0x3518fe(0x141)]);}else _0x21f8ec[_0x3518fe(0x225)][_0x3518fe(0x24b)]='—',_0x21f8ec[_0x3518fe(0x158)][_0x3518fe(0x24b)]='—';_0x21f8ec['bookHealth'][_0x3518fe(0x24b)]=_0x1e7f8e[_0x3518fe(0x23d)][_0x3518fe(0x162)]+_0x3518fe(0x2a8)+_0x1e7f8e['asks'][_0x3518fe(0x162)]+_0x3518fe(0x2d9),_0x21f8ec['depthUpdate'][_0x3518fe(0x24b)]=_0x1e7f8e['lastUpdateId']?_0x1e7f8e[_0x3518fe(0x2d4)]+_0x3518fe(0x1e9)+_0x5eae88(_0x1e7f8e[_0x3518fe(0x161)]):'—',_0x21f8ec[_0x3518fe(0x222)][_0x3518fe(0x24b)]=_0x1e7f8e[_0x3518fe(0x23d)][_0x3518fe(0x162)]+_0x3518fe(0x1ce),_0x21f8ec[_0x3518fe(0x2a6)]['textContent']=_0x1e7f8e['asks'][_0x3518fe(0x162)]+'\x20levels',_0x13b707(_0x21f8ec[_0x3518fe(0x243)],_0x53a30f[_0x3518fe(0x23d)][_0x3518fe(0x11a)](0x0,_0x56852b[_0x3518fe(0x28c)]),_0x3518fe(0x13a)),_0x13b707(_0x21f8ec[_0x3518fe(0x1ac)],_0x53a30f[_0x3518fe(0x242)][_0x3518fe(0x11a)](0x0,_0x56852b[_0x3518fe(0x28c)]),_0x3518fe(0x1c0));}function _0x13b707(_0x1de5c4,_0x367a3b,_0x3f111c){const _0x41fd7b=_0x211539;_0x1de5c4[_0x41fd7b(0x283)]();if(!_0x367a3b[_0x41fd7b(0x1ca)]){const _0x105425=document[_0x41fd7b(0x235)]('tr'),_0x14df8e=document['createElement']('td');_0x14df8e['colSpan']=0x3,_0x14df8e[_0x41fd7b(0x2cb)]=_0x41fd7b(0x285),_0x14df8e[_0x41fd7b(0x24b)]=_0x41fd7b(0x27f),_0x105425[_0x41fd7b(0x2d1)](_0x14df8e),_0x1de5c4[_0x41fd7b(0x2d1)](_0x105425);return;}const _0x4cf915=_0x3f111c==='bid'?_0x41fd7b(0x29d):_0x41fd7b(0x294);for(const _0x5c87ad of _0x367a3b){const _0x2608ed=document[_0x41fd7b(0x235)]('tr'),_0x2cb9a5=document[_0x41fd7b(0x235)]('td');_0x2cb9a5[_0x41fd7b(0x2cb)]=_0x4cf915,_0x2cb9a5[_0x41fd7b(0x24b)]=_0x141bbd(_0x5c87ad[_0x41fd7b(0x1e3)]);const _0x5f1e44=document[_0x41fd7b(0x235)]('td');_0x5f1e44[_0x41fd7b(0x24b)]=_0x37ffd4(_0x5c87ad['qty']);const _0x4d5baa=document[_0x41fd7b(0x235)]('td');_0x4d5baa[_0x41fd7b(0x24b)]=_0x203e7e(_0x5c87ad[_0x41fd7b(0x141)]),_0x2608ed[_0x41fd7b(0x258)](_0x2cb9a5,_0x5f1e44,_0x4d5baa),_0x1de5c4[_0x41fd7b(0x2d1)](_0x2608ed);}}function _0x3a06e6(){const _0x1ca3c2=_0x211539,_0x33cf91=_0x536626[_0x1ca3c2(0x131)][_0x1ca3c2(0x161)]||_0x536626[_0x1ca3c2(0x15c)]['lastEventTime']||_0x536626['realtime'][_0x1ca3c2(0x2f3)];if(!Number[_0x1ca3c2(0x211)](_0x33cf91)||_0x33cf91<=0x0){_0x21f8ec[_0x1ca3c2(0x1eb)][_0x1ca3c2(0x24b)]='—',_0x21f8ec[_0x1ca3c2(0x26f)]['textContent']=_0x1ca3c2(0x18c);return;}const _0x322eaf=Math[_0x1ca3c2(0x1a1)](0x0,_0x17a8b1()-_0x33cf91);_0x21f8ec[_0x1ca3c2(0x1eb)][_0x1ca3c2(0x24b)]=_0x322eaf<0x3e8?Math['round'](_0x322eaf)+'ms':(_0x322eaf/0x3e8)['toFixed'](0x1)+'s',_0x21f8ec[_0x1ca3c2(0x26f)][_0x1ca3c2(0x24b)]=_0x1ca3c2(0x2fe)+_0x5eae88(_0x33cf91);}function _0x5ce003(_0x17ff9f){const _0x46912d=_0x211539,_0x2853a3=document['createElement']('li'),_0x390d1c=document[_0x46912d(0x235)](_0x46912d(0x164));_0x390d1c['className']=_0x46912d(0x29a),_0x390d1c['textContent']=new Date()[_0x46912d(0x16a)](_0x46912d(0x2fd),{'hour12':![]});const _0x20c343=document['createElement'](_0x46912d(0x164));_0x20c343[_0x46912d(0x2cb)]=_0x46912d(0x19a),_0x20c343[_0x46912d(0x24b)]=_0x17ff9f,_0x2853a3[_0x46912d(0x258)](_0x390d1c,_0x20c343),_0x21f8ec[_0x46912d(0xf5)]['prepend'](_0x2853a3);while(_0x21f8ec[_0x46912d(0xf5)][_0x46912d(0x171)]['length']>0x50)_0x21f8ec[_0x46912d(0xf5)][_0x46912d(0x1b2)](_0x21f8ec[_0x46912d(0xf5)][_0x46912d(0x15f)]);}let _0x49e837=null;function _0x351a8d(_0x2198aa){const _0x295030=_0x211539;_0x21f8ec[_0x295030(0x1a0)][_0x295030(0x24b)]=_0x2198aa,_0x21f8ec[_0x295030(0x1a0)][_0x295030(0x2d0)][_0x295030(0x1c9)](_0x295030(0x2a1));if(_0x49e837)clearTimeout(_0x49e837);_0x49e837=setTimeout(()=>_0x21f8ec[_0x295030(0x1a0)][_0x295030(0x2d0)]['remove'](_0x295030(0x2a1)),0xa28);}function _0x1cde64(){const _0x1adc75=_0x211539;_0x21f8ec['triggerCoin'][_0x1adc75(0x1a6)]('click',_0x1a20c6=>{const _0x382090=_0x1adc75;_0x1a20c6[_0x382090(0x1b0)](),_0x571645()?_0x5c6282():_0x47d871();}),_0x21f8ec[_0x1adc75(0x304)][_0x1adc75(0x1a6)](_0x1adc75(0x1bb),_0x2f3615=>{const _0x3ca088=_0x1adc75;(_0x2f3615['key']===_0x3ca088(0x1a5)||_0x2f3615['key']==='\x20')&&(_0x2f3615[_0x3ca088(0x2ff)](),_0x47d871());}),_0x21f8ec['searchCoin'][_0x1adc75(0x1a6)]('input',_0x20bb37=>{const _0x2a761b=_0x1adc75;_0x536626['ui'][_0x2a761b(0x10e)]=0x0,_0x2ed4a8(_0x20bb37['target']['value']);}),_0x21f8ec['searchCoin']['addEventListener'](_0x1adc75(0x17a),_0xed9e0b=>_0xed9e0b[_0x1adc75(0x1b0)]()),_0x21f8ec['searchCoin'][_0x1adc75(0x1a6)]('keydown',_0x14881b=>_0x51ccfc(_0x14881b)),_0x21f8ec[_0x1adc75(0x30a)][_0x1adc75(0x1a6)](_0x1adc75(0x17a),_0x140a64=>_0x140a64[_0x1adc75(0x1b0)]()),document['addEventListener']('click',()=>_0x5c6282()),document[_0x1adc75(0x1a6)](_0x1adc75(0x1bb),_0x391241=>{const _0x4de9e9=_0x1adc75;if(_0x391241[_0x4de9e9(0x1e7)]===_0x4de9e9(0x2ad)&&_0x571645())_0x5c6282();}),_0x21f8ec[_0x1adc75(0x1a9)][_0x1adc75(0x212)]=String(_0x536626[_0x1adc75(0x2d5)][_0x1adc75(0x1cb)]),_0x21f8ec[_0x1adc75(0x115)][_0x1adc75(0x212)]=String(_0x536626[_0x1adc75(0x2d5)][_0x1adc75(0x138)]),_0x21f8ec[_0x1adc75(0x1a9)][_0x1adc75(0x1a6)]('input',()=>{const _0xf24dfc=_0x1adc75;_0x536626[_0xf24dfc(0x2d5)][_0xf24dfc(0x1cb)]=_0x5f140a(_0x21f8ec[_0xf24dfc(0x1a9)][_0xf24dfc(0x212)],0x0,0x64,_0x566d04[_0xf24dfc(0x1cb)]),_0x1a6283(),_0x4c4943(!![]);}),_0x21f8ec['volumeThresholdInput'][_0x1adc75(0x1a6)](_0x1adc75(0x2c2),()=>{const _0x490f0f=_0x1adc75;_0x536626['settings'][_0x490f0f(0x138)]=_0x5f140a(_0x21f8ec['volumeThresholdInput'][_0x490f0f(0x212)],0x0,0x186a0,_0x566d04['volumeThresholdKUsd']),_0x1a6283(),_0x4c4943(!![]);}),_0x21f8ec[_0x1adc75(0x15e)][_0x1adc75(0x1a6)]('click',async()=>{const _0x21f8d1=_0x1adc75;_0x21f8ec[_0x21f8d1(0x15e)][_0x21f8d1(0x247)]=!![];try{if(_0x491fe1)_0x491fe1['stop']();await _0x5cbf8e(),_0x351a8d('Оновлено');}catch(_0x20577e){_0x11a0cc(_0x21f8d1(0x209),'Помилка\x20оновлення'),_0x351a8d(_0x20577e[_0x21f8d1(0x1df)]),_0x5ce003(_0x21f8d1(0x1d2)+_0x20577e[_0x21f8d1(0x1df)]);}finally{_0x21f8ec['refreshBtn'][_0x21f8d1(0x247)]=![];}}),_0x21f8ec[_0x1adc75(0x114)][_0x1adc75(0x1a6)](_0x1adc75(0x17a),()=>{const _0x4a053a=_0x1adc75;_0x536626['ui'][_0x4a053a(0x10a)]=!_0x536626['ui']['paused'];if(_0x536626['ui'][_0x4a053a(0x10a)]){_0x21f8ec[_0x4a053a(0x114)][_0x4a053a(0x24b)]='▶',_0x21f8ec[_0x4a053a(0x114)][_0x4a053a(0x298)]=_0x4a053a(0x183);if(_0x491fe1)_0x491fe1['stop']();_0x11a0cc(_0x4a053a(0x1bd),'Пауза'),_0x5ce003('Paused\x20by\x20user');}else _0x21f8ec[_0x4a053a(0x114)][_0x4a053a(0x24b)]='Ⅱ',_0x21f8ec[_0x4a053a(0x114)]['title']=_0x4a053a(0x181),_0x536626['selectedToken']&&(_0x491fe1=new _0x489a51(_0x536626[_0x4a053a(0x10d)]),_0x491fe1[_0x4a053a(0x2be)]()),_0x5ce003(_0x4a053a(0x2a2));}),document[_0x1adc75(0x1a6)]('visibilitychange',()=>{const _0x4de235=_0x1adc75;document[_0x4de235(0x2fa)]===_0x4de235(0x23e)&&(_0x4c4943(!![]),!_0x536626['ui'][_0x4de235(0x10a)]&&_0x536626[_0x4de235(0x10d)]&&(!_0x491fe1||!_0x491fe1['ws']||_0x491fe1['ws'][_0x4de235(0x137)]===WebSocket[_0x4de235(0x306)])&&(_0x491fe1=new _0x489a51(_0x536626[_0x4de235(0x10d)]),_0x491fe1[_0x4de235(0x2be)]()));});}function _0x51ccfc(_0x9cb900){const _0xb679f2=_0x211539,_0x341428=_0x536626['ui'][_0xb679f2(0x1cd)];if(!_0x341428['length'])return;if(_0x9cb900[_0xb679f2(0x1e7)]==='ArrowDown')_0x9cb900[_0xb679f2(0x2ff)](),_0x536626['ui'][_0xb679f2(0x10e)]=Math[_0xb679f2(0x1a4)](_0x341428[_0xb679f2(0x1ca)]-0x1,_0x536626['ui'][_0xb679f2(0x10e)]+0x1),_0x2ed4a8(_0x21f8ec[_0xb679f2(0x256)][_0xb679f2(0x212)]),_0x23dc86();else{if(_0x9cb900['key']===_0xb679f2(0x1b1))_0x9cb900[_0xb679f2(0x2ff)](),_0x536626['ui'][_0xb679f2(0x10e)]=Math['max'](0x0,_0x536626['ui'][_0xb679f2(0x10e)]-0x1),_0x2ed4a8(_0x21f8ec[_0xb679f2(0x256)][_0xb679f2(0x212)]),_0x23dc86();else{if(_0x9cb900['key']===_0xb679f2(0x1a5)){_0x9cb900['preventDefault']();const _0x1a27ba=_0x341428[_0x536626['ui'][_0xb679f2(0x10e)]>=0x0?_0x536626['ui'][_0xb679f2(0x10e)]:0x0];if(_0x1a27ba)_0xdf5aa0(_0x1a27ba);}else _0x9cb900[_0xb679f2(0x1e7)]===_0xb679f2(0x2ad)&&(_0x9cb900[_0xb679f2(0x2ff)](),_0x5c6282(),_0x21f8ec[_0xb679f2(0x304)][_0xb679f2(0x17e)]({'preventScroll':!![]}));}}}function _0x23dc86(){const _0x4936ef=_0x211539,_0x3f0fc9=_0x21f8ec[_0x4936ef(0x1a3)][_0x4936ef(0x281)](_0x4936ef(0x1ea));if(_0x3f0fc9)_0x3f0fc9[_0x4936ef(0x18b)]({'block':_0x4936ef(0x2f6)});}async function _0x4cf0b5(){const _0x3776a6=_0x211539;_0x37803a(),_0x1cde64(),_0x45b9cd(),_0x536626['ui'][_0x3776a6(0x250)]=setInterval(()=>{const _0x58e50a=_0x3776a6;_0x536626[_0x58e50a(0x19f)][_0x58e50a(0x2ac)](_0x17a8b1()),_0x5be9b8(),_0x3a06e6();},0xfa),_0x536626['ui'][_0x3776a6(0x19b)]=setInterval(()=>{_0x3ac059(),_0x106039();},_0x56852b[_0x3776a6(0x202)]);try{await _0x5cbf8e();}catch(_0x5c85d9){_0x11a0cc(_0x3776a6(0x209),_0x3776a6(0x1fb)),_0x21f8ec['triggerCoin'][_0x3776a6(0x24b)]=_0x3776a6(0x26c),_0x351a8d(_0x3776a6(0x2aa)+_0x5c85d9['message']),_0x5ce003(_0x3776a6(0x308)+_0x5c85d9[_0x3776a6(0x1df)]);}_0x4c4943(!![]);}_0x4cf0b5();})()));
+</script>
+</body>
+</html>
