@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Npoint Basket Manager</title>
+    <style>
+        :root {
+            --bg: #121212; --bg-card: #1e1e1e; --text: #e0e0e0;
+            --primary: #bb86fc; --primary-hover: #9c64e8;
+            --danger: #cf6679; --success: #03dac6;
+            --border: #333; --input-bg: #2c2c2c;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .card { background: var(--bg-card); border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); border: 1px solid var(--border); }
+        h1, h2, h3 { margin-bottom: 15px; color: #fff; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-size: 0.9em; color: #aaa; }
+        input[type="text"], input[type="password"], select { width: 100%; padding: 10px; border-radius: 4px; border: 1px solid var(--border); background: var(--input-bg); color: var(--text); font-size: 1em; }
+        button { padding: 10px 15px; border: none; border-radius: 4px; font-size: 1em; cursor: pointer; transition: 0.2s; background: var(--primary); color: #000; font-weight: bold; }
+        button:hover { background: var(--primary-hover); }
+        button.danger { background: var(--danger); color: #fff; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .flex-row { display: flex; gap: 15px; align-items: center; }
+        .flex-row > * { flex: 1; }
+        .checkbox-group { display: flex; gap: 15px; align-items: center; background: var(--input-bg); padding: 10px; border-radius: 4px; }
+        .checkbox-group label { margin: 0; display: flex; align-items: center; gap: 5px; cursor: pointer; color: var(--text); }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: #252525; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8em; background: #333; }
+        
+        .loader { display: none; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .hidden { display: none !important; }
+        #notification { position: fixed; top: 20px; right: 20px; padding: 15px 20px; border-radius: 4px; background: var(--primary); color: #000; font-weight: bold; transform: translateX(150%); transition: transform 0.3s ease-out; z-index: 1000; }
+        #notification.show { transform: translateX(0); }
+        #notification.error { background: var(--danger); color: white; }
+
+        .heartbeat-card { border: 1px solid var(--success); background: rgba(3, 218, 198, 0.05); }
+    </style>
+</head>
+<body>
+
+<div id="notification"></div>
+
+<div class="container">
+    <!-- Секція підключення -->
+    <div id="authSection" class="card">
+        <h2>Підключення API (npoint.io)</h2>
+        <form id="authForm">
+            <div class="form-group">
+                <label for="npointCodeInput">Код npoint</label>
+                <input type="password" id="npointCodeInput" placeholder="Напр. 96e51c8cb67681969093" autocomplete="off" inputmode="latin" spellcheck="false">
+                <small id="endpointPreview" style="display: block; margin-top: 6px; color: #aaa; word-break: break-all;">Endpoint буде сформовано автоматично після введення коду.</small>
+            </div>
+            <div class="flex-row">
+                <button type="submit" id="authBtn" style="flex: none;">Повторно підключитися</button>
+                <button type="button" id="resetAuthBtn" class="danger hidden" style="flex: none;">Скинути налаштування</button>
+                <div class="loader" id="authLoader"></div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Основний інтерфейс (прихований до авторизації) -->
+    <div id="mainSection" class="hidden">
+        
+        <!-- Керування HEARTBEAT -->
+        <div class="card heartbeat-card">
+            <h3>Системний токен: HEARTBEAT</h3>
+            <div class="flex-row">
+                <div>
+                    <label>Статус</label>
+                    <select id="hbStatus">
+                        <option value="disabled">Вимкнено</option>
+                        <option value="enabled">Увімкнено</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Timeframe</label>
+                    <select id="hbTimeframe">
+                        <!-- Заповнюється через JS -->
+                    </select>
+                </div>
+                <div style="display: flex; align-items: flex-end; padding-bottom: 2px;">
+                    <button id="saveHbBtn" style="width: 100%;">Зберегти Heartbeat</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Додавання нового токена -->
+        <div class="card">
+            <h3>Додати новий токен</h3>
+            <form id="addTokenForm" class="flex-row" style="flex-wrap: wrap;">
+                <div class="form-group" style="flex: 1 1 20%;">
+                    <label>Coin Symbol</label>
+                    <input type="text" id="coinInput" placeholder="Напр. PRL" required>
+                </div>
+                <div class="form-group" style="flex: 1 1 20%;">
+                    <label>Timeframe</label>
+                    <select id="timeframeInput"></select>
+                </div>
+                <div class="form-group" style="flex: 1 1 20%;">
+                    <label>Market</label>
+                    <select id="marketInput">
+                        <option value="spot">spot</option>
+                        <option value="futures">futures</option>
+                        <option value="alpha">alpha</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 1 1 30%;">
+                    <label>Indicator (BB, SM, V, HM)</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" id="indBB"> BB</label>
+                        <label><input type="checkbox" id="indSM" checked> SM</label>
+                        <label><input type="checkbox" id="indV"> V</label>
+                        <label><input type="checkbox" id="indHM"> HM</label>
+                    </div>
+                </div>
+                <div class="form-group" style="flex: 1 1 100%; display: flex; justify-content: flex-end;">
+                    <button type="submit">Додати токен</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Список токенів -->
+        <div class="card">
+            <div class="flex-row" style="justify-content: space-between; margin-bottom: 15px;">
+                <h3 style="margin:0;">Поточні монети в управлінні</h3>
+                <button id="refreshBtn" style="flex:none; background: #333; color: white;">Оновити дані</button>
+            </div>
+            <div style="overflow-x: auto;">
+                <table id="tokensTable">
+                    <thead>
+                        <tr>
+                            <th>Coin</th>
+                            <th>Timeframe</th>
+                            <th>Market</th>
+                            <th>Indicator</th>
+                            <th>Дії</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Рендеринг через JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    const _0x13d2e8=_0xa4a2;(function(_0x293758,_0x442540){const _0x58c7c5=_0xa4a2,_0x13e0f2=_0x293758();while(!![]){try{const _0x4e3c55=parseInt(_0x58c7c5(0x149))/0x1*(-parseInt(_0x58c7c5(0xde))/0x2)+parseInt(_0x58c7c5(0x180))/0x3+parseInt(_0x58c7c5(0x181))/0x4*(-parseInt(_0x58c7c5(0x172))/0x5)+parseInt(_0x58c7c5(0x16f))/0x6*(parseInt(_0x58c7c5(0x182))/0x7)+-parseInt(_0x58c7c5(0x178))/0x8+-parseInt(_0x58c7c5(0x133))/0x9*(-parseInt(_0x58c7c5(0xf2))/0xa)+parseInt(_0x58c7c5(0x109))/0xb*(parseInt(_0x58c7c5(0xf5))/0xc);if(_0x4e3c55===_0x442540)break;else _0x13e0f2['push'](_0x13e0f2['shift']());}catch(_0x2e202e){_0x13e0f2['push'](_0x13e0f2['shift']());}}}(_0x24a6,0x8006b));function _0xa4a2(_0x1a3da9,_0xbdc738){_0x1a3da9=_0x1a3da9-0xd2;const _0x24a6f0=_0x24a6();let _0xa4a2de=_0x24a6f0[_0x1a3da9];return _0xa4a2de;}function _0x24a6(){const _0xbaf3d0=['checkExistingAuth','add','filter','querySelector','63594DpcSWj','currentBasket','mainSection','&quot;','cookie','forEach','toggleLoader','preventDefault','test','addEventListener','updateEndpointPreview','show\x20error','loadData','addTokenForm','([+-])','changed','requestJson','items','location','getElementById','toString','object','26330mDjtNQ','createEmptyBasket','&amp;','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td><strong>','npointAccessCode','setAccessCode','timeframeInput','getBasket','shouldPersist','BASE_URL','COOKIE_NAME','split','renderData','classList','https:','value','timeframes',';\x20Secure','hidden','match','Код\x20npoint\x20має\x20містити\x20лише\x20hex-символи\x20a-f,\x200-9\x20та\x20бути\x20довжиною\x20від\x208\x20до\x20128\x20символів.','indSM','api','reset','baseUrl','readCookie','npointCodeInput','coinInput','clearAccessCode','Успішно\x20підключено\x20до\x20npoint\x20API','innerHTML','accessCode','placeholder','indV','#tokensTable\x20tbody','handleAuth','hasOwnProperty','button','6mRJcZV','Повторно\x20підключитися','trim','1089730jPkjkB','remove','saveHbBtn','#cf6679','parse','notification','3071600CVOgWU','hbTimeframe','display','Для\x20HEARTBEAT\x20використовуйте\x20спеціальну\x20панель\x20вище','normalizeAccessCode','application/json','headers','spot','2639901rbUyQw','8bSAUHv','1549177asbzGa','futures','replace','escapeHtml','prototype','click','</option>','resolveAccessCodeForAuth','indicator','indBB','findIndex','</strong></td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td><span\x20class=\x22badge\x22>','saveHeartbeat','12h','no-store','showNotification','validateBasketShape','Базовий\x20JSON\x20npoint\x20перезаписано\x20у\x20формат\x20корзини','coin','timeframe','map','marketInput','46rsAfrP','string','Збережений\x20код\x20npoint\x20видалено\x20з\x20cookie','https://api.npoint.io/','enabled','&gt;','Токен\x20додано/оновлено','checked','ACCESS_CODE_PATTERN','syncWithApi','30m','&lt;','market','has','normalizeIndicatorString','input','unshift','submit','startsWith','Код\x20уже\x20збережено\x20у\x20cookie','1030QRzfVW','</span></td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td><span\x20class=\x22badge\x22\x20style=\x22background:\x20','Помилка\x20завантаження\x20даних','12KSqDcy','Видалити\x20цю\x20монету?','isBaseServicePayload','COOKIE_MAX_AGE_SECONDS','Спочатку\x20підключіться\x20до\x20npoint\x20API.','Підключитися','stringify','updateBasket','deleteToken','Endpoint:\x20',';\x20color:\x20#000;\x22>','disabled','handleAddToken','resetAuth','join','toUpperCase','createElement','</span></td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22danger\x22\x20style=\x22padding:\x205px\x2010px;\x20font-size:\x200.8em;\x22\x20onclick=\x22app.deleteToken(','buildIndicatorString','Напр.\x2096e51c8cb67681969093','1328261VuIKyv','Не\x20вдалося\x20зберегти\x20код\x20npoint\x20у\x20cookie.\x20Перевірте,\x20чи\x20браузер\x20дозволяє\x20cookie\x20для\x20цієї\x20сторінки.','textContent','keys','className','normalizeBasketItems','querySelectorAll',')\x22>Видалити</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','authLoader','authBtn','[object\x20Object]','length','initUI','isPlainObject','basket','buildEndpointFromCode','call','Поле\x20items\x20у\x20npoint\x20має\x20бути\x20масивом.\x20Перезапис\x20скасовано,\x20щоб\x20не\x20втратити\x20дані.','JSON\x20у\x20npoint\x20не\x20містить\x20поля\x20items.\x20Перезапис\x20скасовано,\x20бо\x20документ\x20не\x20схожий\x20на\x20базовий\x20порожній\x20шаблон.','Налаштування\x20HEARTBEAT\x20збережено','push','JSON\x20у\x20npoint\x20має\x20неочікуваний\x20формат.\x20Перезапис\x20скасовано,\x20щоб\x20не\x20втратити\x20дані.','status','indHM','text','message',';\x20Path=/;\x20SameSite=Lax','isArray','hbStatus','Дані\x20оновлено','getAccessCode','toLowerCase','POST','show','Помилка\x20збереження','resetAuthBtn','=;\x20Max-Age=0;\x20Path=/;\x20SameSite=Lax','HEARTBEAT_COIN'];_0x24a6=function(){return _0xbaf3d0;};return _0x24a6();}class NpointAPI{static [_0x13d2e8(0x152)]=_0x13d2e8(0xe1);static [_0x13d2e8(0xe6)]=/^[a-f0-9]{8,128}$/i;static[_0x13d2e8(0x17c)](_0x357417){const _0x5e04da=_0x13d2e8,_0x3a9ee6=String(_0x357417||'')[_0x5e04da(0x171)]();if(!NpointAPI['ACCESS_CODE_PATTERN'][_0x5e04da(0x13b)](_0x3a9ee6))throw new Error(_0x5e04da(0x15d));return _0x3a9ee6['toLowerCase']();}static['buildEndpointFromCode'](_0x2be344){const _0x2e91f8=_0x13d2e8;return''+NpointAPI[_0x2e91f8(0x152)]+NpointAPI[_0x2e91f8(0x17c)](_0x2be344);}constructor(_0x3845a6){const _0x1abd16=_0x13d2e8;this[_0x1abd16(0x168)]=NpointAPI[_0x1abd16(0x17c)](_0x3845a6),this[_0x1abd16(0x161)]=NpointAPI['buildEndpointFromCode'](this[_0x1abd16(0x168)]);}async[_0x13d2e8(0x143)](_0x40b9d6={}){const _0x5cc46f=_0x13d2e8,_0x39fed4=await fetch(this['baseUrl'],{'cache':_0x5cc46f(0xd6),..._0x40b9d6,'headers':{'Accept':'application/json',..._0x40b9d6[_0x5cc46f(0x17e)]||{}}}),_0x9414f4=await _0x39fed4[_0x5cc46f(0x121)]();if(!_0x39fed4['ok'])throw new Error(('Npoint\x20API\x20Error:\x20'+_0x39fed4[_0x5cc46f(0x11f)]+'\x20'+_0x39fed4['statusText'])[_0x5cc46f(0x171)]());if(_0x9414f4[_0x5cc46f(0x171)]()==='')return null;try{return JSON[_0x5cc46f(0x176)](_0x9414f4);}catch(_0x1da5d7){throw new Error('Npoint\x20API\x20повернув\x20невалідний\x20JSON.');}}async[_0x13d2e8(0x150)](){const _0x4b2db7=_0x13d2e8;return await this[_0x4b2db7(0x143)]();}async[_0x13d2e8(0xfc)](_0x434b15){const _0x110d2c=_0x13d2e8;return await this[_0x110d2c(0x143)]({'method':_0x110d2c(0x129),'headers':{'Content-Type':_0x110d2c(0x17d)},'body':JSON[_0x110d2c(0xfb)](_0x434b15)});}}class CookieAuthStore{static ['COOKIE_NAME']=_0x13d2e8(0x14d);static [_0x13d2e8(0xf8)]=0x3c*0x3c*0x18*0x16d;static[_0x13d2e8(0x162)](_0x5f13ff){const _0x469e65=_0x13d2e8,_0x5c76e3=encodeURIComponent(_0x5f13ff)+'=',_0x1934ae=document[_0x469e65(0x137)]?document['cookie'][_0x469e65(0x154)](';'):[];for(const _0x1255fb of _0x1934ae){const _0xc180ca=_0x1255fb[_0x469e65(0x171)]();if(_0xc180ca[_0x469e65(0xf0)](_0x5c76e3))return decodeURIComponent(_0xc180ca['slice'](_0x5c76e3[_0x469e65(0x114)]));}return null;}static[_0x13d2e8(0x127)](){const _0x11a8e0=_0x13d2e8,_0x15532d=CookieAuthStore[_0x11a8e0(0x162)](CookieAuthStore[_0x11a8e0(0x153)]);if(!_0x15532d)return null;try{return NpointAPI[_0x11a8e0(0x17c)](_0x15532d);}catch(_0x141538){return CookieAuthStore[_0x11a8e0(0x165)](),null;}}static['setAccessCode'](_0x2b4fe6){const _0x502624=_0x13d2e8,_0x4509a9=NpointAPI[_0x502624(0x17c)](_0x2b4fe6),_0x11b47c=window[_0x502624(0x145)]['protocol']===_0x502624(0x157)?_0x502624(0x15a):'';document['cookie']=encodeURIComponent(CookieAuthStore[_0x502624(0x153)])+'='+encodeURIComponent(_0x4509a9)+';\x20Max-Age='+CookieAuthStore[_0x502624(0xf8)]+_0x502624(0x123)+_0x11b47c;const _0x4830d3=CookieAuthStore[_0x502624(0x127)]();if(_0x4830d3!==_0x4509a9)throw new Error(_0x502624(0x10a));return _0x4509a9;}static[_0x13d2e8(0x165)](){const _0x142a7a=_0x13d2e8;document[_0x142a7a(0x137)]=encodeURIComponent(CookieAuthStore[_0x142a7a(0x153)])+_0x142a7a(0x12d);}}class AppController{constructor(){const _0x55f8d2=_0x13d2e8;this[_0x55f8d2(0x15f)]=null,this[_0x55f8d2(0x134)]={'items':[]},this[_0x55f8d2(0x159)]=['1m','3m','5m','15m',_0x55f8d2(0xe8),'1h','2h','4h','6h','8h',_0x55f8d2(0xd5),'1d','3d','1w','1M'],this[_0x55f8d2(0x12e)]='HEARTBEAT',this[_0x55f8d2(0x115)]();const _0x333e96=this[_0x55f8d2(0x12f)]();_0x333e96&&this[_0x55f8d2(0x16c)]();}[_0x13d2e8(0xd7)](_0x11426b,_0x56fd2a=![]){const _0x2c1bd1=_0x13d2e8,_0x37bced=document['getElementById'](_0x2c1bd1(0x177));_0x37bced[_0x2c1bd1(0x10b)]=_0x11426b,_0x37bced[_0x2c1bd1(0x10d)]=_0x56fd2a?_0x2c1bd1(0x13e):_0x2c1bd1(0x12a),setTimeout(()=>_0x37bced[_0x2c1bd1(0x10d)]='',0xbb8);}['toggleLoader'](_0x44ae3e){const _0x421ef0=_0x13d2e8;document[_0x421ef0(0x146)](_0x421ef0(0x111))['style'][_0x421ef0(0x17a)]=_0x44ae3e?'block':'none';const _0x859212=document[_0x421ef0(0x10f)](_0x421ef0(0x16e));_0x859212[_0x421ef0(0x138)](_0x911528=>_0x911528[_0x421ef0(0x100)]=_0x44ae3e);}[_0x13d2e8(0x115)](){const _0x5bacce=_0x13d2e8,_0x259a63=this[_0x5bacce(0x159)][_0x5bacce(0xdc)](_0x30c00e=>'<option\x20value=\x22'+_0x30c00e+'\x22>'+_0x30c00e+_0x5bacce(0x188))[_0x5bacce(0x103)]('');document['getElementById']('timeframeInput')[_0x5bacce(0x167)]=_0x259a63,document[_0x5bacce(0x146)](_0x5bacce(0x179))['innerHTML']=_0x259a63,document['getElementById']('authForm')[_0x5bacce(0x13c)]('submit',_0x5968dd=>{const _0x3a8c13=_0x5bacce;_0x5968dd[_0x3a8c13(0x13a)](),this['handleAuth']();}),document[_0x5bacce(0x146)](_0x5bacce(0x163))[_0x5bacce(0x13c)](_0x5bacce(0xed),()=>this['updateEndpointPreview']()),document[_0x5bacce(0x146)](_0x5bacce(0x12c))[_0x5bacce(0x13c)](_0x5bacce(0x187),()=>this[_0x5bacce(0x102)]()),document['getElementById'](_0x5bacce(0x140))[_0x5bacce(0x13c)](_0x5bacce(0xef),_0x28ec34=>this[_0x5bacce(0x101)](_0x28ec34)),document[_0x5bacce(0x146)]('refreshBtn')['addEventListener'](_0x5bacce(0x187),()=>this[_0x5bacce(0x13f)]()),document[_0x5bacce(0x146)](_0x5bacce(0x174))[_0x5bacce(0x13c)]('click',()=>this[_0x5bacce(0xd4)]());}['updateEndpointPreview'](_0x477c9c=document[_0x13d2e8(0x146)]('npointCodeInput')[_0x13d2e8(0x158)]){const _0x26c6ed=_0x13d2e8,_0x27a121=document[_0x26c6ed(0x146)]('endpointPreview'),_0x460b3b=String(_0x477c9c||'')['trim']();if(!_0x460b3b){_0x27a121[_0x26c6ed(0x10b)]='Endpoint\x20буде\x20сформовано\x20автоматично\x20після\x20введення\x20коду.';return;}try{_0x27a121['textContent']=_0x26c6ed(0xfe)+NpointAPI[_0x26c6ed(0x118)](_0x460b3b);}catch(_0x1ded41){_0x27a121['textContent']=_0x1ded41[_0x26c6ed(0x122)];}}['checkExistingAuth'](){const _0x4d5669=_0x13d2e8,_0x2621e9=CookieAuthStore[_0x4d5669(0x127)](),_0x37b2b6=document['getElementById'](_0x4d5669(0x163)),_0xc42ab9=document[_0x4d5669(0x146)](_0x4d5669(0x12c)),_0x15cadc=document[_0x4d5669(0x146)](_0x4d5669(0x112));if(_0x2621e9)return _0x37b2b6['value']='',_0x37b2b6[_0x4d5669(0x169)]=_0x4d5669(0xf1),_0x15cadc['textContent']=_0x4d5669(0x170),_0xc42ab9[_0x4d5669(0x156)]['remove'](_0x4d5669(0x15b)),this[_0x4d5669(0x13d)](_0x2621e9),!![];return _0x37b2b6[_0x4d5669(0x158)]='',_0x37b2b6[_0x4d5669(0x169)]=_0x4d5669(0x108),_0x15cadc[_0x4d5669(0x10b)]=_0x4d5669(0xfa),_0xc42ab9[_0x4d5669(0x156)][_0x4d5669(0x130)](_0x4d5669(0x15b)),document[_0x4d5669(0x146)](_0x4d5669(0x135))[_0x4d5669(0x156)][_0x4d5669(0x130)]('hidden'),this[_0x4d5669(0x13d)](''),![];}['resolveAccessCodeForAuth'](){const _0x13adb2=_0x13d2e8,_0x58e794=document['getElementById']('npointCodeInput')[_0x13adb2(0x158)][_0x13adb2(0x171)]();if(_0x58e794)return NpointAPI[_0x13adb2(0x17c)](_0x58e794);const _0xe9d54e=CookieAuthStore['getAccessCode']();if(_0xe9d54e)return _0xe9d54e;throw new Error('Введіть\x20код\x20npoint\x20для\x20підключення.');}async[_0x13d2e8(0x16c)](){const _0x41115e=_0x13d2e8;this[_0x41115e(0x139)](!![]);try{const _0x433ac6=this[_0x41115e(0x189)]();this[_0x41115e(0x15f)]=new NpointAPI(_0x433ac6),await this['loadData'](),CookieAuthStore[_0x41115e(0x14e)](_0x433ac6),document[_0x41115e(0x146)](_0x41115e(0x163))['value']='',this['checkExistingAuth'](),document[_0x41115e(0x146)](_0x41115e(0x135))[_0x41115e(0x156)][_0x41115e(0x173)](_0x41115e(0x15b)),this[_0x41115e(0xd7)](_0x41115e(0x166));}catch(_0x232f1a){this['api']=null,document['getElementById']('mainSection')[_0x41115e(0x156)]['add'](_0x41115e(0x15b)),this[_0x41115e(0xd7)](_0x232f1a[_0x41115e(0x122)],!![]);}finally{this[_0x41115e(0x139)](![]);}}[_0x13d2e8(0x102)](){const _0x568a6d=_0x13d2e8;CookieAuthStore['clearAccessCode'](),this['api']=null,this[_0x568a6d(0x134)]=this[_0x568a6d(0x14a)](),this[_0x568a6d(0x12f)](),this['showNotification'](_0x568a6d(0xe0));}['escapeHtml'](_0x427379){const _0x50f609=_0x13d2e8;return String(_0x427379??'')[_0x50f609(0x184)](/&/g,_0x50f609(0x14b))['replace'](/</g,_0x50f609(0xe9))[_0x50f609(0x184)](/>/g,_0x50f609(0xe3))[_0x50f609(0x184)](/"/g,_0x50f609(0x136))['replace'](/'/g,'&#039;');}[_0x13d2e8(0xec)](_0x477dd7){const _0x5b5603=_0x13d2e8,_0x50bf18={'BB':!![],'SM':!![],'V':!![],'HM':![]};if(typeof _0x477dd7!==_0x5b5603(0xdf)||_0x477dd7['trim']()==='')return this[_0x5b5603(0x107)](_0x50bf18['BB'],_0x50bf18['SM'],_0x50bf18['V'],_0x50bf18['HM']);const _0x380c14=_0x477dd7[_0x5b5603(0x104)]()['replace'](/\s+/g,''),_0x1ee314={..._0x50bf18};return['BB','SM','V','HM'][_0x5b5603(0x138)](_0xf31de3=>{const _0x131ed2=_0x5b5603,_0x256570=_0x380c14[_0x131ed2(0x15c)](new RegExp(_0xf31de3+_0x131ed2(0x141)));_0x256570&&(_0x1ee314[_0xf31de3]=_0x256570[0x1]==='+');}),this[_0x5b5603(0x107)](_0x1ee314['BB'],_0x1ee314['SM'],_0x1ee314['V'],_0x1ee314['HM']);}[_0x13d2e8(0x10e)](_0x1a079d){const _0x1eb38b=_0x13d2e8;if(!Array[_0x1eb38b(0x124)](_0x1a079d))return{'items':[],'changed':!![]};const _0xccd54a=[],_0x23a8e6=new Set();let _0x58e474=![];for(let _0x1fc866=_0x1a079d[_0x1eb38b(0x114)]-0x1;_0x1fc866>=0x0;_0x1fc866--){const _0x27cc1e=_0x1a079d[_0x1fc866];if(!_0x27cc1e||typeof _0x27cc1e!=='object'){_0x58e474=!![];continue;}const _0x3cf6d5=String(_0x27cc1e['coin']??'')[_0x1eb38b(0x171)]()[_0x1eb38b(0x104)](),_0x2b0627=String(_0x27cc1e['timeframe']??'')['trim'](),_0x2ac662=String(_0x27cc1e[_0x1eb38b(0xea)]??_0x1eb38b(0x17f))[_0x1eb38b(0x171)]()[_0x1eb38b(0x128)]()||_0x1eb38b(0x17f);if(!_0x3cf6d5||!_0x2b0627){_0x58e474=!![];continue;}const _0x4c9571=_0x3cf6d5+'-'+_0x2ac662;if(_0x23a8e6[_0x1eb38b(0xeb)](_0x4c9571)){_0x58e474=!![];continue;}_0x23a8e6[_0x1eb38b(0x130)](_0x4c9571);const _0x47572c=this[_0x1eb38b(0xec)](_0x27cc1e['indicator']),_0x4dc6f9={..._0x27cc1e,'coin':_0x3cf6d5,'timeframe':_0x2b0627,'market':_0x2ac662,'indicator':_0x47572c};(_0x27cc1e[_0x1eb38b(0xda)]!==_0x4dc6f9[_0x1eb38b(0xda)]||_0x27cc1e[_0x1eb38b(0xdb)]!==_0x4dc6f9['timeframe']||_0x27cc1e['market']!==_0x4dc6f9[_0x1eb38b(0xea)]||_0x27cc1e['indicator']!==_0x4dc6f9[_0x1eb38b(0x18a)])&&(_0x58e474=!![]),_0xccd54a[_0x1eb38b(0xee)](_0x4dc6f9);}return{'items':_0xccd54a,'changed':_0x58e474};}[_0x13d2e8(0x14a)](){return{'items':[]};}[_0x13d2e8(0x116)](_0x10ecac){const _0x17ab1b=_0x13d2e8;return Object[_0x17ab1b(0x186)][_0x17ab1b(0x147)][_0x17ab1b(0x119)](_0x10ecac)===_0x17ab1b(0x113);}['isBaseServicePayload'](_0x4eef24){const _0x36c3fd=_0x13d2e8;if(_0x4eef24===null)return!![];if(Array['isArray'](_0x4eef24))return _0x4eef24['length']===0x0;if(this[_0x36c3fd(0x116)](_0x4eef24))return Object[_0x36c3fd(0x10c)](_0x4eef24)['length']===0x0;return![];}[_0x13d2e8(0xd8)](_0xf46177){const _0x13a8de=_0x13d2e8;if(this[_0x13a8de(0xf7)](_0xf46177))return{'basket':this[_0x13a8de(0x14a)](),'shouldPersist':!![],'message':_0x13a8de(0xd9)};if(!this[_0x13a8de(0x116)](_0xf46177))throw new Error(_0x13a8de(0x11e));if(!Object[_0x13a8de(0x186)][_0x13a8de(0x16d)][_0x13a8de(0x119)](_0xf46177,'items'))throw new Error(_0x13a8de(0x11b));if(!Array[_0x13a8de(0x124)](_0xf46177[_0x13a8de(0x144)]))throw new Error(_0x13a8de(0x11a));return{'basket':{..._0xf46177},'shouldPersist':![],'message':_0x13a8de(0x126)};}async[_0x13d2e8(0x13f)](){const _0x3181ef=_0x13d2e8;this['toggleLoader'](!![]);try{if(!this[_0x3181ef(0x15f)])throw new Error('Спочатку\x20підключіться\x20до\x20npoint\x20API.');const _0x5caa34=await this['api'][_0x3181ef(0x150)](),_0x23b5ef=this[_0x3181ef(0xd8)](_0x5caa34);this['currentBasket']=_0x23b5ef[_0x3181ef(0x117)];const _0x12c1c7=this['normalizeBasketItems'](this[_0x3181ef(0x134)][_0x3181ef(0x144)]);this[_0x3181ef(0x134)][_0x3181ef(0x144)]=_0x12c1c7['items'];if(_0x23b5ef[_0x3181ef(0x151)]||_0x12c1c7[_0x3181ef(0x142)]){if(!this[_0x3181ef(0x15f)])throw new Error(_0x3181ef(0xf9));await this[_0x3181ef(0x15f)][_0x3181ef(0xfc)](this[_0x3181ef(0x134)]),_0x23b5ef[_0x3181ef(0x151)]?this[_0x3181ef(0xd7)](_0x23b5ef[_0x3181ef(0x122)]):this[_0x3181ef(0xd7)]('Дані\x20оновлено\x20та\x20мігровано\x20на\x20формат\x20з\x20HM');}else this[_0x3181ef(0xd7)](_0x23b5ef[_0x3181ef(0x122)]);this[_0x3181ef(0x155)]();}catch(_0x116d13){this[_0x3181ef(0xd7)](_0x116d13[_0x3181ef(0x122)]||_0x3181ef(0xf4),!![]);}finally{this[_0x3181ef(0x139)](![]);}}[_0x13d2e8(0x107)](_0x274c6b,_0x36a2b8,_0x3bdbd5,_0x28c07a){return'BB'+(_0x274c6b?'+':'-')+'SM'+(_0x36a2b8?'+':'-')+'V'+(_0x3bdbd5?'+':'-')+'HM'+(_0x28c07a?'+':'-');}['renderData'](){const _0x7e74a5=_0x13d2e8,_0x4d843f=document[_0x7e74a5(0x132)](_0x7e74a5(0x16b));_0x4d843f[_0x7e74a5(0x167)]='';let _0x352fb9=![];this[_0x7e74a5(0x134)][_0x7e74a5(0x144)][_0x7e74a5(0x138)]((_0x3c3afb,_0x3d072a)=>{const _0x73981c=_0x7e74a5;if(_0x3c3afb['coin']===this['HEARTBEAT_COIN']){_0x352fb9=!![],document[_0x73981c(0x146)](_0x73981c(0x125))['value']=_0x73981c(0xe2),document[_0x73981c(0x146)]('hbTimeframe')['value']=_0x3c3afb[_0x73981c(0xdb)];return;}const _0x34000c=this[_0x73981c(0x185)](_0x3c3afb[_0x73981c(0xda)]),_0x3851e6=this['escapeHtml'](_0x3c3afb['timeframe']),_0x52a38e=this['escapeHtml'](_0x3c3afb[_0x73981c(0xea)]),_0x3625de=this[_0x73981c(0x185)](_0x3c3afb[_0x73981c(0x18a)]),_0x4d4c2e=_0x3c3afb[_0x73981c(0xea)]===_0x73981c(0x183)?_0x73981c(0x175):'#bb86fc',_0x2c68fa=document[_0x73981c(0x105)]('tr');_0x2c68fa[_0x73981c(0x167)]=_0x73981c(0x14c)+_0x34000c+_0x73981c(0xd3)+_0x3851e6+_0x73981c(0xf3)+_0x4d4c2e+_0x73981c(0xff)+_0x52a38e+'</span></td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td><span\x20style=\x22font-family:\x20monospace;\x20letter-spacing:\x201px;\x22>'+_0x3625de+_0x73981c(0x106)+_0x3d072a+_0x73981c(0x110),_0x4d843f['appendChild'](_0x2c68fa);}),!_0x352fb9&&(document[_0x7e74a5(0x146)](_0x7e74a5(0x125))['value']=_0x7e74a5(0x100));}async[_0x13d2e8(0x101)](_0x49aaed){const _0x3b3e7f=_0x13d2e8;_0x49aaed[_0x3b3e7f(0x13a)]();const _0x32ba1c=document['getElementById'](_0x3b3e7f(0x164))[_0x3b3e7f(0x158)][_0x3b3e7f(0x171)]()[_0x3b3e7f(0x104)]();if(_0x32ba1c===this[_0x3b3e7f(0x12e)])return this[_0x3b3e7f(0xd7)](_0x3b3e7f(0x17b),!![]);const _0x10c3fc=document['getElementById'](_0x3b3e7f(0x14f))[_0x3b3e7f(0x158)],_0x243825=document['getElementById'](_0x3b3e7f(0xdd))[_0x3b3e7f(0x158)],_0x5cf3b6=document['getElementById'](_0x3b3e7f(0x18b))['checked'],_0x3feca8=document['getElementById'](_0x3b3e7f(0x15e))[_0x3b3e7f(0xe5)],_0x1d1cbb=document['getElementById'](_0x3b3e7f(0x16a))['checked'],_0x5e55b5=document['getElementById'](_0x3b3e7f(0x120))[_0x3b3e7f(0xe5)],_0x15b5bf=this[_0x3b3e7f(0x107)](_0x5cf3b6,_0x3feca8,_0x1d1cbb,_0x5e55b5),_0x10d32f={'coin':_0x32ba1c,'timeframe':_0x10c3fc,'market':_0x243825,'indicator':_0x15b5bf},_0x51c574=this['currentBasket']['items'][_0x3b3e7f(0xd2)](_0x34ef46=>_0x34ef46['coin']===_0x32ba1c&&_0x34ef46['market']===_0x243825);_0x51c574!==-0x1?this['currentBasket'][_0x3b3e7f(0x144)][_0x51c574]=_0x10d32f:this['currentBasket']['items'][_0x3b3e7f(0x11d)](_0x10d32f),await this[_0x3b3e7f(0xe7)](_0x3b3e7f(0xe4)),document[_0x3b3e7f(0x146)]('addTokenForm')[_0x3b3e7f(0x160)](),document[_0x3b3e7f(0x146)]('indSM')[_0x3b3e7f(0xe5)]=!![],document[_0x3b3e7f(0x146)](_0x3b3e7f(0x120))['checked']=![];}async[_0x13d2e8(0xfd)](_0x4412e6){const _0x1e9dc3=_0x13d2e8;if(!confirm(_0x1e9dc3(0xf6)))return;this[_0x1e9dc3(0x134)]['items']['splice'](_0x4412e6,0x1),await this[_0x1e9dc3(0xe7)]('Токен\x20видалено');}async[_0x13d2e8(0xd4)](){const _0x38ee06=_0x13d2e8,_0x159fe0=document[_0x38ee06(0x146)](_0x38ee06(0x125))[_0x38ee06(0x158)],_0x3de3d7=document[_0x38ee06(0x146)](_0x38ee06(0x179))[_0x38ee06(0x158)];this[_0x38ee06(0x134)]['items']=this[_0x38ee06(0x134)][_0x38ee06(0x144)][_0x38ee06(0x131)](_0x7aced=>_0x7aced[_0x38ee06(0xda)]!==this[_0x38ee06(0x12e)]),_0x159fe0===_0x38ee06(0xe2)&&this[_0x38ee06(0x134)]['items'][_0x38ee06(0x11d)]({'coin':this[_0x38ee06(0x12e)],'timeframe':_0x3de3d7,'market':_0x38ee06(0x17f),'indicator':'BB+SM+V+HM-'}),await this[_0x38ee06(0xe7)](_0x38ee06(0x11c));}async[_0x13d2e8(0xe7)](_0x225b8c){const _0x45a827=_0x13d2e8;this[_0x45a827(0x139)](!![]);try{(!this['currentBasket']||typeof this[_0x45a827(0x134)]!==_0x45a827(0x148)||Array[_0x45a827(0x124)](this['currentBasket']))&&(this[_0x45a827(0x134)]={'items':[]});const _0x16208a=this[_0x45a827(0x10e)](this['currentBasket'][_0x45a827(0x144)]);this[_0x45a827(0x134)][_0x45a827(0x144)]=_0x16208a[_0x45a827(0x144)];const _0x10050e=this[_0x45a827(0x134)]['items'][_0x45a827(0x131)](_0x466319=>_0x466319['coin']!==this[_0x45a827(0x12e)]),_0x1cfc2b=this[_0x45a827(0x134)][_0x45a827(0x144)][_0x45a827(0x131)](_0x499aa9=>_0x499aa9[_0x45a827(0xda)]===this[_0x45a827(0x12e)]);this['currentBasket'][_0x45a827(0x144)]=[..._0x10050e,..._0x1cfc2b];if(!this[_0x45a827(0x15f)])throw new Error(_0x45a827(0xf9));await this['api'][_0x45a827(0xfc)](this[_0x45a827(0x134)]),this[_0x45a827(0x155)](),this[_0x45a827(0xd7)](_0x225b8c);}catch(_0x545485){this[_0x45a827(0xd7)](_0x45a827(0x12b),!![]),await this[_0x45a827(0x13f)]();}finally{this[_0x45a827(0x139)](![]);}}}const app=new AppController();
+</script>
+
+</body>
+</html>
