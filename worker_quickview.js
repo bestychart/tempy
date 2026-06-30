@@ -1,4 +1,4 @@
-// [QuickView Worker] v16.1 (Parametric Indicators + VWAP + Incremental + Validation)
+// [QuickView Worker] v19 (Parametric Indicators + VWAP + Incremental + Validation + Bitstamp)
 
 // === CONFIGURATION ===
 const NEW_COIN_PERIOD_MS = 8 * 7 * 24 * 60 * 60 * 1000; 
@@ -12,10 +12,11 @@ const ENDPOINTS = {
     FUTURES_INFO: "https://fapi.binance.com/fapi/v1/exchangeInfo",
     FUTURES_KLINES: "https://fapi.binance.com/fapi/v1/klines",
     SPOT_INFO: "https://api.binance.com/api/v3/exchangeInfo",
-    SPOT_KLINES: "https://api.binance.com/api/v3/klines"
+    SPOT_KLINES: "https://api.binance.com/api/v3/klines",
+    BITSTAMP_KLINES: "https://www.bitstamp.net/api/v2/ohlc"
 };
 
-let marketLists = { ALPHA: [], FUTURES: [], SPOT: [] };
+let marketLists = { ALPHA: [], FUTURES: [], SPOT: [], BITSTAMP: [] };
 
 // Динамічна структура для активних завдань (ініціалізується при INIT з chartCount)
 let activeSubs = {}; 
@@ -77,6 +78,24 @@ const fetchWithTimeout = async (url, options = {}, timeout = 8000) => {
     }
 };
 
+function mapTimeframeToBitstampStep(timeframe) {
+    const mapping = {
+        '1m': 60,
+        '3m': 180,
+        '5m': 300,
+        '15m': 900,
+        '30m': 1800,
+        '1h': 3600,
+        '2h': 7200,
+        '4h': 14400,
+        '6h': 21600,
+        '12h': 43200,
+        '1d': 86400,
+        '3d': 259200
+    };
+    return mapping[timeframe] || 60;
+}
+
 const getKlinesUrl = (market, symbol, timeframe, limit, alphaId = null, startTime = null, endTime = null) => {
     let url;
     if (market === 'ALPHA') {
@@ -84,11 +103,27 @@ const getKlinesUrl = (market, symbol, timeframe, limit, alphaId = null, startTim
         url = `${ENDPOINTS.ALPHA_KLINES}?symbol=${reqSym}&interval=${timeframe}&limit=${limit}`;
     } else if (market === 'SPOT') {
         url = `${ENDPOINTS.SPOT_KLINES}?symbol=${symbol}&interval=${timeframe}&limit=${limit}`;
-    } else {
+    } else if (market === 'FUTURES') {
         url = `${ENDPOINTS.FUTURES_KLINES}?symbol=${symbol}&interval=${timeframe}&limit=${limit}`;
+    } else if (market === 'BITSTAMP') {
+        const step = mapTimeframeToBitstampStep(timeframe);
+        url = `${ENDPOINTS.BITSTAMP_KLINES}/${symbol.toLowerCase()}/?step=${step}&limit=${limit}`;
     }
-    if (startTime) url += `&startTime=${startTime}`;
-    if (endTime) url += `&endTime=${endTime}`;
+    
+    if (startTime) {
+        if (market === 'BITSTAMP') {
+            url += `&start=${Math.floor(startTime / 1000)}`;
+        } else {
+            url += `&startTime=${startTime}`;
+        }
+    }
+    if (endTime) {
+        if (market === 'BITSTAMP') {
+            url += `&end=${Math.floor(endTime / 1000)}`;
+        } else {
+            url += `&endTime=${endTime}`;
+        }
+    }
     return url;
 };
 
@@ -284,7 +319,27 @@ function calculateIndicators(candles) {
     return candles; // Повертаємо той самий мутований масив
 }
 
-function mapCandleData(raw) {
+function mapCandleData(raw, market = 'SPOT') {
+    if (market === 'BITSTAMP') {
+        if (!raw || !Array.isArray(raw.ohlc)) return [];
+        const ohlc = raw.ohlc;
+        const result = [];
+        for (let i = 0; i < ohlc.length; i++) {
+            const d = ohlc[i];
+            const time = parseInt(d.timestamp);
+            const open = parseFloat(d.open);
+            const high = parseFloat(d.high);
+            const low = parseFloat(d.low);
+            const close = parseFloat(d.close);
+            const volume = parseFloat(d.volume);
+            if (!isFinite(time) || !isFinite(open) || !isFinite(high) || !isFinite(low) || !isFinite(close) || !isFinite(volume)) continue;
+            if (time <= 0 || open <= 0 || high <= 0 || low <= 0 || close <= 0) continue;
+            result.push({ time, open, high, low, close, volume });
+        }
+        result.sort((a, b) => a.time - b.time);
+        return result;
+    }
+
     if (!Array.isArray(raw)) return [];
     const result = [];
     for (let i = 0; i < raw.length; i++) {
@@ -359,14 +414,16 @@ async function fetchAllMarkets() {
     try {
         const now = Date.now();
 
-        // === Паралельне завантаження всіх трьох ринків ===
-        const [alphaResult, futuresResult, spotResult] = await Promise.allSettled([
+        // === Паралельне завантаження всіх ринків ===
+        const [alphaResult, futuresResult, spotResult, bitstampResult] = await Promise.allSettled([
             // ALPHA
             fetchWithTimeout(ENDPOINTS.ALPHA_LIST, {}, 12000).then(r => r.json()),
             // FUTURES
             fetchWithTimeout(ENDPOINTS.FUTURES_INFO, {}, 12000).then(r => r.json()),
             // SPOT
-            fetchWithTimeout(ENDPOINTS.SPOT_INFO, {}, 12000).then(r => r.json())
+            fetchWithTimeout(ENDPOINTS.SPOT_INFO, {}, 12000).then(r => r.json()),
+            // BITSTAMP
+            fetchWithTimeout("https://www.bitstamp.net/api/v2/markets/", {}, 12000).then(r => r.json())
         ]);
 
         // --- ALPHA ---
@@ -422,8 +479,28 @@ async function fetchAllMarkets() {
             console.error('Failed to load SPOT market:', spotResult.reason);
         }
 
+        // --- BITSTAMP ---
+        if (bitstampResult.status === 'fulfilled') {
+            const bitstampData = bitstampResult.value || [];
+            marketLists.BITSTAMP = bitstampData
+                .filter(m => m.trading === 'Enabled' && m.counter_currency === 'USDT')
+                .map(m => ({
+                    symbol: m.market_symbol,
+                    dispName: m.base_currency,
+                    alphaId: null,
+                    listingDate: 0,
+                    precision: m.counter_decimals,
+                    isNew: false,
+                    isMid: false,
+                    group: 2
+                }))
+                .sort((a, b) => a.dispName.localeCompare(b.dispName));
+        } else {
+            console.error('Failed to load BITSTAMP market:', bitstampResult.reason);
+        }
+
         // Вважаємо завантаженим, якщо хоча б один ринок завантажився
-        const anyLoaded = marketLists.ALPHA.length > 0 || marketLists.FUTURES.length > 0 || marketLists.SPOT.length > 0;
+        const anyLoaded = marketLists.ALPHA.length > 0 || marketLists.FUTURES.length > 0 || marketLists.SPOT.length > 0 || marketLists.BITSTAMP.length > 0;
         if (anyLoaded) {
             areMarketsLoaded = true;
             self.postMessage({ type: 'COINS_LISTS', data: marketLists });
@@ -449,6 +526,11 @@ async function fetchCandles(chartId, market, symbol, timeframe) {
     
     if (!coin) {
         self.postMessage({ type: 'DATA_ERROR', chartId, symbol, reason: 'Symbol not found' });
+        return;
+    }
+
+    if (market === 'BITSTAMP' && !['1m', '3m', '5m', '15m', '30m', '1h', '2h', '4h', '6h', '12h', '1d', '3d'].includes(timeframe)) {
+        self.postMessage({ type: 'DATA_ERROR', chartId, symbol, reason: `Bitstamp does not support ${timeframe} timeframe` });
         return;
     }
 
@@ -480,7 +562,7 @@ async function fetchCandles(chartId, market, symbol, timeframe) {
         if (activeSubs[chartId].symbol !== symbol) return;
 
         const raw = (res.data || res); 
-        const data = mapCandleData(raw);
+        const data = mapCandleData(raw, market);
 
         if (data.length === 0) {
             if(activeSubs[chartId].symbol === symbol) activeSubs[chartId].isLoading = false; 
@@ -559,7 +641,7 @@ async function runRealtimeLoop() {
                     // Короткий таймаут для ріалтайму
                     const res = await fetchWithTimeout(url, {}, 3000).then(r => r.json());
                     const raw = (res.data || res);
-                    const newCandles = mapCandleData(raw);
+                    const newCandles = mapCandleData(raw, req.market);
 
                     if (newCandles.length > 0) {
                         req.chartIds.forEach(id => {
@@ -686,6 +768,11 @@ async function fetchHistoryWindow(chartId, market, symbol, timeframe, startTimeM
         return;
     }
 
+    if (market === 'BITSTAMP' && !['1m', '3m', '5m', '15m', '30m', '1h', '2h', '4h', '6h', '12h', '1d', '3d'].includes(timeframe)) {
+        self.postMessage({ type: 'DATA_ERROR', chartId, symbol, reason: `Bitstamp does not support ${timeframe} timeframe` });
+        return;
+    }
+
     // Перевірка лістингу: якщо startTime < listingDate — обрізаємо
     const listingMs = coin.listingDate || 0;
     let effectiveStart = startTimeMs;
@@ -711,7 +798,7 @@ async function fetchHistoryWindow(chartId, market, symbol, timeframe, startTimeM
         if (!activeSubs[chartId] || activeSubs[chartId].symbol !== symbol) return;
 
         const raw = (res.data || res);
-        const data = mapCandleData(raw);
+        const data = mapCandleData(raw, market);
 
         if (data.length === 0) {
             self.postMessage({ type: 'HISTORY_WINDOW_DATA', chartId, data: [], symbol, market, precision: coin.precision });
