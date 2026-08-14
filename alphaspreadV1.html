@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="color-scheme" content="light">
-    <title>Alpha Spread & Volume Monitor V170</title>
+    <title>Alpha Spread & Volume Monitor V170a</title>
     <script src="lightweight-charts.standalone.production.js"></script>
     <style>
         :root {
@@ -1756,10 +1756,10 @@
 
             <button class="icon-btn" id="refresh-btn" title="Перезавантажити список і потоки" aria-label="Refresh">⟳</button>
             <button class="icon-btn" id="pause-btn" title="Пауза / відновити WebSocket" aria-label="Pause">Ⅱ</button>
+            <button class="icon-btn" id="chart-invert-btn" type="button" title="Інвертувати шкалу цін" aria-label="Інвертувати шкалу цін">🔃</button>
             <div class="toolbar-popup-wrapper" id="chart-toolbar-wrapper">
                 <button class="icon-btn" id="chart-toolbar-toggle-btn" type="button" title="Панель графіків" aria-label="Панель графіків" aria-expanded="false">⋮</button>
                 <div class="toolbar-popup-menu" id="chart-toolbar-menu" role="menu" aria-label="Панель інструментів графіка">
-                    <button class="icon-btn" id="chart-invert-btn" type="button" title="Інвертувати шкалу цін" aria-label="Інвертувати шкалу цін">🔃</button>
                     <button class="icon-btn" id="chart-live-btn" type="button" title="До останньої свічки" aria-label="До останньої свічки">→</button>
                     <button class="icon-btn active" id="chart-auto-follow-btn" type="button" title="Автоперехід до нової свічки: увімкнено" aria-label="Автоперехід до нової свічки: увімкнено" aria-pressed="true">⇥</button>
                     <button class="icon-btn" id="chart-fit-btn" type="button" title="Підігнати видимий діапазон" aria-label="Підігнати видимий діапазон">⌖</button>
@@ -1768,9 +1768,9 @@
                     <button class="icon-btn" id="alertModeBtn" type="button" title="Режим розміщення сповіщень (Alt+A)" aria-label="Режим розміщення сповіщень">⏱️</button>
                     <button class="icon-btn" id="clear-coin-alerts-btn" type="button" title="Видалити алерти вибраної монети" aria-label="Видалити алерти вибраної монети">🧹</button>
                     <button class="icon-btn" id="clear-all-alerts-btn" type="button" title="Видалити взагалі всі алерти" aria-label="Видалити взагалі всі алерти">🔥</button>
+                    <button class="icon-btn" id="settings-btn" title="Налаштування" aria-label="Налаштування">⚙</button>
                 </div>
             </div>
-            <button class="icon-btn" id="settings-btn" title="Налаштування" aria-label="Налаштування">⚙</button>
         </div>
 
         <div class="status-pill connecting" id="status-pill" aria-live="polite">
